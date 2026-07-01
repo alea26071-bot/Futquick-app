@@ -14,7 +14,199 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pelada_likes: {
+        Row: {
+          created_at: string
+          pelada_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pelada_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pelada_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_likes_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pelada_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          pelada_id: string
+          responded_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          pelada_id: string
+          responded_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          pelada_id?: string
+          responded_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_requests_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      peladas: {
+        Row: {
+          address: string
+          auto_approve: boolean
+          city: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          field_type: string
+          filled_slots: number
+          id: string
+          latitude: number
+          level: string
+          likes_count: number
+          location_name: string
+          longitude: number
+          name: string
+          organizer_id: string
+          photo_url: string | null
+          price_cents: number
+          starts_at: string
+          status: string
+          total_slots: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          auto_approve?: boolean
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          field_type: string
+          filled_slots?: number
+          id?: string
+          latitude: number
+          level: string
+          likes_count?: number
+          location_name: string
+          longitude: number
+          name: string
+          organizer_id: string
+          photo_url?: string | null
+          price_cents?: number
+          starts_at: string
+          status?: string
+          total_slots: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          auto_approve?: boolean
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          field_type?: string
+          filled_slots?: number
+          id?: string
+          latitude?: number
+          level?: string
+          likes_count?: number
+          location_name?: string
+          longitude?: number
+          name?: string
+          organizer_id?: string
+          photo_url?: string | null
+          price_cents?: number
+          starts_at?: string
+          status?: string
+          total_slots?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          created_at: string
+          favorite_position: string | null
+          id: string
+          name: string
+          onboarding_complete: boolean
+          peladas_played: number
+          phone: string | null
+          phone_verified: boolean
+          postura_score: number
+          rating_avg: number
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          favorite_position?: string | null
+          id: string
+          name?: string
+          onboarding_complete?: boolean
+          peladas_played?: number
+          phone?: string | null
+          phone_verified?: boolean
+          postura_score?: number
+          rating_avg?: number
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          favorite_position?: string | null
+          id?: string
+          name?: string
+          onboarding_complete?: boolean
+          peladas_played?: number
+          phone?: string | null
+          phone_verified?: boolean
+          postura_score?: number
+          rating_avg?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
