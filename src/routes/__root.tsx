@@ -87,8 +87,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Futquick" },
       { name: "twitter:description", content: "Pelada Já connects amateur soccer players and organizers to create and find pickup games." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4dd8dbe2-c1f3-48c5-a29a-ec1171c3f5f6/id-preview-52185c9b--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1782867400479.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4dd8dbe2-c1f3-48c5-a29a-ec1171c3f5f6/id-preview-52185c9b--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1782867400479.png" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/93dfbda7-93de-4ae0-8dae-ecef97607955/id-preview-e70422ef--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1782868498307.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/93dfbda7-93de-4ae0-8dae-ecef97607955/id-preview-e70422ef--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1782868498307.png" },
     ],
     links: [
       {
