@@ -40,6 +40,44 @@ export type Database = {
           },
         ]
       }
+      pelada_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          pelada_id: string
+          rated_id: string
+          rater_id: string
+          score: number
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          pelada_id: string
+          rated_id: string
+          rater_id: string
+          score: number
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          pelada_id?: string
+          rated_id?: string
+          rater_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_ratings_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pelada_requests: {
         Row: {
           created_at: string
@@ -169,6 +207,7 @@ export type Database = {
           phone_verified: boolean
           postura_score: number
           rating_avg: number
+          theme_preference: string
           updated_at: string
         }
         Insert: {
@@ -186,6 +225,7 @@ export type Database = {
           phone_verified?: boolean
           postura_score?: number
           rating_avg?: number
+          theme_preference?: string
           updated_at?: string
         }
         Update: {
@@ -203,6 +243,7 @@ export type Database = {
           phone_verified?: boolean
           postura_score?: number
           rating_avg?: number
+          theme_preference?: string
           updated_at?: string
         }
         Relationships: []
