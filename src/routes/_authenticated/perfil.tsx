@@ -1,10 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { toast } from "sonner";
-import { LogOut, Edit3, Check } from "lucide-react";
+import { LogOut, Edit3, Check, Camera, Sun, Moon } from "lucide-react";
+import { uploadUserPhoto } from "@/lib/storage-helpers";
+import { useTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
@@ -17,7 +19,10 @@ function PerfilPage() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { theme, toggle } = useTheme();
   const [editing, setEditing] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user.id],
@@ -71,6 +76,21 @@ function PerfilPage() {
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
   };
 
+  const onPickAvatar = async (file: File) => {
+    setUploadingAvatar(true);
+    try {
+      const url = await uploadUserPhoto("avatars", user.id, file, "avatar");
+      const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+      if (error) throw error;
+      toast.success("Foto atualizada");
+      qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao enviar foto");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
@@ -85,6 +105,13 @@ function PerfilPage() {
       <div className="relative pt-12 px-6 pb-6 bg-gradient-to-b from-navy-soft to-navy">
         <div className="flex justify-end gap-2 mb-6">
           <button
+            onClick={toggle}
+            aria-label="Alternar tema"
+            className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
+          >
+            {theme === "dark" ? <Sun className="size-4 text-cyan" /> : <Moon className="size-4 text-cyan" />}
+          </button>
+          <button
             onClick={() => (editing ? save() : setEditing(true))}
             className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
           >
@@ -96,7 +123,11 @@ function PerfilPage() {
         </div>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="size-20 rounded-full bg-cyan/20 border-2 border-cyan/40 grid place-items-center overflow-hidden">
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="relative size-20 rounded-full bg-cyan/20 border-2 border-cyan/40 grid place-items-center overflow-hidden group"
+            aria-label="Trocar foto de perfil"
+          >
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -104,7 +135,26 @@ function PerfilPage() {
                 {(profile?.name || user.email || "?")[0]?.toUpperCase()}
               </span>
             )}
-          </div>
+            <div className="absolute inset-0 bg-navy/50 opacity-0 group-hover:opacity-100 grid place-items-center transition-opacity">
+              <Camera className="size-5 text-white" />
+            </div>
+            {uploadingAvatar && (
+              <div className="absolute inset-0 bg-navy/70 grid place-items-center">
+                <div className="size-5 rounded-full border-2 border-cyan border-t-transparent animate-spin" />
+              </div>
+            )}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onPickAvatar(f);
+              e.currentTarget.value = "";
+            }}
+          />
           <div className="flex-1 min-w-0">
             {editing ? (
               <input
