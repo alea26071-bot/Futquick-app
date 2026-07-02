@@ -225,6 +225,50 @@ function CriarPage() {
                 className="w-full p-3 bg-navy-soft rounded-2xl border border-white/10 text-white placeholder:text-white/30 focus:border-cyan outline-none resize-none"
               />
             </div>
+
+            <div className="space-y-2">
+              <label className="text-mono-label">Foto da pelada (opcional)</label>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickCover(f);
+                  e.currentTarget.value = "";
+                }}
+              />
+              {coverUrl ? (
+                <div className="relative rounded-2xl overflow-hidden border border-cyan/30">
+                  <img src={coverUrl} alt="Capa" className="w-full h-40 object-cover" />
+                  <button
+                    onClick={() => setCoverUrl(null)}
+                    className="absolute top-2 right-2 size-9 rounded-full bg-navy/80 grid place-items-center"
+                    aria-label="Remover foto"
+                  >
+                    <Trash2 className="size-4 text-white" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="w-full py-4 bg-navy-soft text-white rounded-2xl font-bold border border-dashed border-white/20 flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
+                >
+                  {uploadingCover ? (
+                    <span className="size-4 rounded-full border-2 border-cyan border-t-transparent animate-spin" />
+                  ) : (
+                    <Camera className="size-5 text-cyan" />
+                  )}
+                  {uploadingCover ? "Enviando..." : "Enviar foto"}
+                </button>
+              )}
+              <p className="text-[11px] text-white/40 flex items-center gap-1.5">
+                <Sparkles className="size-3 text-cyan" />
+                Se não enviar, geramos uma imagem por IA para você.
+              </p>
+            </div>
           </div>
         )}
 
