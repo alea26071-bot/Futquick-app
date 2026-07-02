@@ -69,11 +69,14 @@ function CriarPage() {
       let finalPhoto = coverUrl;
       if (!finalPhoto) {
         try {
-          finalPhoto = await generatePeladaImage({
-            name: name.trim(),
-            fieldType,
-            location: location.name,
+          const res = await generatePeladaImage({
+            data: {
+              peladaName: name.trim(),
+              fieldType,
+              city: location.city ?? null,
+            },
           });
+          finalPhoto = res.url;
         } catch (e) {
           console.warn("AI image failed", e);
         }
