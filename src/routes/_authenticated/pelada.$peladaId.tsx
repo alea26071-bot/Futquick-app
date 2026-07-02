@@ -6,6 +6,7 @@ import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/l
 import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { PostMatchRating } from "@/components/PostMatchRating";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
@@ -239,6 +240,19 @@ function PeladaDetailPage() {
             <p className="text-sm text-white/80">{pelada.description}</p>
           </div>
         )}
+
+        <PostMatchRating
+          peladaId={pelada.id}
+          organizerId={pelada.organizer_id}
+          userId={user.id}
+          isOrganizer={isOrganizer}
+          hasFinished={
+            pelada.status === "finished" ||
+            new Date(pelada.starts_at).getTime() + (pelada.duration_minutes ?? 90) * 60_000 < Date.now()
+          }
+          wasAccepted={myRequest?.status === "accepted"}
+        />
+
 
         <div>
           <p className="text-mono-label mb-3">Localização</p>
