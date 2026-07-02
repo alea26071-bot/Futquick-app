@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
-import { X, MapPin, Minus, Plus } from "lucide-react";
+import { uploadUserPhoto } from "@/lib/storage-helpers";
+import { generatePeladaImage } from "@/lib/pelada-image.functions";
+import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/criar")({
   ssr: false,
@@ -41,14 +43,44 @@ function CriarPage() {
   const [totalSlots, setTotalSlots] = useState(12);
   const [price, setPrice] = useState("");
   const [autoApprove, setAutoApprove] = useState(true);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const canNext1 = name.trim().length >= 3 && location !== null;
   const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;
+
+  const pickCover = async (file: File) => {
+    setUploadingCover(true);
+    try {
+      const url = await uploadUserPhoto("peladas", user.id, file, "cover");
+      setCoverUrl(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao enviar imagem");
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   const submit = async () => {
     if (!location) return;
     setSaving(true);
     try {
+      let finalPhoto = coverUrl;
+      if (!finalPhoto) {
+        try {
+          const res = await generatePeladaImage({
+            data: {
+              peladaName: name.trim(),
+              fieldType,
+              city: location.city ?? null,
+            },
+          });
+          finalPhoto = res.url;
+        } catch (e) {
+          console.warn("AI image failed", e);
+        }
+      }
       const startsAt = new Date(`${date}T${time}:00`);
       const priceCents = price ? Math.round(parseFloat(price.replace(",", ".")) * 100) : 0;
       const { data, error } = await supabase
@@ -68,6 +100,7 @@ function CriarPage() {
           price_cents: priceCents,
           field_type: fieldType,
           level,
+          photo_url: finalPhoto,
           auto_approve: autoApprove,
           status: "open",
         })
@@ -191,6 +224,50 @@ function CriarPage() {
                 rows={3}
                 className="w-full p-3 bg-navy-soft rounded-2xl border border-white/10 text-white placeholder:text-white/30 focus:border-cyan outline-none resize-none"
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-mono-label">Foto da pelada (opcional)</label>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickCover(f);
+                  e.currentTarget.value = "";
+                }}
+              />
+              {coverUrl ? (
+                <div className="relative rounded-2xl overflow-hidden border border-cyan/30">
+                  <img src={coverUrl} alt="Capa" className="w-full h-40 object-cover" />
+                  <button
+                    onClick={() => setCoverUrl(null)}
+                    className="absolute top-2 right-2 size-9 rounded-full bg-navy/80 grid place-items-center"
+                    aria-label="Remover foto"
+                  >
+                    <Trash2 className="size-4 text-white" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="w-full py-4 bg-navy-soft text-white rounded-2xl font-bold border border-dashed border-white/20 flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
+                >
+                  {uploadingCover ? (
+                    <span className="size-4 rounded-full border-2 border-cyan border-t-transparent animate-spin" />
+                  ) : (
+                    <Camera className="size-5 text-cyan" />
+                  )}
+                  {uploadingCover ? "Enviando..." : "Enviar foto"}
+                </button>
+              )}
+              <p className="text-[11px] text-white/40 flex items-center gap-1.5">
+                <Sparkles className="size-3 text-cyan" />
+                Se não enviar, geramos uma imagem por IA para você.
+              </p>
             </div>
           </div>
         )}

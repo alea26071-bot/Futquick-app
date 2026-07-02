@@ -7,6 +7,7 @@
 /*
  * FUTQUICK — design system
  * Navy escuro + cyan elétrico + brancos crisp. Mobile-first.
+ * Suporte a tema claro (padrão) e escuro via classe .light / .dark no <html>.
  */
 
 @theme inline {
@@ -42,7 +43,6 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  /* Brand tokens */
   --color-navy: var(--navy);
   --color-navy-soft: var(--navy-soft);
   --color-cyan: var(--cyan);
@@ -61,10 +61,10 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root {
+/* --- Dark theme (previously default) --- */
+:root, html.dark {
   --radius: 1rem;
 
-  /* Deep navy background, white/near-white foreground, electric cyan primary */
   --navy: oklch(0.18 0.06 260);
   --navy-soft: oklch(0.24 0.06 260);
   --cyan: oklch(0.75 0.18 220);
@@ -78,22 +78,17 @@
 
   --card: oklch(0.22 0.06 260);
   --card-foreground: oklch(0.98 0.01 240);
-
   --popover: oklch(0.22 0.06 260);
   --popover-foreground: oklch(0.98 0.01 240);
 
   --primary: oklch(0.75 0.18 220);
   --primary-foreground: oklch(0.15 0.06 260);
-
   --secondary: oklch(0.28 0.05 260);
   --secondary-foreground: oklch(0.98 0.01 240);
-
   --muted: oklch(0.26 0.04 260);
   --muted-foreground: oklch(0.72 0.02 240);
-
   --accent: oklch(0.75 0.18 220);
   --accent-foreground: oklch(0.15 0.06 260);
-
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0.01 240);
 
@@ -109,12 +104,66 @@
   --sidebar-accent-foreground: oklch(0.98 0.01 240);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.75 0.18 220);
+
+  /* Painting tokens used by light-mode overrides below */
+  --paint-bg: 15 23 42;         /* navy solid (used only in light overrides) */
+  --paint-surface: 30 41 59;    /* navy-soft */
+  --paint-fg: 255 255 255;      /* text-white replacement */
+  --paint-border: 255 255 255;  /* border-white replacement */
+}
+
+/* --- Light theme --- */
+html.light {
+  --radius: 1rem;
+
+  --navy: oklch(0.985 0.005 240);      /* app background */
+  --navy-soft: oklch(1 0 0);            /* surfaces (cards) */
+  --cyan: oklch(0.62 0.19 240);         /* electric blue, still primary */
+  --cyan-soft: oklch(0.95 0.03 240);
+  --sky: oklch(0.98 0.01 240);
+  --success: oklch(0.62 0.17 155);
+  --warning: oklch(0.7 0.17 60);
+
+  --background: oklch(0.985 0.005 240);
+  --foreground: oklch(0.18 0.06 260);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.06 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.06 260);
+
+  --primary: oklch(0.62 0.19 240);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.94 0.01 240);
+  --secondary-foreground: oklch(0.18 0.06 260);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.45 0.03 260);
+  --accent: oklch(0.62 0.19 240);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.18 0.06 260 / 12%);
+  --input: oklch(0.18 0.06 260 / 8%);
+  --ring: oklch(0.62 0.19 240);
+
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.18 0.06 260);
+  --sidebar-primary: oklch(0.62 0.19 240);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0.01 240);
+  --sidebar-accent-foreground: oklch(0.18 0.06 260);
+  --sidebar-border: oklch(0.18 0.06 260 / 10%);
+  --sidebar-ring: oklch(0.62 0.19 240);
+
+  --paint-bg: 245 247 250;      /* light app bg */
+  --paint-surface: 255 255 255; /* cards */
+  --paint-fg: 15 23 42;         /* deep navy text */
+  --paint-border: 15 23 42;     /* borders in light */
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
+  * { border-color: var(--color-border); }
   html, body, #root {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -162,3 +211,57 @@
 
 .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-pulse-ring { animation: pulseRing 2s infinite ease-in-out; }
+
+/* ---------------------------------------------------------------
+ * Light-mode overrides for legacy hardcoded utility classes.
+ * Instead of rewriting every text-white / bg-navy across the app,
+ * we remap those raw Tailwind utilities to theme-aware paint tokens
+ * only when the .light class is present on <html>.
+ * ---------------------------------------------------------------*/
+html.light .bg-navy { background-color: rgb(var(--paint-bg)) !important; }
+html.light .bg-navy\/60 { background-color: rgb(var(--paint-bg) / 0.6) !important; }
+html.light .bg-navy\/80 { background-color: rgb(var(--paint-bg) / 0.8) !important; }
+html.light .bg-navy\/90 { background-color: rgb(var(--paint-bg) / 0.9) !important; }
+html.light .bg-navy\/95 { background-color: rgb(var(--paint-bg) / 0.95) !important; }
+
+html.light .bg-navy-soft { background-color: rgb(var(--paint-surface)) !important; box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05); }
+html.light .bg-navy-soft\/40 { background-color: rgb(var(--paint-surface) / 0.6) !important; }
+html.light .bg-navy-soft\/50 { background-color: rgb(var(--paint-surface) / 0.7) !important; }
+html.light .bg-navy-soft\/60 { background-color: rgb(var(--paint-surface) / 0.8) !important; }
+html.light .bg-navy-soft\/90 { background-color: rgb(var(--paint-surface) / 0.95) !important; }
+
+html.light .text-white { color: rgb(var(--paint-fg)) !important; }
+html.light .text-white\/40 { color: rgb(var(--paint-fg) / 0.5) !important; }
+html.light .text-white\/50 { color: rgb(var(--paint-fg) / 0.55) !important; }
+html.light .text-white\/60 { color: rgb(var(--paint-fg) / 0.65) !important; }
+html.light .text-white\/70 { color: rgb(var(--paint-fg) / 0.72) !important; }
+html.light .text-white\/80 { color: rgb(var(--paint-fg) / 0.82) !important; }
+html.light .placeholder\:text-white\/20::placeholder { color: rgb(var(--paint-fg) / 0.35) !important; }
+html.light .placeholder\:text-white\/30::placeholder { color: rgb(var(--paint-fg) / 0.4) !important; }
+
+html.light .border-white\/5 { border-color: rgb(var(--paint-border) / 0.08) !important; }
+html.light .border-white\/10 { border-color: rgb(var(--paint-border) / 0.12) !important; }
+html.light .border-white\/20 { border-color: rgb(var(--paint-border) / 0.2) !important; }
+html.light .border-white\/30 { border-color: rgb(var(--paint-border) / 0.3) !important; }
+
+/* Divider hairlines */
+html.light .bg-white\/10 { background-color: rgb(var(--paint-border) / 0.1) !important; }
+html.light .bg-white\/20 { background-color: rgb(var(--paint-border) / 0.2) !important; }
+
+/* Focus outlines / cyan surfaces already themed via --cyan var */
+html.light .bg-cyan\/10 { background-color: rgb(59 130 246 / 0.10) !important; }
+html.light .bg-cyan\/20 { background-color: rgb(59 130 246 / 0.15) !important; }
+html.light .text-cyan { color: rgb(37 99 235) !important; }
+html.light .border-cyan\/20 { border-color: rgb(37 99 235 / 0.3) !important; }
+html.light .border-cyan\/30 { border-color: rgb(37 99 235 / 0.35) !important; }
+html.light .border-cyan\/40 { border-color: rgb(37 99 235 / 0.45) !important; }
+html.light .bg-cyan { background-color: rgb(37 99 235) !important; }
+html.light .text-navy { color: rgb(255 255 255) !important; }
+html.light .fill-cyan { fill: rgb(37 99 235) !important; }
+
+/* From-gradient anchors used in hero images */
+html.light .from-cyan\/40 { --tw-gradient-from: rgb(37 99 235 / 0.35) var(--tw-gradient-from-position); }
+html.light .from-cyan\/30 { --tw-gradient-from: rgb(37 99 235 / 0.25) var(--tw-gradient-from-position); }
+html.light .via-navy-soft { --tw-gradient-via: rgb(var(--paint-surface)) var(--tw-gradient-via-position); }
+html.light .to-navy { --tw-gradient-to: rgb(var(--paint-bg)) var(--tw-gradient-to-position); }
+html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(--tw-gradient-from-position); }

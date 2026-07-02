@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Zap } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
@@ -53,12 +53,13 @@ function OnboardingPage() {
   return (
     <div className="min-h-screen bg-navy flex flex-col">
       <header className="pt-12 px-6 pb-6">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="size-9 rounded-xl bg-cyan grid place-items-center">
-            <Zap className="size-4 text-navy" strokeWidth={3} />
-          </div>
-          <span className="font-display font-extrabold italic text-lg text-white">FUTQUICK</span>
+        <div className="flex flex-col items-center gap-2 mb-4">
+          <Logo className="size-12 rounded-2xl" />
+          <span className="font-display font-extrabold italic text-lg text-white">Futquick</span>
         </div>
+        <p className="text-center text-white/60 text-xs mb-4">
+          Rápido e fácil · leva menos de 1 minuto
+        </p>
         <div className="flex gap-1.5">
           {[1, 2, 3].map((s) => (
             <div key={s} className={`h-1.5 flex-1 rounded-full ${step >= s ? "bg-cyan" : "bg-white/10"}`} />

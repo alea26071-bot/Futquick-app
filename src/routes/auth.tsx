@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import { Zap } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -77,17 +77,15 @@ function AuthPage() {
           <div className="absolute bottom-40 -right-20 size-80 bg-cyan/50 rounded-full blur-3xl" />
         </div>
         <div className="relative">
-          <div className="inline-flex items-center gap-2 mb-6">
-            <div className="size-10 rounded-2xl bg-cyan grid place-items-center">
-              <Zap className="size-5 text-navy" strokeWidth={3} />
-            </div>
-            <span className="font-display font-extrabold italic text-2xl tracking-tighter">FUTQUICK</span>
+          <div className="flex flex-col items-center text-center gap-3 mb-6">
+            <Logo className="size-16 rounded-2xl shadow-lg shadow-cyan/20" />
+            <span className="font-display font-extrabold italic text-2xl tracking-tight text-white">Futquick</span>
           </div>
-          <h1 className="font-display font-extrabold italic uppercase text-5xl leading-[0.95] text-white text-balance">
+          <h1 className="font-display font-extrabold italic uppercase text-5xl leading-[0.95] text-white text-balance text-center">
             Encontre sua<br />
             <span className="text-cyan">próxima pelada.</span>
           </h1>
-          <p className="mt-4 text-white/60 text-base max-w-sm">
+          <p className="mt-4 text-white/60 text-base max-w-sm mx-auto text-center">
             O jeito mais rápido do Brasil para completar um time ou entrar num racha perto de você.
           </p>
         </div>
