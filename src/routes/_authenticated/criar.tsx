@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
-import { X, MapPin, Minus, Plus } from "lucide-react";
+import { uploadUserPhoto } from "@/lib/storage-helpers";
+import { generatePeladaImage } from "@/lib/pelada-image.functions";
+import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/criar")({
   ssr: false,
@@ -41,9 +43,24 @@ function CriarPage() {
   const [totalSlots, setTotalSlots] = useState(12);
   const [price, setPrice] = useState("");
   const [autoApprove, setAutoApprove] = useState(true);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const canNext1 = name.trim().length >= 3 && location !== null;
   const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;
+
+  const pickCover = async (file: File) => {
+    setUploadingCover(true);
+    try {
+      const url = await uploadUserPhoto("peladas", user.id, file, "cover");
+      setCoverUrl(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao enviar imagem");
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   const submit = async () => {
     if (!location) return;
