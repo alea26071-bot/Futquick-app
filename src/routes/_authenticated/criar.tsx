@@ -66,6 +66,18 @@ function CriarPage() {
     if (!location) return;
     setSaving(true);
     try {
+      let finalPhoto = coverUrl;
+      if (!finalPhoto) {
+        try {
+          finalPhoto = await generatePeladaImage({
+            name: name.trim(),
+            fieldType,
+            location: location.name,
+          });
+        } catch (e) {
+          console.warn("AI image failed", e);
+        }
+      }
       const startsAt = new Date(`${date}T${time}:00`);
       const priceCents = price ? Math.round(parseFloat(price.replace(",", ".")) * 100) : 0;
       const { data, error } = await supabase
@@ -85,6 +97,7 @@ function CriarPage() {
           price_cents: priceCents,
           field_type: fieldType,
           level,
+          photo_url: finalPhoto,
           auto_approve: autoApprove,
           status: "open",
         })
