@@ -42,7 +42,7 @@ export function PostMatchRating({ peladaId, organizerId, userId, isOrganizer, ha
           pelada_id: peladaId,
           rater_id: userId,
           rated_id: organizerId,
-          stars: rating,
+          score: rating,
           comment: comment.trim() || null,
         },
         { onConflict: "pelada_id,rater_id,rated_id" },
@@ -66,7 +66,7 @@ export function PostMatchRating({ peladaId, organizerId, userId, isOrganizer, ha
           {[1, 2, 3, 4, 5].map((n) => (
             <Star
               key={n}
-              className={`size-5 ${n <= existing.stars ? "fill-cyan text-cyan" : "text-white/20"}`}
+              className={`size-5 ${n <= existing.score ? "fill-cyan text-cyan" : "text-white/20"}`}
             />
           ))}
         </div>
