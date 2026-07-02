@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { PeladaCard, type PeladaCardData } from "@/components/PeladaCard";
 import { haversineKm } from "@/lib/pelada-utils";
 import { Zap, Bell } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
   ssr: false,
@@ -93,28 +94,34 @@ function DescobrirPage() {
   return (
     <div className="min-h-screen bg-navy pb-28">
       <header className="pt-12 px-5 pb-4 sticky top-0 bg-navy/95 backdrop-blur-md z-30">
-        <div className="flex justify-between items-center mb-6">
+        <div className="relative flex items-center justify-center mb-6 h-10">
+          <button
+            aria-label="Notificações"
+            className="absolute left-0 size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
+          >
+            <Bell className="size-4 text-white/70" />
+            <span className="absolute top-2 right-2 size-2 bg-cyan rounded-full" />
+          </button>
+
           <div className="flex items-center gap-2">
-            <div className="size-9 rounded-xl bg-cyan grid place-items-center">
-              <Zap className="size-4 text-navy" strokeWidth={3} />
-            </div>
-            <h1 className="text-2xl font-display font-extrabold italic tracking-tighter text-white">FUTQUICK</h1>
+            <Logo className="size-9 rounded-xl" />
+            <h1 className="text-2xl font-display font-extrabold italic tracking-tight text-white">
+              Futquick
+            </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center relative">
-              <Bell className="size-4 text-white/70" />
-              <span className="absolute top-2 right-2 size-2 bg-cyan rounded-full" />
-            </button>
-            <Link to="/perfil" className="size-10 rounded-full bg-cyan/10 border border-cyan/20 grid place-items-center overflow-hidden">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="Você" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-cyan font-bold text-sm">
-                  {(profile?.name || user.email || "?")[0]?.toUpperCase()}
-                </span>
-              )}
-            </Link>
-          </div>
+
+          <Link
+            to="/perfil"
+            className="absolute right-0 size-10 rounded-full bg-cyan/10 border border-cyan/20 grid place-items-center overflow-hidden"
+          >
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Você" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-cyan font-bold text-sm">
+                {(profile?.name || user.email || "?")[0]?.toUpperCase()}
+              </span>
+            )}
+          </Link>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
