@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
@@ -7,10 +7,18 @@ import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2 } from "lucide-react";
 
+type CriarSearch = { lat?: number; lng?: number; address?: string };
+
 export const Route = createFileRoute("/_authenticated/criar")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): CriarSearch => ({
+    lat: typeof s.lat === "number" ? s.lat : s.lat ? Number(s.lat) : undefined,
+    lng: typeof s.lng === "number" ? s.lng : s.lng ? Number(s.lng) : undefined,
+    address: typeof s.address === "string" ? s.address : undefined,
+  }),
   component: CriarPage,
 });
+
 
 const FIELD_TYPES = [
   { id: "society", label: "Society" },
