@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
@@ -7,10 +7,18 @@ import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2 } from "lucide-react";
 
+type CriarSearch = { lat?: number; lng?: number; address?: string };
+
 export const Route = createFileRoute("/_authenticated/criar")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): CriarSearch => ({
+    lat: typeof s.lat === "number" ? s.lat : s.lat ? Number(s.lat) : undefined,
+    lng: typeof s.lng === "number" ? s.lng : s.lng ? Number(s.lng) : undefined,
+    address: typeof s.address === "string" ? s.address : undefined,
+  }),
   component: CriarPage,
 });
+
 
 const FIELD_TYPES = [
   { id: "society", label: "Society" },
@@ -26,6 +34,7 @@ const LEVELS = [
 
 function CriarPage() {
   const { user } = Route.useRouteContext();
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
@@ -46,6 +55,20 @@ function CriarPage() {
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
+
+  // Prefill from mapa long-press
+  useEffect(() => {
+    if (search.lat && search.lng && !location) {
+      setLocation({
+        name: search.address?.split(",")[0] ?? "Local selecionado",
+        address: search.address ?? `${search.lat.toFixed(5)}, ${search.lng.toFixed(5)}`,
+        city: null,
+        lat: search.lat,
+        lng: search.lng,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.lat, search.lng]);
 
   const canNext1 = name.trim().length >= 3 && location !== null;
   const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;

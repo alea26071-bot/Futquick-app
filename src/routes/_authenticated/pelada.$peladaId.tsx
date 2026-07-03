@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
@@ -141,6 +141,36 @@ function PeladaDetailPage() {
     }
   };
 
+  const openChatWithOrganizer = async () => {
+    if (isOrganizer) return;
+    // Find or create thread
+    const { data: existing } = await supabase
+      .from("chat_threads")
+      .select("id")
+      .eq("pelada_id", pelada.id)
+      .eq("organizer_id", pelada.organizer_id)
+      .eq("player_id", user.id)
+      .maybeSingle();
+    let threadId = existing?.id;
+    if (!threadId) {
+      const { data, error } = await supabase
+        .from("chat_threads")
+        .insert({
+          pelada_id: pelada.id,
+          organizer_id: pelada.organizer_id,
+          player_id: user.id,
+        })
+        .select("id")
+        .single();
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      threadId = data.id;
+    }
+    navigate({ to: "/chat/$threadId", params: { threadId } });
+  };
+
   return (
     <div className="min-h-screen bg-navy pb-32">
       <div className="relative h-72">
@@ -252,6 +282,18 @@ function PeladaDetailPage() {
           }
           wasAccepted={myRequest?.status === "accepted"}
         />
+
+        {!isOrganizer && (
+          <button
+            onClick={openChatWithOrganizer}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-navy-soft border border-cyan/30 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
+          >
+            <MessageCircle className="size-5" />
+            Falar com organizador
+          </button>
+        )}
+
+
 
 
         <div>
