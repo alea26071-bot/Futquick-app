@@ -283,6 +283,18 @@ function PeladaDetailPage() {
           wasAccepted={myRequest?.status === "accepted"}
         />
 
+        {!isOrganizer && (
+          <button
+            onClick={openChatWithOrganizer}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-navy-soft border border-cyan/30 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
+          >
+            <MessageCircle className="size-5" />
+            Falar com organizador
+          </button>
+        )}
+
+
+
 
         <div>
           <p className="text-mono-label mb-3">Localização</p>
