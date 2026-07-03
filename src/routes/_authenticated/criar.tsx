@@ -56,6 +56,20 @@ function CriarPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
+  // Prefill from mapa long-press
+  useEffect(() => {
+    if (search.lat && search.lng && !location) {
+      setLocation({
+        name: search.address?.split(",")[0] ?? "Local selecionado",
+        address: search.address ?? `${search.lat.toFixed(5)}, ${search.lng.toFixed(5)}`,
+        city: null,
+        lat: search.lat,
+        lng: search.lng,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.lat, search.lng]);
+
   const canNext1 = name.trim().length >= 3 && location !== null;
   const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;
 
