@@ -141,6 +141,36 @@ function PeladaDetailPage() {
     }
   };
 
+  const openChatWithOrganizer = async () => {
+    if (isOrganizer) return;
+    // Find or create thread
+    const { data: existing } = await supabase
+      .from("chat_threads")
+      .select("id")
+      .eq("pelada_id", pelada.id)
+      .eq("organizer_id", pelada.organizer_id)
+      .eq("player_id", user.id)
+      .maybeSingle();
+    let threadId = existing?.id;
+    if (!threadId) {
+      const { data, error } = await supabase
+        .from("chat_threads")
+        .insert({
+          pelada_id: pelada.id,
+          organizer_id: pelada.organizer_id,
+          player_id: user.id,
+        })
+        .select("id")
+        .single();
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      threadId = data.id;
+    }
+    navigate({ to: "/chat/$threadId", params: { threadId } });
+  };
+
   return (
     <div className="min-h-screen bg-navy pb-32">
       <div className="relative h-72">
