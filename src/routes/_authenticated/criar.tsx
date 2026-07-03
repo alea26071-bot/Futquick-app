@@ -34,6 +34,7 @@ const LEVELS = [
 
 function CriarPage() {
   const { user } = Route.useRouteContext();
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
