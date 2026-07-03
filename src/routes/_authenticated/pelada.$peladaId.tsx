@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
