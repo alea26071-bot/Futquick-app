@@ -58,15 +58,17 @@ function OnboardingPage() {
   const finish = async () => {
     setSaving(true);
     try {
-      const payload: Record<string, any> = {
-        name: form.name.trim(),
-        age: form.age ? parseInt(form.age, 10) : null,
-        city: form.city.trim() || null,
-        favorite_position: form.favorite_position || null,
-        onboarding_complete: true,
-      };
-      if (avatarUrl) payload.avatar_url = avatarUrl;
-      const { error } = await supabase.from("profiles").update(payload).eq("id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: form.name.trim(),
+          age: form.age ? parseInt(form.age, 10) : null,
+          city: form.city.trim() || null,
+          favorite_position: form.favorite_position || null,
+          onboarding_complete: true,
+          ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+        })
+        .eq("id", user.id);
       if (error) throw error;
       navigate({ to: "/descobrir" });
     } catch (e) {
