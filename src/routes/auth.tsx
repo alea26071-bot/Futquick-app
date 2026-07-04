@@ -1,22 +1,42 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
+import { uploadUserPhoto } from "@/lib/storage-helpers";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  User as UserIcon,
+  Phone,
+  Calendar,
+  MapPin,
+  Image as ImageIcon,
+} from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   component: AuthPage,
 });
 
+const TOTAL_STEPS = 5;
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signup");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    age: "",
+    city: "",
+  });
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -24,37 +44,77 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  const handleEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const canNext =
+    step === 1 ? form.name.trim().length >= 2 :
+    step === 2 ? form.phone.replace(/\D/g, "").length >= 10 :
+    step === 3 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
+    step === 4 ? form.city.trim().length >= 2 :
+    true;
+
+  const pickAvatar = async (file: File) => {
+    // Need a signed-in user to upload; sign in anonymously first if needed.
+    setUploadingAvatar(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { name },
-          },
+      let { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        const { data, error } = await supabase.auth.signInAnonymously({
+          options: { data: { name: form.name.trim() } },
         });
         if (error) throw error;
-        toast.success("Conta criada! Bem-vindo ao Futquick.");
-        navigate({ to: "/onboarding" });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Bora jogar!");
-        navigate({ to: "/descobrir" });
+        userData = { user: data.user };
       }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao autenticar");
+      if (!userData.user) throw new Error("Sessão não iniciada");
+      const url = await uploadUserPhoto("avatars", userData.user.id, file, "avatar");
+      setAvatarUrl(url);
+      toast.success("Foto carregada");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao enviar foto");
     } finally {
-      setLoading(false);
+      setUploadingAvatar(false);
     }
   };
 
+  const finish = async () => {
+    setSaving(true);
+    try {
+      let { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        const { data, error } = await supabase.auth.signInAnonymously({
+          options: { data: { name: form.name.trim() } },
+        });
+        if (error) throw error;
+        userData = { user: data.user };
+      }
+      if (!userData.user) throw new Error("Sessão não iniciada");
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: form.name.trim(),
+          phone: form.phone.trim() || null,
+          age: form.age ? parseInt(form.age, 10) : null,
+          city: form.city.trim() || null,
+          onboarding_complete: true,
+          ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+        })
+        .eq("id", userData.user.id);
+      if (error) throw error;
+      toast.success("Bora jogar!");
+      navigate({ to: "/descobrir" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar perfil");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const next = () => {
+    if (step < TOTAL_STEPS) setStep((s) => s + 1);
+    else finish();
+  };
+
   const handleGoogle = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
@@ -64,117 +124,191 @@ function AuthPage() {
       navigate({ to: "/descobrir" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro no login com Google");
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-navy flex flex-col">
-      {/* Hero */}
-      <div className="flex-1 flex flex-col justify-end px-6 pt-16 pb-8 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 -left-20 size-72 bg-cyan rounded-full blur-3xl" />
-          <div className="absolute bottom-40 -right-20 size-80 bg-cyan/50 rounded-full blur-3xl" />
+      <header className="pt-12 px-6 pb-4">
+        <div className="flex flex-col items-center gap-2 mb-4">
+          <Logo className="size-12 rounded-2xl" />
+          <span className="font-display font-extrabold italic text-lg text-white">Futquick</span>
         </div>
-        <div className="relative">
-          <div className="flex flex-col items-center text-center gap-3 mb-6">
-            <Logo className="size-16 rounded-2xl shadow-lg shadow-cyan/20" />
-            <span className="font-display font-extrabold italic text-2xl tracking-tight text-white">Futquick</span>
-          </div>
-          <h1 className="font-display font-extrabold italic uppercase text-5xl leading-[0.95] text-white text-balance text-center">
-            Encontre sua<br />
-            <span className="text-cyan">próxima pelada.</span>
-          </h1>
-          <p className="mt-4 text-white/60 text-base max-w-sm mx-auto text-center">
-            O jeito mais rápido do Brasil para completar um time ou entrar num racha perto de você.
-          </p>
-        </div>
-      </div>
-
-      {/* Auth form */}
-      <div className="bg-navy-soft rounded-t-3xl px-6 pt-8 pb-10 border-t border-white/5">
-        <div className="flex gap-1 mb-6 p-1 bg-navy rounded-full w-fit">
-          <button
-            type="button"
-            onClick={() => setMode("signup")}
-            className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-              mode === "signup" ? "bg-cyan text-navy" : "text-white/60"
-            }`}
-          >
-            Criar conta
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("signin")}
-            className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-              mode === "signin" ? "bg-cyan text-navy" : "text-white/60"
-            }`}
-          >
-            Entrar
-          </button>
-        </div>
-
-        <form onSubmit={handleEmail} className="space-y-3">
-          {mode === "signup" && (
-            <input
-              type="text"
-              placeholder="Seu nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-4 rounded-2xl bg-navy border border-white/10 text-white placeholder:text-white/30 focus:border-cyan focus:outline-none transition-colors"
-            />
+        <p className="text-center text-white/60 text-xs mb-4">
+          Rápido e fácil · leva menos de 1 minuto
+        </p>
+        <div className="flex items-center gap-3">
+          {step > 1 && (
+            <button
+              onClick={() => setStep((s) => s - 1)}
+              className="size-8 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="size-4 text-white" />
+            </button>
           )}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-4 rounded-2xl bg-navy border border-white/10 text-white placeholder:text-white/30 focus:border-cyan focus:outline-none transition-colors"
-          />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full px-4 py-4 rounded-2xl bg-navy border border-white/10 text-white placeholder:text-white/30 focus:border-cyan focus:outline-none transition-colors"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase tracking-wide text-lg active:scale-95 transition-transform disabled:opacity-50"
-          >
-            {loading ? "..." : mode === "signup" ? "Bora jogar" : "Entrar"}
-          </button>
-        </form>
-
-        <div className="flex items-center gap-3 my-5">
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="text-white/40 text-xs uppercase font-mono">ou</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 flex gap-1.5">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div key={i} className={`h-1.5 flex-1 rounded-full ${step > i ? "bg-cyan" : "bg-white/10"}`} />
+            ))}
+          </div>
+          <span className="text-mono-label text-white/50">{step}/{TOTAL_STEPS}</span>
         </div>
+      </header>
 
+      <main className="flex-1 px-6 pt-6">
+        {step === 1 && (
+          <Step icon={<UserIcon className="size-6 text-cyan" />} title="Como você se chama?" hint="Seu nome será visível para outros jogadores.">
+            <input
+              autoFocus
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Seu nome completo"
+              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+            />
+          </Step>
+        )}
+
+        {step === 2 && (
+          <Step icon={<Phone className="size-6 text-cyan" />} title="Qual seu telefone?" hint="Usado apenas para organizadores entrarem em contato.">
+            <input
+              autoFocus
+              type="tel"
+              inputMode="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="(00) 00000-0000"
+              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+            />
+          </Step>
+        )}
+
+        {step === 3 && (
+          <Step icon={<Calendar className="size-6 text-cyan" />} title="Qual sua idade?" hint="Para organizarmos peladas adequadas ao seu perfil.">
+            <input
+              autoFocus
+              type="number"
+              inputMode="numeric"
+              value={form.age}
+              onChange={(e) => setForm({ ...form, age: e.target.value })}
+              placeholder="Ex: 25"
+              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+            />
+          </Step>
+        )}
+
+        {step === 4 && (
+          <Step icon={<MapPin className="size-6 text-cyan" />} title="Qual sua região?" hint="Encontraremos peladas perto de você.">
+            <input
+              autoFocus
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+              placeholder="Ex: Natal, RN"
+              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+            />
+          </Step>
+        )}
+
+        {step === 5 && (
+          <Step icon={<ImageIcon className="size-6 text-cyan" />} title="Foto de perfil" hint="Adicione uma foto para que outros jogadores te reconheçam.">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) pickAvatar(f);
+                e.currentTarget.value = "";
+              }}
+            />
+            <div className="flex flex-col items-center gap-4 py-6">
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="relative size-40 rounded-full bg-navy-soft border-2 border-cyan/40 grid place-items-center overflow-hidden"
+                aria-label="Escolher foto"
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Sua foto" className="w-full h-full object-cover" />
+                ) : (
+                  <UserIcon className="size-16 text-white/30" strokeWidth={1.5} />
+                )}
+                <div className="absolute bottom-2 right-2 size-11 rounded-full bg-cyan grid place-items-center border-4 border-navy">
+                  {uploadingAvatar ? (
+                    <div className="size-4 rounded-full border-2 border-navy border-t-transparent animate-spin" />
+                  ) : (
+                    <Camera className="size-5 text-navy" strokeWidth={2.5} />
+                  )}
+                </div>
+              </button>
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="text-cyan text-sm font-bold uppercase tracking-wide"
+              >
+                {avatarUrl ? "Trocar foto" : "Escolher foto"}
+              </button>
+              {!avatarUrl && (
+                <p className="text-xs text-white/40 text-center">Você pode adicionar depois no seu perfil.</p>
+              )}
+            </div>
+          </Step>
+        )}
+      </main>
+
+      <footer className="p-6 space-y-3">
         <button
-          onClick={handleGoogle}
-          disabled={loading}
-          className="w-full py-4 bg-white text-navy rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform disabled:opacity-50"
+          disabled={!canNext || saving || uploadingAvatar}
+          onClick={next}
+          className="w-full py-4 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase disabled:opacity-30 active:scale-95 transition-transform flex items-center justify-center gap-2"
         >
-          <svg className="size-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-          </svg>
-          Continuar com Google
+          {saving ? "..." : step === TOTAL_STEPS ? "Bora jogar" : "Continuar"}
+          {!saving && step < TOTAL_STEPS && <ArrowRight className="size-5" strokeWidth={3} />}
         </button>
-
-        <p className="text-center text-xs text-white/40 mt-6">
+        {step === 1 && (
+          <button
+            onClick={handleGoogle}
+            disabled={googleLoading}
+            className="w-full py-3 text-white/60 text-sm underline underline-offset-4 disabled:opacity-50"
+          >
+            Já tenho conta · entrar com Google
+          </button>
+        )}
+        <p className="text-center text-[10px] text-white/30">
           Ao continuar você concorda com nossos termos.
         </p>
+      </footer>
+    </div>
+  );
+}
+
+function Step({
+  icon,
+  title,
+  hint,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="animate-slide-up">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="size-12 rounded-2xl bg-cyan/10 border border-cyan/20 grid place-items-center flex-none">
+          {icon}
+        </div>
+        <h1 className="font-display font-extrabold italic uppercase text-2xl text-white leading-tight">
+          {title}
+        </h1>
       </div>
+      <p className="text-white/60 text-sm mb-6 pl-15" style={{ paddingLeft: "60px" }}>
+        {hint}
+      </p>
+      {children}
     </div>
   );
 }
