@@ -80,24 +80,25 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
             </span>
           </div>
         )}
-        {/* dark gradient at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20" />
+        {/* dark gradient overlays for legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 to-transparent" />
 
         {/* Top tags */}
         <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wide">
+          <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wide drop-shadow-md">
             {FIELD_TYPE_LABEL[pelada.field_type]}
           </span>
-          <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wide">
+          <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wide drop-shadow-md">
             {LEVEL_LABEL[pelada.level]}
           </span>
-          <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${
+          <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide drop-shadow-md ${
             pelada.price_cents === 0 ? "bg-emerald-500 text-white" : "bg-cyan text-navy"
           }`}>
             {formatPrice(pelada.price_cents)}
           </span>
           {pelada.distance_km != null && (
-            <span className="ml-auto px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
+            <span className="ml-auto px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1 drop-shadow-md">
               <MapPin className="size-3" /> {pelada.distance_km.toFixed(1)} km
             </span>
           )}
@@ -105,10 +106,10 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
 
         {/* Title + location bottom-left */}
         <div className="absolute bottom-3 left-4 right-4">
-          <h3 className="font-display text-2xl font-extrabold italic uppercase leading-tight text-white line-clamp-2 drop-shadow-lg">
+          <h3 className="font-display text-2xl font-extrabold italic uppercase leading-tight text-white line-clamp-2 [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
             {pelada.name}
           </h3>
-          <div className="flex items-center gap-1.5 mt-1 text-white/90 text-xs">
+          <div className="flex items-center gap-1.5 mt-1 text-white text-xs drop-shadow-md">
             <MapPin className="size-3.5 flex-none" />
             <span className="truncate">{pelada.location_name}</span>
           </div>
