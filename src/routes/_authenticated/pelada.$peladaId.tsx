@@ -283,7 +283,7 @@ function PeladaDetailPage() {
           wasAccepted={myRequest?.status === "accepted"}
         />
 
-        {!isOrganizer && (
+        {!isOrganizer && myRequest && (myRequest.status === "pending" || myRequest.status === "accepted") && (
           <button
             onClick={openChatWithOrganizer}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-navy-soft border border-cyan/30 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
@@ -291,6 +291,11 @@ function PeladaDetailPage() {
             <MessageCircle className="size-5" />
             Falar com organizador
           </button>
+        )}
+        {!isOrganizer && !myRequest && (
+          <p className="text-center text-xs text-white/40">
+            Solicite uma vaga para conversar com o organizador.
+          </p>
         )}
 
 
