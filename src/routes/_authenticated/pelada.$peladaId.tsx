@@ -350,8 +350,17 @@ function PeladaDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-navy border-t border-white/10 z-40">
         <div className="max-w-[430px] mx-auto">
           {isOrganizer ? (
-            <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/60 rounded-2xl font-display font-extrabold italic uppercase text-center">
-              Você organiza essa pelada
+            <div className="flex gap-2">
+              <div className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/60 rounded-2xl font-display font-extrabold italic uppercase text-center">
+                Você organiza
+              </div>
+              <button
+                onClick={deletePelada}
+                className="px-4 rounded-2xl bg-destructive/10 border border-destructive/40 text-destructive grid place-items-center active:scale-95 transition-transform"
+                aria-label="Apagar pelada"
+              >
+                <Trash2 className="size-5" />
+              </button>
             </div>
           ) : myRequest?.status === "accepted" ? (
             <button
