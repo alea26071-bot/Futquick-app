@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
@@ -139,6 +139,19 @@ function PeladaDetailPage() {
       await navigator.clipboard.writeText(`${text} ${url}`);
       toast.success("Link copiado!");
     }
+  };
+
+  const deletePelada = async () => {
+    if (!isOrganizer) return;
+    if (!window.confirm("Apagar esta pelada? Esta ação não pode ser desfeita.")) return;
+    const { error } = await supabase.from("peladas").delete().eq("id", pelada.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Pelada apagada");
+    qc.invalidateQueries({ queryKey: ["peladas"] });
+    navigate({ to: "/descobrir" });
   };
 
   const openChatWithOrganizer = async () => {
@@ -337,8 +350,17 @@ function PeladaDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-navy border-t border-white/10 z-40">
         <div className="max-w-[430px] mx-auto">
           {isOrganizer ? (
-            <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/60 rounded-2xl font-display font-extrabold italic uppercase text-center">
-              Você organiza essa pelada
+            <div className="flex gap-2">
+              <div className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/60 rounded-2xl font-display font-extrabold italic uppercase text-center">
+                Você organiza
+              </div>
+              <button
+                onClick={deletePelada}
+                className="px-4 rounded-2xl bg-destructive/10 border border-destructive/40 text-destructive grid place-items-center active:scale-95 transition-transform"
+                aria-label="Apagar pelada"
+              >
+                <Trash2 className="size-5" />
+              </button>
             </div>
           ) : myRequest?.status === "accepted" ? (
             <button
