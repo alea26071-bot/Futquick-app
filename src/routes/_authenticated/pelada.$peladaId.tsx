@@ -141,6 +141,19 @@ function PeladaDetailPage() {
     }
   };
 
+  const deletePelada = async () => {
+    if (!isOrganizer) return;
+    if (!window.confirm("Apagar esta pelada? Esta ação não pode ser desfeita.")) return;
+    const { error } = await supabase.from("peladas").delete().eq("id", pelada.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Pelada apagada");
+    qc.invalidateQueries({ queryKey: ["peladas"] });
+    navigate({ to: "/descobrir" });
+  };
+
   const openChatWithOrganizer = async () => {
     if (isOrganizer) return;
     // Find or create thread
