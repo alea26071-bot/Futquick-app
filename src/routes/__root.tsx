@@ -88,6 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Futquick" },
       { name: "twitter:description", content: "Futquick conecta jogadores e organizadores de pelada para criar e completar partidas rapidamente." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/417941e0-6ce6-46a9-b52c-07bfb5f631a0/id-preview-3b6762f8--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1783340417239.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/417941e0-6ce6-46a9-b52c-07bfb5f631a0/id-preview-3b6762f8--51a04721-fe87-4997-8b87-066f643e38b4.lovable.app-1783340417239.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
