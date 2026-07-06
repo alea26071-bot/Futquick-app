@@ -81,8 +81,8 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
           </div>
         )}
         {/* dark gradient overlays for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent" />
 
         {/* Top tags */}
         <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
@@ -106,10 +106,10 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
 
         {/* Title + location bottom-left */}
         <div className="absolute bottom-3 left-4 right-4">
-          <h3 className="font-display text-2xl font-extrabold italic uppercase leading-tight text-white line-clamp-2 [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
+          <h3 className="font-display text-2xl font-extrabold italic uppercase leading-tight text-white line-clamp-2 [text-shadow:_0_2px_10px_rgba(0,0,0,1)]">
             {pelada.name}
           </h3>
-          <div className="flex items-center gap-1.5 mt-1 text-white text-xs drop-shadow-md">
+          <div className="flex items-center gap-1.5 mt-1 text-white text-xs font-semibold [text-shadow:_0_1px_6px_rgba(0,0,0,1)]">
             <MapPin className="size-3.5 flex-none" />
             <span className="truncate">{pelada.location_name}</span>
           </div>
@@ -118,17 +118,17 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
 
       {/* Bottom bar */}
       <div className="flex items-center gap-3 px-4 py-3 bg-navy-soft">
-        <div className="flex items-center gap-1.5 text-white/80 text-sm font-bold">
-          <Calendar className="size-4 text-white/60" />
+        <div className="flex items-center gap-1.5 text-white text-sm font-bold">
+          <Calendar className="size-4 text-white" />
           {formatDayMonth(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-white/80 text-sm font-bold">
-          <Clock className="size-4 text-white/60" />
+        <div className="flex items-center gap-1.5 text-white text-sm font-bold">
+          <Clock className="size-4 text-white" />
           {formatHM(pelada.starts_at)}
         </div>
         <div className="flex items-center gap-1.5 text-sm font-bold">
-          <Users className="size-4 text-white/60" />
-          <span className={isFull ? "text-white/40" : "text-cyan"}>
+          <Users className="size-4 text-white" />
+          <span className={isFull ? "text-white/50" : "text-cyan"}>
             {isFull ? "LOTADA" : `${remaining} ${remaining === 1 ? "vaga" : "vagas"}`}
           </span>
         </div>
