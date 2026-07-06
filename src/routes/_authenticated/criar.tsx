@@ -336,7 +336,7 @@ function CriarPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-mono-label">Total de jogadores</label>
+              <label className="text-mono-label">Quantos jogadores faltam pra pelada?</label>
               <div className="flex items-center justify-between p-4 bg-navy-soft rounded-2xl border border-white/10">
                 <button
                   onClick={() => setTotalSlots((s) => Math.max(2, s - 1))}
@@ -344,7 +344,12 @@ function CriarPage() {
                 >
                   <Minus className="size-5" />
                 </button>
-                <span className="text-4xl font-display font-extrabold text-white">{totalSlots}</span>
+                <div className="text-center">
+                  <span className="block text-4xl font-display font-extrabold text-white leading-none">{Math.max(1, totalSlots - 1)}</span>
+                  <span className="block text-[10px] uppercase tracking-widest text-white/50 mt-1">
+                    {totalSlots - 1 === 1 ? "jogador falta" : "jogadores faltam"}
+                  </span>
+                </div>
                 <button
                   onClick={() => setTotalSlots((s) => Math.min(40, s + 1))}
                   className="size-12 rounded-full bg-cyan text-navy grid place-items-center"
@@ -352,7 +357,7 @@ function CriarPage() {
                   <Plus className="size-5" strokeWidth={3} />
                 </button>
               </div>
-              <p className="text-xs text-white/40">Você já conta como 1 jogador. Faltam {totalSlots - 1}.</p>
+              <p className="text-xs text-white/50">Você já conta como 1 jogador. Total do time: {totalSlots}.</p>
             </div>
 
             <div className="space-y-3">
