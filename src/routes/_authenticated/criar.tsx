@@ -387,6 +387,25 @@ function CriarPage() {
                 <p className="text-xs text-white/50">Jogadores entram sem esperar sua confirmação.</p>
               </div>
             </label>
+
+            <label className="flex items-center gap-3 p-4 bg-navy-soft rounded-2xl border border-cyan/20 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={recurring}
+                onChange={(e) => setRecurring(e.target.checked)}
+                className="size-5 accent-cyan"
+              />
+              <div className="flex-1">
+                <p className="text-white font-bold text-sm flex items-center gap-1.5">
+                  <Pin className="size-3.5 text-cyan" /> Repetir toda semana
+                </p>
+                <p className="text-xs text-white/50">
+                  Fixa a pelada {weekdayLabel ? `toda ${weekdayLabel} · ${time}` : "neste dia e horário"} e cria a próxima
+                  automaticamente.
+                </p>
+              </div>
+            </label>
+
           </div>
         )}
       </main>
