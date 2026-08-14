@@ -2,16 +2,18 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
-import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2 } from "lucide-react";
+import { FIELD_TYPE_LABEL, LEVEL_LABEL, WEEKDAY_LABEL, brTimeString, brWeekday, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
+import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
   component: PeladaDetailPage,
 });
+
 
 function PeladaDetailPage() {
   const { peladaId } = Route.useParams();
@@ -65,6 +67,24 @@ function PeladaDetailPage() {
     },
   });
 
+  const isOrganizerEarly = pelada?.organizer_id === user.id;
+
+  const { data: template } = useQuery({
+    queryKey: ["pelada-template", pelada?.template_id],
+    queryFn: async () => {
+      if (!pelada?.template_id) return null;
+      const { data } = await supabase
+        .from("pelada_templates")
+        .select("*")
+        .eq("id", pelada.template_id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!pelada?.template_id && isOrganizerEarly,
+  });
+
+  const [pinning, setPinning] = useState(false);
+
   if (isLoading || !pelada) {
     return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Carregando...</div>;
   }
@@ -72,6 +92,55 @@ function PeladaDetailPage() {
   const isOrganizer = pelada.organizer_id === user.id;
   const remaining = pelada.total_slots - pelada.filled_slots;
   const isFull = remaining <= 0;
+  const peladaWeekday = brWeekday(new Date(pelada.starts_at));
+  const peladaTime = brTimeString(new Date(pelada.starts_at));
+  const isPinned = !!template?.active;
+
+  const doPin = async () => {
+    setPinning(true);
+    try {
+      await pinPelada({ data: { peladaId: pelada.id } });
+      toast.success(`Pelada fixada toda ${WEEKDAY_LABEL[peladaWeekday]} às ${peladaTime}`);
+      qc.invalidateQueries({ queryKey: ["pelada", peladaId] });
+      qc.invalidateQueries({ queryKey: ["pelada-templates", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao fixar pelada");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+  const doUnpin = async () => {
+    if (!template) return;
+    setPinning(true);
+    try {
+      await setTemplateActive({ data: { templateId: template.id, active: false } });
+      toast.success("Pelada não é mais fixa");
+      qc.invalidateQueries({ queryKey: ["pelada-template", pelada.template_id] });
+      qc.invalidateQueries({ queryKey: ["pelada-templates", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao desfixar");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+  const doRepeatNow = async () => {
+    if (!template) return;
+    setPinning(true);
+    try {
+      const res = await createNextFromTemplate({ data: { templateId: template.id } });
+      toast.success(res.created ? "Próxima pelada criada!" : "A próxima pelada já existe.");
+      qc.invalidateQueries({ queryKey: ["peladas"] });
+      navigate({ to: "/pelada/$peladaId", params: { peladaId: res.peladaId } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao repetir pelada");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+
 
   const requestJoin = async () => {
     setRequesting(true);
@@ -295,6 +364,54 @@ function PeladaDetailPage() {
           }
           wasAccepted={myRequest?.status === "accepted"}
         />
+
+        {isOrganizer && (
+          <div className="p-4 rounded-2xl bg-navy-soft border border-cyan/20 space-y-3">
+            <div className="flex items-center gap-2">
+              <Pin className="size-4 text-cyan" />
+              <p className="text-mono-label text-cyan">Pelada fixa</p>
+            </div>
+            {isPinned ? (
+              <>
+                <p className="text-sm text-white/80">
+                  Fixa toda <span className="font-bold text-white">{WEEKDAY_LABEL[template!.weekday]}</span> ·{" "}
+                  {template!.time_of_day.slice(0, 5)} — criamos a próxima automaticamente.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={doRepeatNow}
+                    disabled={pinning}
+                    className="flex-1 py-3 rounded-xl bg-cyan text-navy font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+                  >
+                    <Repeat className="size-4" /> Repetir agora
+                  </button>
+                  <button
+                    onClick={doUnpin}
+                    disabled={pinning}
+                    className="px-4 py-3 rounded-xl bg-navy border border-white/10 text-white/70 font-bold uppercase text-xs disabled:opacity-50"
+                  >
+                    Desfixar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-white/70">
+                  Repita esta pelada toda semana sem preencher tudo de novo.
+                </p>
+                <button
+                  onClick={doPin}
+                  disabled={pinning}
+                  className="w-full py-3 rounded-xl bg-cyan/10 border border-cyan/40 text-cyan font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+                >
+                  <Pin className="size-4" /> Fixar toda {WEEKDAY_LABEL[peladaWeekday]} · {peladaTime}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+
 
         {!isOrganizer && myRequest && (myRequest.status === "pending" || myRequest.status === "accepted") && (
           <button

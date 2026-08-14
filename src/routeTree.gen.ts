@@ -20,6 +20,7 @@ import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authenticated/pelada.$peladaId'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
+import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -77,6 +78,12 @@ const AuthenticatedChatThreadIdRoute =
     path: '/$threadId',
     getParentRoute: () => AuthenticatedChatRoute,
   } as any)
+const ApiPublicCronRecurringPeladasRoute =
+  ApiPublicCronRecurringPeladasRouteImport.update({
+    id: '/api/public/cron/recurring-peladas',
+    path: '/api/public/cron/recurring-peladas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +124,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
+    | '/api/public/cron/recurring-peladas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
+    | '/api/public/cron/recurring-peladas'
   id:
     | '__root__'
     | '/'
@@ -154,6 +166,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/chat/$threadId'
     | '/_authenticated/pelada/$peladaId'
+    | '/api/public/cron/recurring-peladas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -161,6 +174,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiPublicCronRecurringPeladasRoute: typeof ApiPublicCronRecurringPeladasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -242,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
       parentRoute: typeof AuthenticatedChatRoute
     }
+    '/api/public/cron/recurring-peladas': {
+      id: '/api/public/cron/recurring-peladas'
+      path: '/api/public/cron/recurring-peladas'
+      fullPath: '/api/public/cron/recurring-peladas'
+      preLoaderRoute: typeof ApiPublicCronRecurringPeladasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -282,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiPublicCronRecurringPeladasRoute: ApiPublicCronRecurringPeladasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

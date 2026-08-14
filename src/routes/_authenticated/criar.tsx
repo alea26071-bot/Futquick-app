@@ -5,7 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
-import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2 } from "lucide-react";
+import { pinPelada } from "@/lib/pelada-templates.functions";
+import { WEEKDAY_LABEL, brWeekday } from "@/lib/pelada-utils";
+import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
+
 
 type CriarSearch = { lat?: number; lng?: number; address?: string };
 
@@ -52,6 +55,9 @@ function CriarPage() {
   const [totalSlots, setTotalSlots] = useState(12);
   const [price, setPrice] = useState("");
   const [autoApprove, setAutoApprove] = useState(true);
+  const [recurring, setRecurring] = useState(false);
+  const weekdayLabel = date ? WEEKDAY_LABEL[brWeekday(new Date(`${date}T${time || "20:00"}:00-03:00`))] : null;
+
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -130,8 +136,17 @@ function CriarPage() {
         .select("id")
         .single();
       if (error) throw error;
+      if (recurring) {
+        try {
+          await pinPelada({ data: { peladaId: data.id } });
+        } catch (e) {
+          console.warn("pin failed", e);
+          toast.error("Pelada criada, mas não foi possível fixá-la.");
+        }
+      }
       toast.success("Pelada criada! Bora completar o time.");
       navigate({ to: "/pelada/$peladaId", params: { peladaId: data.id } });
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pelada");
     } finally {
@@ -387,6 +402,25 @@ function CriarPage() {
                 <p className="text-xs text-white/50">Jogadores entram sem esperar sua confirmação.</p>
               </div>
             </label>
+
+            <label className="flex items-center gap-3 p-4 bg-navy-soft rounded-2xl border border-cyan/20 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={recurring}
+                onChange={(e) => setRecurring(e.target.checked)}
+                className="size-5 accent-cyan"
+              />
+              <div className="flex-1">
+                <p className="text-white font-bold text-sm flex items-center gap-1.5">
+                  <Pin className="size-3.5 text-cyan" /> Repetir toda semana
+                </p>
+                <p className="text-xs text-white/50">
+                  Fixa a pelada {weekdayLabel ? `toda ${weekdayLabel} · ${time}` : "neste dia e horário"} e cria a próxima
+                  automaticamente.
+                </p>
+              </div>
+            </label>
+
           </div>
         )}
       </main>

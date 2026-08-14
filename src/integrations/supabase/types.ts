@@ -189,6 +189,81 @@ export type Database = {
           },
         ]
       }
+      pelada_templates: {
+        Row: {
+          active: boolean
+          address: string
+          auto_approve: boolean
+          city: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          field_type: string
+          id: string
+          last_generated_for: string | null
+          latitude: number
+          level: string
+          location_name: string
+          longitude: number
+          name: string
+          organizer_id: string
+          photo_url: string | null
+          price_cents: number
+          time_of_day: string
+          total_slots: number
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          active?: boolean
+          address: string
+          auto_approve?: boolean
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          field_type: string
+          id?: string
+          last_generated_for?: string | null
+          latitude: number
+          level: string
+          location_name: string
+          longitude: number
+          name: string
+          organizer_id: string
+          photo_url?: string | null
+          price_cents?: number
+          time_of_day: string
+          total_slots: number
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          active?: boolean
+          address?: string
+          auto_approve?: boolean
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          field_type?: string
+          id?: string
+          last_generated_for?: string | null
+          latitude?: number
+          level?: string
+          location_name?: string
+          longitude?: number
+          name?: string
+          organizer_id?: string
+          photo_url?: string | null
+          price_cents?: number
+          time_of_day?: string
+          total_slots?: number
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       peladas: {
         Row: {
           address: string
@@ -211,6 +286,7 @@ export type Database = {
           price_cents: number
           starts_at: string
           status: string
+          template_id: string | null
           total_slots: number
           updated_at: string
         }
@@ -235,6 +311,7 @@ export type Database = {
           price_cents?: number
           starts_at: string
           status?: string
+          template_id?: string | null
           total_slots: number
           updated_at?: string
         }
@@ -259,10 +336,19 @@ export type Database = {
           price_cents?: number
           starts_at?: string
           status?: string
+          template_id?: string | null
           total_slots?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "peladas_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pelada_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
