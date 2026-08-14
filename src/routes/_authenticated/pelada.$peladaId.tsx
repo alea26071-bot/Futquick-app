@@ -67,6 +67,24 @@ function PeladaDetailPage() {
     },
   });
 
+  const isOrganizerEarly = pelada?.organizer_id === user.id;
+
+  const { data: template } = useQuery({
+    queryKey: ["pelada-template", pelada?.template_id],
+    queryFn: async () => {
+      if (!pelada?.template_id) return null;
+      const { data } = await supabase
+        .from("pelada_templates")
+        .select("*")
+        .eq("id", pelada.template_id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!pelada?.template_id && isOrganizerEarly,
+  });
+
+  const [pinning, setPinning] = useState(false);
+
   if (isLoading || !pelada) {
     return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Carregando...</div>;
   }
@@ -74,6 +92,55 @@ function PeladaDetailPage() {
   const isOrganizer = pelada.organizer_id === user.id;
   const remaining = pelada.total_slots - pelada.filled_slots;
   const isFull = remaining <= 0;
+  const peladaWeekday = brWeekday(new Date(pelada.starts_at));
+  const peladaTime = brTimeString(new Date(pelada.starts_at));
+  const isPinned = !!template?.active;
+
+  const doPin = async () => {
+    setPinning(true);
+    try {
+      await pinPelada({ data: { peladaId: pelada.id } });
+      toast.success(`Pelada fixada toda ${WEEKDAY_LABEL[peladaWeekday]} às ${peladaTime}`);
+      qc.invalidateQueries({ queryKey: ["pelada", peladaId] });
+      qc.invalidateQueries({ queryKey: ["pelada-templates", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao fixar pelada");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+  const doUnpin = async () => {
+    if (!template) return;
+    setPinning(true);
+    try {
+      await setTemplateActive({ data: { templateId: template.id, active: false } });
+      toast.success("Pelada não é mais fixa");
+      qc.invalidateQueries({ queryKey: ["pelada-template", pelada.template_id] });
+      qc.invalidateQueries({ queryKey: ["pelada-templates", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao desfixar");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+  const doRepeatNow = async () => {
+    if (!template) return;
+    setPinning(true);
+    try {
+      const res = await createNextFromTemplate({ data: { templateId: template.id } });
+      toast.success(res.created ? "Próxima pelada criada!" : "A próxima pelada já existe.");
+      qc.invalidateQueries({ queryKey: ["peladas"] });
+      navigate({ to: "/pelada/$peladaId", params: { peladaId: res.peladaId } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao repetir pelada");
+    } finally {
+      setPinning(false);
+    }
+  };
+
+
 
   const requestJoin = async () => {
     setRequesting(true);
