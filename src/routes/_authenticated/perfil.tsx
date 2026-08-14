@@ -349,11 +349,19 @@ function PerfilPage() {
                 className="flex justify-between items-center p-4 bg-navy-soft/60 rounded-2xl border border-white/5"
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-white truncate">{p.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-white truncate">{p.name}</p>
+                    {p.template_id && (
+                      <span className="px-1.5 py-0.5 rounded bg-cyan/15 text-cyan text-[9px] font-bold uppercase flex items-center gap-1 flex-none">
+                        <Pin className="size-2.5" /> Fixa
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-white/50 truncate">
                     {new Date(p.starts_at).toLocaleDateString("pt-BR")} · {p.filled_slots}/{p.total_slots} vagas
                   </p>
                 </div>
+
                 <span
                   className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
                     p.status === "open" ? "bg-cyan/10 text-cyan" : "bg-white/5 text-white/40"
