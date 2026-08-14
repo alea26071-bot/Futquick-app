@@ -136,8 +136,17 @@ function CriarPage() {
         .select("id")
         .single();
       if (error) throw error;
+      if (recurring) {
+        try {
+          await pinPelada({ data: { peladaId: data.id } });
+        } catch (e) {
+          console.warn("pin failed", e);
+          toast.error("Pelada criada, mas não foi possível fixá-la.");
+        }
+      }
       toast.success("Pelada criada! Bora completar o time.");
       navigate({ to: "/pelada/$peladaId", params: { peladaId: data.id } });
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pelada");
     } finally {
