@@ -365,6 +365,54 @@ function PeladaDetailPage() {
           wasAccepted={myRequest?.status === "accepted"}
         />
 
+        {isOrganizer && (
+          <div className="p-4 rounded-2xl bg-navy-soft border border-cyan/20 space-y-3">
+            <div className="flex items-center gap-2">
+              <Pin className="size-4 text-cyan" />
+              <p className="text-mono-label text-cyan">Pelada fixa</p>
+            </div>
+            {isPinned ? (
+              <>
+                <p className="text-sm text-white/80">
+                  Fixa toda <span className="font-bold text-white">{WEEKDAY_LABEL[template!.weekday]}</span> ·{" "}
+                  {template!.time_of_day.slice(0, 5)} — criamos a próxima automaticamente.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={doRepeatNow}
+                    disabled={pinning}
+                    className="flex-1 py-3 rounded-xl bg-cyan text-navy font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+                  >
+                    <Repeat className="size-4" /> Repetir agora
+                  </button>
+                  <button
+                    onClick={doUnpin}
+                    disabled={pinning}
+                    className="px-4 py-3 rounded-xl bg-navy border border-white/10 text-white/70 font-bold uppercase text-xs disabled:opacity-50"
+                  >
+                    Desfixar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-white/70">
+                  Repita esta pelada toda semana sem preencher tudo de novo.
+                </p>
+                <button
+                  onClick={doPin}
+                  disabled={pinning}
+                  className="w-full py-3 rounded-xl bg-cyan/10 border border-cyan/40 text-cyan font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+                >
+                  <Pin className="size-4" /> Fixar toda {WEEKDAY_LABEL[peladaWeekday]} · {peladaTime}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+
+
         {!isOrganizer && myRequest && (myRequest.status === "pending" || myRequest.status === "accepted") && (
           <button
             onClick={openChatWithOrganizer}
