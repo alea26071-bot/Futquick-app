@@ -2,16 +2,18 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
-import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2 } from "lucide-react";
+import { FIELD_TYPE_LABEL, LEVEL_LABEL, WEEKDAY_LABEL, brTimeString, brWeekday, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
+import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
   component: PeladaDetailPage,
 });
+
 
 function PeladaDetailPage() {
   const { peladaId } = Route.useParams();
