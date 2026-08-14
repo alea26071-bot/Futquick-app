@@ -295,8 +295,47 @@ function PerfilPage() {
         </div>
       </div>
 
+      {templates.length > 0 && (
+        <div className="px-6 mt-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Pin className="size-4 text-cyan" />
+            <p className="text-mono-label text-cyan">Minhas peladas fixas</p>
+          </div>
+          <div className="space-y-2">
+            {templates.map((t) => (
+              <div key={t.id} className="p-4 bg-navy-soft/60 rounded-2xl border border-cyan/20">
+                <p className="font-bold text-white truncate">{t.name}</p>
+                <p className="text-xs text-cyan/80 font-mono uppercase tracking-wider mt-0.5">
+                  toda {WEEKDAY_LABEL[t.weekday]} · {t.time_of_day.slice(0, 5)}
+                </p>
+                <p className="text-xs text-white/50 truncate flex items-center gap-1 mt-1">
+                  <MapPin className="size-3 flex-none" /> {t.location_name}
+                </p>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => repeatTemplate(t.id)}
+                    disabled={busyTemplate === t.id}
+                    className="flex-1 py-2.5 rounded-xl bg-cyan text-navy font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Repeat className="size-4" /> Criar próxima
+                  </button>
+                  <button
+                    onClick={() => deactivateTemplate(t.id)}
+                    disabled={busyTemplate === t.id}
+                    className="px-4 py-2.5 rounded-xl bg-navy border border-white/10 text-white/70 font-bold uppercase text-xs disabled:opacity-50"
+                  >
+                    Desativar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="px-6 mt-6">
         <p className="text-mono-label mb-3">Peladas que organizei</p>
+
         {myPeladas.length === 0 ? (
           <p className="text-sm text-white/50 py-8 text-center bg-navy-soft/40 rounded-2xl border border-white/5">
             Você ainda não organizou nenhuma pelada.
