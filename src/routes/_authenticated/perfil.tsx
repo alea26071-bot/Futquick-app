@@ -48,6 +48,50 @@ function PerfilPage() {
     },
   });
 
+  const { data: templates = [] } = useQuery({
+    queryKey: ["pelada-templates", user.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("pelada_templates")
+        .select("*")
+        .eq("organizer_id", user.id)
+        .eq("active", true)
+        .order("weekday", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  const [busyTemplate, setBusyTemplate] = useState<string | null>(null);
+
+  const repeatTemplate = async (templateId: string) => {
+    setBusyTemplate(templateId);
+    try {
+      const res = await createNextFromTemplate({ data: { templateId } });
+      toast.success(res.created ? "Próxima pelada criada!" : "A próxima pelada já existe.");
+      qc.invalidateQueries({ queryKey: ["my-peladas", user.id] });
+      navigate({ to: "/pelada/$peladaId", params: { peladaId: res.peladaId } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao criar próxima pelada");
+    } finally {
+      setBusyTemplate(null);
+    }
+  };
+
+  const deactivateTemplate = async (templateId: string) => {
+    setBusyTemplate(templateId);
+    try {
+      await setTemplateActive({ data: { templateId, active: false } });
+      toast.success("Pelada fixa desativada");
+      qc.invalidateQueries({ queryKey: ["pelada-templates", user.id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao desativar");
+    } finally {
+      setBusyTemplate(null);
+    }
+  };
+
+
+
   const [form, setForm] = useState({ name: "", bio: "", city: "", age: "", favorite_position: "" });
   useEffect(() => {
     if (profile) {
