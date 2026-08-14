@@ -55,6 +55,9 @@ function CriarPage() {
   const [totalSlots, setTotalSlots] = useState(12);
   const [price, setPrice] = useState("");
   const [autoApprove, setAutoApprove] = useState(true);
+  const [recurring, setRecurring] = useState(false);
+  const weekdayLabel = date ? WEEKDAY_LABEL[brWeekday(new Date(`${date}T${time || "20:00"}:00-03:00`))] : null;
+
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
