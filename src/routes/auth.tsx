@@ -439,18 +439,74 @@ function AuthPage() {
         )}
 
         {step === 5 && (
-          <Step icon={<MapPin className="size-6 text-cyan" />} title="Qual sua região?" hint="Encontraremos peladas perto de você.">
-            <input
-              autoFocus
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              placeholder="Ex: Natal, RN"
-              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+          <Step icon={<MapPin className="size-6 text-cyan" />} title="Qual sua região?" hint="Escolha seu estado e cidade — mostramos as opções enquanto você digita.">
+            <StateCityPicker
+              state={form.state}
+              city={form.city}
+              onChange={({ state, city }) => setForm({ ...form, state, city })}
             />
           </Step>
         )}
 
         {step === 6 && (
+          <Step icon={<Navigation className="size-6 text-cyan" />} title="Peladas perto de você" hint="Permita a localização e escolha o raio de notificação.">
+            <div className="space-y-5">
+              <button
+                onClick={askLocation}
+                disabled={geoLoading}
+                className={`w-full py-4 rounded-2xl font-bold uppercase text-sm flex items-center justify-center gap-2 border-2 ${
+                  coords ? "border-cyan/40 bg-cyan/10 text-cyan" : "border-cyan/40 bg-navy-soft text-white"
+                }`}
+              >
+                <LocateFixed className="size-5" />
+                {geoLoading ? "Localizando..." : coords ? "Localização confirmada" : "Permitir localização"}
+              </button>
+              {geoError && <p className="text-red-400 text-xs">{geoError}</p>}
+
+              <div>
+                <p className="text-white/60 text-xs uppercase tracking-wide mb-4">
+                  Raio de notificação
+                </p>
+                <div className="relative pl-1">
+                  <div className="absolute left-[13px] top-2 bottom-2 w-0.5 bg-white/10" />
+                  <div className="space-y-2">
+                    {RADIUS_OPTIONS.map((opt) => {
+                      const active = form.radius === opt.value;
+                      return (
+                        <button
+                          key={opt.label}
+                          onClick={() => setForm({ ...form, radius: opt.value })}
+                          className="w-full flex items-center gap-3 py-2 text-left"
+                        >
+                          <span
+                            className={`relative z-10 size-6 rounded-full grid place-items-center border-2 flex-none ${
+                              active ? "bg-cyan border-cyan" : "bg-navy border-white/20"
+                            }`}
+                          >
+                            {active && <Check className="size-3.5 text-navy" strokeWidth={4} />}
+                          </span>
+                          <span className="flex-1">
+                            <span
+                              className={`block font-display font-extrabold italic uppercase ${
+                                active ? "text-cyan" : "text-white"
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            <span className="block text-xs text-white/50">{opt.hint}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Step>
+        )}
+
+        {step === 7 && (
+
           <Step icon={<ImageIcon className="size-6 text-cyan" />} title="Foto de perfil" hint="Adicione uma foto para que outros jogadores te reconheçam.">
             <input
               ref={fileRef}
