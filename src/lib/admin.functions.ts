@@ -1,29 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const DEV_KEY = "adm.futquick.";
-const ADMIN_PHONE = "12121212121";
-
-async function assertAdmin(context: { supabase: any; userId: string }) {
-  const { data } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
-  });
-  if (!data) throw new Error("Acesso restrito ao administrador");
-}
-
 /** Desbloqueia o modo desenvolvedor: telefone reservado + chave secreta. */
 export const claimAdminAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { key: string }) => input)
   .handler(async ({ data, context }) => {
-    if (data.key !== DEV_KEY) throw new Error("Chave inválida");
+    if (data.key !== "adm.futquick.") throw new Error("Chave inválida");
     const { data: profile } = await context.supabase
       .from("profiles")
       .select("phone")
       .eq("id", context.userId)
       .maybeSingle();
-    if (!profile || profile.phone !== ADMIN_PHONE) {
+    if (!profile || profile.phone !== "12121212121") {
       throw new Error("Esta conta não pode ser administradora");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -37,7 +26,11 @@ export const claimAdminAccess = createServerFn({ method: "POST" })
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: users }, { data: peladas }, { data: requests }] = await Promise.all([
       supabaseAdmin
@@ -81,7 +74,11 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
     }) => input,
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { id, ...patch } = data;
     const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", id);
@@ -93,7 +90,11 @@ export const adminDeletePelada = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { peladaId: string }) => input)
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("peladas").delete().eq("id", data.peladaId);
     if (error) throw new Error(error.message);
@@ -104,7 +105,11 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { userId: string }) => input)
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
     if (data.userId === context.userId) throw new Error("Você não pode excluir sua própria conta");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
