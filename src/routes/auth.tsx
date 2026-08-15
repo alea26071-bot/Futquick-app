@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
+import { StateCityPicker } from "@/components/StateCityPicker";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import {
   maskPhoneBR,
@@ -16,10 +17,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Camera,
+  Check,
   User as UserIcon,
   Phone,
   Calendar,
   MapPin,
+  Navigation,
+  LocateFixed,
   Image as ImageIcon,
   Lock,
 } from "lucide-react";
@@ -29,7 +33,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
+
+const RADIUS_OPTIONS: Array<{ label: string; hint: string; value: number | null }> = [
+  { label: "2 km", hint: "Só o que está no seu bairro", value: 2 },
+  { label: "5 km", hint: "Sua região e vizinhança", value: 5 },
+  { label: "10 km", hint: "Boa parte da sua cidade", value: 10 },
+  { label: "Qualquer distância", hint: "Receber todas as peladas", value: null },
+];
+
 
 type Mode = "signup" | "login";
 
@@ -44,14 +56,29 @@ function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pinError, setPinError] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [form, setForm] = useState<{
+    name: string;
+    phone: string;
+    pin: string;
+    pinConfirm: string;
+    age: string;
+    city: string;
+    state: string;
+    radius: number | null;
+  }>({
     name: "",
     phone: "",
     pin: "",
     pinConfirm: "",
     age: "",
     city: "",
+    state: "",
+    radius: 5,
   });
+  const [radiusTouched, setRadiusTouched] = useState(false);
 
   // Login-mode state
   const [loginPhone, setLoginPhone] = useState("");
@@ -72,8 +99,10 @@ function AuthPage() {
     step === 2 ? phoneCheck.ok :
     step === 3 ? validatePin(form.pin) && form.pin === form.pinConfirm :
     step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
-    step === 5 ? form.city.trim().length >= 2 :
+    step === 5 ? !!form.state && form.city.trim().length >= 2 :
+    step === 6 ? radiusTouched || form.radius !== null :
     true;
+
 
   // Create the account (auth + profile.phone) at end of step 3.
   const createAccount = async (): Promise<boolean> => {
@@ -140,6 +169,26 @@ function AuthPage() {
     }
   };
 
+  const askLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Seu dispositivo não suporta localização.");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Não conseguimos sua localização. Você pode continuar sem ela.");
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
   const finish = async () => {
     setSaving(true);
     try {
@@ -152,7 +201,16 @@ function AuthPage() {
           name: form.name.trim(),
           age: form.age ? parseInt(form.age, 10) : null,
           city: form.city.trim() || null,
+          state: form.state || null,
+          notify_radius_km: form.radius,
           onboarding_complete: true,
+          ...(coords
+            ? {
+                latitude: coords.lat,
+                longitude: coords.lng,
+                location_updated_at: new Date().toISOString(),
+              }
+            : {}),
           ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         })
         .eq("id", userData.user.id);
@@ -165,6 +223,7 @@ function AuthPage() {
       setSaving(false);
     }
   };
+
 
   const next = async () => {
     if (!canNext) return;
@@ -439,18 +498,78 @@ function AuthPage() {
         )}
 
         {step === 5 && (
-          <Step icon={<MapPin className="size-6 text-cyan" />} title="Qual sua região?" hint="Encontraremos peladas perto de você.">
-            <input
-              autoFocus
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              placeholder="Ex: Natal, RN"
-              className="w-full text-xl font-bold bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
+          <Step icon={<MapPin className="size-6 text-cyan" />} title="Qual sua região?" hint="Escolha seu estado e cidade — mostramos as opções enquanto você digita.">
+            <StateCityPicker
+              state={form.state}
+              city={form.city}
+              onChange={({ state, city }) => setForm({ ...form, state, city })}
             />
           </Step>
         )}
 
         {step === 6 && (
+          <Step icon={<Navigation className="size-6 text-cyan" />} title="Peladas perto de você" hint="Permita a localização e escolha o raio de notificação.">
+            <div className="space-y-5">
+              <button
+                onClick={askLocation}
+                disabled={geoLoading}
+                className={`w-full py-4 rounded-2xl font-bold uppercase text-sm flex items-center justify-center gap-2 border-2 ${
+                  coords ? "border-cyan/40 bg-cyan/10 text-cyan" : "border-cyan/40 bg-navy-soft text-white"
+                }`}
+              >
+                <LocateFixed className="size-5" />
+                {geoLoading ? "Localizando..." : coords ? "Localização confirmada" : "Permitir localização"}
+              </button>
+              {geoError && <p className="text-red-400 text-xs">{geoError}</p>}
+
+              <div>
+                <p className="text-white/60 text-xs uppercase tracking-wide mb-4">
+                  Raio de notificação
+                </p>
+                <div className="relative pl-1">
+                  <div className="absolute left-[13px] top-2 bottom-2 w-0.5 bg-white/10" />
+                  <div className="space-y-2">
+                    {RADIUS_OPTIONS.map((opt) => {
+                      const active = form.radius === opt.value;
+                      return (
+                        <button
+                          key={opt.label}
+                          onClick={() => {
+                            setRadiusTouched(true);
+                            setForm({ ...form, radius: opt.value });
+                          }}
+
+                          className="w-full flex items-center gap-3 py-2 text-left"
+                        >
+                          <span
+                            className={`relative z-10 size-6 rounded-full grid place-items-center border-2 flex-none ${
+                              active ? "bg-cyan border-cyan" : "bg-navy border-white/20"
+                            }`}
+                          >
+                            {active && <Check className="size-3.5 text-navy" strokeWidth={4} />}
+                          </span>
+                          <span className="flex-1">
+                            <span
+                              className={`block font-display font-extrabold italic uppercase ${
+                                active ? "text-cyan" : "text-white"
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            <span className="block text-xs text-white/50">{opt.hint}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Step>
+        )}
+
+        {step === 7 && (
+
           <Step icon={<ImageIcon className="size-6 text-cyan" />} title="Foto de perfil" hint="Adicione uma foto para que outros jogadores te reconheçam.">
             <input
               ref={fileRef}
