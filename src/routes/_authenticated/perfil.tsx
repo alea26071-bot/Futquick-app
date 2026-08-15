@@ -64,9 +64,41 @@ function PerfilPage() {
     },
   });
 
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ["is-admin", user.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
+  const [devKey, setDevKey] = useState("");
+  const [devBusy, setDevBusy] = useState(false);
+
+  const unlockDev = async () => {
+    setDevBusy(true);
+    try {
+      await claimAdminAccess({ data: { key: devKey } });
+      toast.success("Modo desenvolvedor liberado");
+      setDevKey("");
+      await qc.invalidateQueries({ queryKey: ["is-admin", user.id] });
+      navigate({ to: "/admin" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Chave inválida");
+    } finally {
+      setDevBusy(false);
+    }
+  };
+
   const [busyTemplate, setBusyTemplate] = useState<string | null>(null);
 
   const repeatTemplate = async (templateId: string) => {
+
     setBusyTemplate(templateId);
     try {
       const res = await createNextFromTemplate({ data: { templateId } });
