@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
+import { StateCityPicker } from "@/components/StateCityPicker";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import {
   maskPhoneBR,
@@ -16,10 +17,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Camera,
+  Check,
   User as UserIcon,
   Phone,
   Calendar,
   MapPin,
+  Navigation,
+  LocateFixed,
   Image as ImageIcon,
   Lock,
 } from "lucide-react";
@@ -29,7 +33,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
+
+const RADIUS_OPTIONS: Array<{ label: string; hint: string; value: number | null }> = [
+  { label: "2 km", hint: "Só o que está no seu bairro", value: 2 },
+  { label: "5 km", hint: "Sua região e vizinhança", value: 5 },
+  { label: "10 km", hint: "Boa parte da sua cidade", value: 10 },
+  { label: "Qualquer distância", hint: "Receber todas as peladas", value: null },
+];
+
 
 type Mode = "signup" | "login";
 
