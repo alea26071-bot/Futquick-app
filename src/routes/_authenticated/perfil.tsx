@@ -4,11 +4,14 @@ import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { toast } from "sonner";
-import { LogOut, Edit3, Check, Camera, Sun, Moon, Pin, Repeat, MapPin } from "lucide-react";
+import { LogOut, Edit3, Check, Camera, Sun, Moon, Pin, Repeat, MapPin, ShieldCheck } from "lucide-react";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { useTheme } from "@/lib/theme";
 import { WEEKDAY_LABEL } from "@/lib/pelada-utils";
 import { createNextFromTemplate, setTemplateActive } from "@/lib/pelada-templates.functions";
+import { claimAdminAccess } from "@/lib/admin.functions";
+import { ADMIN_PHONE_DIGITS } from "@/lib/phone-utils";
+
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
