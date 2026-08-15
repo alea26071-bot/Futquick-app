@@ -410,7 +410,39 @@ function PerfilPage() {
         )}
       </div>
 
+      {isAdmin ? (
+        <div className="px-6 mt-8">
+          <button
+            onClick={() => navigate({ to: "/admin" })}
+            className="w-full py-4 rounded-2xl bg-cyan text-navy font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
+          >
+            <ShieldCheck className="size-5" /> Painel do administrador
+          </button>
+        </div>
+      ) : profile?.phone === ADMIN_PHONE_DIGITS ? (
+        <div className="px-6 mt-8">
+          <p className="text-mono-label mb-3">Modo desenvolvedor</p>
+          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5 space-y-3">
+            <input
+              type="password"
+              value={devKey}
+              onChange={(e) => setDevKey(e.target.value)}
+              placeholder="Chave de desenvolvedor"
+              className="w-full p-3 rounded-xl bg-navy border border-white/10 text-white text-sm focus:border-cyan outline-none"
+            />
+            <button
+              onClick={unlockDev}
+              disabled={devBusy || devKey.length < 4}
+              className="w-full py-3 rounded-xl bg-cyan text-navy font-bold uppercase text-xs disabled:opacity-40"
+            >
+              {devBusy ? "..." : "Desbloquear"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <BottomNav />
+
     </div>
   );
 }
