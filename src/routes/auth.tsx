@@ -534,7 +534,11 @@ function AuthPage() {
                       return (
                         <button
                           key={opt.label}
-                          onClick={() => setForm({ ...form, radius: opt.value })}
+                          onClick={() => {
+                            setRadiusTouched(true);
+                            setForm({ ...form, radius: opt.value });
+                          }}
+
                           className="w-full flex items-center gap-3 py-2 text-left"
                         >
                           <span
