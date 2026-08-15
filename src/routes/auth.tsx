@@ -56,14 +56,29 @@ function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pinError, setPinError] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [form, setForm] = useState<{
+    name: string;
+    phone: string;
+    pin: string;
+    pinConfirm: string;
+    age: string;
+    city: string;
+    state: string;
+    radius: number | null;
+  }>({
     name: "",
     phone: "",
     pin: "",
     pinConfirm: "",
     age: "",
     city: "",
+    state: "",
+    radius: 5,
   });
+  const [radiusTouched, setRadiusTouched] = useState(false);
 
   // Login-mode state
   const [loginPhone, setLoginPhone] = useState("");
@@ -84,8 +99,10 @@ function AuthPage() {
     step === 2 ? phoneCheck.ok :
     step === 3 ? validatePin(form.pin) && form.pin === form.pinConfirm :
     step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
-    step === 5 ? form.city.trim().length >= 2 :
+    step === 5 ? !!form.state && form.city.trim().length >= 2 :
+    step === 6 ? radiusTouched || form.radius !== null :
     true;
+
 
   // Create the account (auth + profile.phone) at end of step 3.
   const createAccount = async (): Promise<boolean> => {
