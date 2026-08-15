@@ -140,6 +140,26 @@ function AuthPage() {
     }
   };
 
+  const askLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Seu dispositivo não suporta localização.");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Não conseguimos sua localização. Você pode continuar sem ela.");
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
   const finish = async () => {
     setSaving(true);
     try {
@@ -152,7 +172,16 @@ function AuthPage() {
           name: form.name.trim(),
           age: form.age ? parseInt(form.age, 10) : null,
           city: form.city.trim() || null,
+          state: form.state || null,
+          notify_radius_km: form.radius,
           onboarding_complete: true,
+          ...(coords
+            ? {
+                latitude: coords.lat,
+                longitude: coords.lng,
+                location_updated_at: new Date().toISOString(),
+              }
+            : {}),
           ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         })
         .eq("id", userData.user.id);
@@ -165,6 +194,7 @@ function AuthPage() {
       setSaving(false);
     }
   };
+
 
   const next = async () => {
     if (!canNext) return;
