@@ -62,3 +62,9 @@ export function phoneToSyntheticEmail(digits: string): string {
 export function validatePin(pin: string): boolean {
   return /^\d{6}$/.test(pin);
 }
+
+/** Senha válida para o telefone informado: PIN numérico, ou a chave de adm. */
+export function validateSecretForPhone(phone: string, secret: string): boolean {
+  return isAdminPhone(phone) ? secret === ADMIN_SECRET : validatePin(secret);
+}
+
