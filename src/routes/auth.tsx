@@ -370,20 +370,24 @@ function AuthPage() {
             <label className="text-white/60 text-xs uppercase tracking-wide">
               {loginAdminMode ? "Chave de administrador" : "PIN de 6 dígitos"}
             </label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              {...(loginAdminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-              value={loginPin}
-              onChange={(e) =>
-                setLoginPin(
-                  loginAdminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6),
-                )
-              }
-              placeholder={loginAdminMode ? "Digite sua chave" : "••••••"}
-              className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-            />
+            <div className="relative">
+              <input
+                type={showLoginPin ? "text" : "password"}
+                autoComplete="current-password"
+                {...(loginAdminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                value={loginPin}
+                onChange={(e) =>
+                  setLoginPin(
+                    loginAdminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6),
+                  )
+                }
+                placeholder={loginAdminMode ? "Digite sua chave" : "••••••"}
+                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+              />
+              <RevealButton shown={showLoginPin} onToggle={() => setShowLoginPin((s) => !s)} />
+            </div>
           </div>
+
 
           {loginError && (
             <p className="text-red-400 text-sm">{loginError}</p>
