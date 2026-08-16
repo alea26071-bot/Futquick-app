@@ -87,7 +87,36 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminUpdatePelada = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      id: string;
+      name?: string;
+      location_name?: string;
+      city?: string | null;
+      starts_at?: string;
+      total_slots?: number;
+      filled_slots?: number;
+      price_cents?: number;
+      status?: string;
+    }) => input,
+  )
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { id, ...patch } = data;
+    const { error } = await supabaseAdmin.from("peladas").update(patch).eq("id", id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const adminDeletePelada = createServerFn({ method: "POST" })
+
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { peladaId: string }) => input)
   .handler(async ({ data, context }) => {

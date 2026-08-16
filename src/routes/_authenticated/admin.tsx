@@ -8,7 +8,9 @@ import {
   adminOverview,
   adminUpdateProfile,
   adminDeletePelada,
+  adminUpdatePelada,
   adminDeleteUser,
+
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -36,7 +38,20 @@ function AdminPage() {
   const deletePelada = useServerFn(adminDeletePelada);
   const deleteUser = useServerFn(adminDeleteUser);
   const [tab, setTab] = useState<Tab>("users");
+  const updatePelada = useServerFn(adminUpdatePelada);
+  const [editingPelada, setEditingPelada] = useState<string | null>(null);
+  const [pDraft, setPDraft] = useState({
+    name: "",
+    location_name: "",
+    city: "",
+    starts_at: "",
+    total_slots: "",
+    filled_slots: "",
+    price: "",
+    status: "open",
+  });
   const [editing, setEditing] = useState<string | null>(null);
+
   const [draft, setDraft] = useState<{ name: string; city: string; state: string; age: string; radius: string }>({
     name: "",
     city: "",
@@ -118,6 +133,48 @@ function AdminPage() {
       toast.error(e instanceof Error ? e.message : "Erro ao excluir");
     }
   };
+
+  const startEditPelada = (p: (typeof peladas)[number]) => {
+    setEditingPelada(p.id);
+    const d = new Date(p.starts_at);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setPDraft({
+      name: p.name ?? "",
+      location_name: p.location_name ?? "",
+      city: p.city ?? "",
+      starts_at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+      total_slots: p.total_slots?.toString() ?? "",
+      filled_slots: p.filled_slots?.toString() ?? "",
+      price: ((p.price_cents ?? 0) / 100).toString(),
+      status: p.status ?? "open",
+    });
+  };
+
+  const savePelada = async (id: string) => {
+    try {
+      const total = parseInt(pDraft.total_slots, 10);
+      const filled = parseInt(pDraft.filled_slots, 10);
+      await updatePelada({
+        data: {
+          id,
+          name: pDraft.name.trim(),
+          location_name: pDraft.location_name.trim(),
+          city: pDraft.city.trim() || null,
+          starts_at: new Date(pDraft.starts_at).toISOString(),
+          ...(Number.isFinite(total) ? { total_slots: total } : {}),
+          ...(Number.isFinite(filled) ? { filled_slots: filled } : {}),
+          price_cents: Math.round((parseFloat(pDraft.price.replace(",", ".")) || 0) * 100),
+          status: pDraft.status,
+        },
+      });
+      toast.success("Pelada atualizada");
+      setEditingPelada(null);
+      qc.invalidateQueries({ queryKey: ["admin-overview"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-navy pb-16">
@@ -229,26 +286,115 @@ function AdminPage() {
 
           {tab === "peladas" &&
             peladas.map((p) => (
-              <div
-                key={p.id}
-                className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5 flex items-start justify-between gap-3"
-              >
-                <div className="min-w-0">
-                  <p className="font-bold text-white truncate">{p.name}</p>
-                  <p className="text-xs text-white/50 truncate">{p.location_name}</p>
-                  <p className="text-[11px] text-white/40 mt-1">
-                    {new Date(p.starts_at).toLocaleString("pt-BR")} · {p.filled_slots}/{p.total_slots} ·{" "}
-                    {p.status}
-                  </p>
-                </div>
-                <button
-                  onClick={() => removePelada(p.id, p.name)}
-                  className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-bold uppercase flex items-center gap-1 flex-none"
-                >
-                  <Trash2 className="size-3" /> Excluir
-                </button>
+              <div key={p.id} className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5">
+                {editingPelada === p.id ? (
+                  <div className="space-y-2">
+                    <Field
+                      label="Nome"
+                      value={pDraft.name}
+                      onChange={(v) => setPDraft({ ...pDraft, name: v })}
+                    />
+                    <div className="flex gap-2">
+                      <Field
+                        label="Local"
+                        value={pDraft.location_name}
+                        onChange={(v) => setPDraft({ ...pDraft, location_name: v })}
+                      />
+                      <Field
+                        label="Cidade"
+                        value={pDraft.city}
+                        onChange={(v) => setPDraft({ ...pDraft, city: v })}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[10px] uppercase tracking-wider text-white/40">
+                        Data e hora
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={pDraft.starts_at}
+                        onChange={(e) => setPDraft({ ...pDraft, starts_at: e.target.value })}
+                        className="w-full mt-1 p-2.5 rounded-xl bg-navy border border-white/10 text-white text-sm focus:border-cyan outline-none"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Field
+                        label="Total vagas"
+                        value={pDraft.total_slots}
+                        onChange={(v) => setPDraft({ ...pDraft, total_slots: v })}
+                      />
+                      <Field
+                        label="Confirmados"
+                        value={pDraft.filled_slots}
+                        onChange={(v) => setPDraft({ ...pDraft, filled_slots: v })}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Field
+                        label="Preço (R$)"
+                        value={pDraft.price}
+                        onChange={(v) => setPDraft({ ...pDraft, price: v })}
+                      />
+                      <div className="flex-1">
+                        <label className="text-[10px] uppercase tracking-wider text-white/40">
+                          Status
+                        </label>
+                        <select
+                          value={pDraft.status}
+                          onChange={(e) => setPDraft({ ...pDraft, status: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl bg-navy border border-white/10 text-white text-sm focus:border-cyan outline-none"
+                        >
+                          <option value="open">open</option>
+                          <option value="full">full</option>
+                          <option value="closed">closed</option>
+                          <option value="cancelled">cancelled</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => savePelada(p.id)}
+                        className="flex-1 py-2.5 rounded-xl bg-cyan text-navy font-bold uppercase text-xs flex items-center justify-center gap-2"
+                      >
+                        <Save className="size-4" /> Salvar
+                      </button>
+                      <button
+                        onClick={() => setEditingPelada(null)}
+                        className="px-4 py-2.5 rounded-xl bg-navy border border-white/10 text-white/70 text-xs font-bold uppercase"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-bold text-white truncate">{p.name}</p>
+                      <p className="text-xs text-white/50 truncate">{p.location_name}</p>
+                      <p className="text-[11px] text-white/40 mt-1">
+                        {new Date(p.starts_at).toLocaleString("pt-BR")} · {p.filled_slots}/
+                        {p.total_slots} · {p.status}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-none">
+                      <button
+                        onClick={() => startEditPelada(p)}
+                        className="px-3 py-1.5 rounded-lg bg-navy border border-white/10 text-white/70 text-[11px] font-bold uppercase"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => removePelada(p.id, p.name)}
+                        className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-bold uppercase flex items-center gap-1"
+                      >
+                        <Trash2 className="size-3" /> Excluir
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
+
 
           {tab === "requests" &&
             requests.map((r) => (

@@ -29,7 +29,23 @@ import {
   LocateFixed,
   Image as ImageIcon,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+
+function RevealButton({ shown, onToggle }: { shown: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={shown ? "Ocultar senha" : "Mostrar senha"}
+      className="absolute right-3 top-1/2 -translate-y-1/2 size-9 grid place-items-center rounded-xl text-white/60 hover:text-cyan"
+    >
+      {shown ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+    </button>
+  );
+}
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -86,6 +102,9 @@ function AuthPage() {
   // Login-mode state
   const [loginPhone, setLoginPhone] = useState("");
   const [loginPin, setLoginPin] = useState("");
+  const [showLoginPin, setShowLoginPin] = useState(false);
+  const [showPin, setShowPin] = useState(false);
+
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -354,20 +373,24 @@ function AuthPage() {
             <label className="text-white/60 text-xs uppercase tracking-wide">
               {loginAdminMode ? "Chave de administrador" : "PIN de 6 dígitos"}
             </label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              {...(loginAdminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-              value={loginPin}
-              onChange={(e) =>
-                setLoginPin(
-                  loginAdminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6),
-                )
-              }
-              placeholder={loginAdminMode ? "Digite sua chave" : "••••••"}
-              className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-            />
+            <div className="relative">
+              <input
+                type={showLoginPin ? "text" : "password"}
+                autoComplete="current-password"
+                {...(loginAdminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                value={loginPin}
+                onChange={(e) =>
+                  setLoginPin(
+                    loginAdminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6),
+                  )
+                }
+                placeholder={loginAdminMode ? "Digite sua chave" : "••••••"}
+                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+              />
+              <RevealButton shown={showLoginPin} onToggle={() => setShowLoginPin((s) => !s)} />
+            </div>
           </div>
+
 
           {loginError && (
             <p className="text-red-400 text-sm">{loginError}</p>
@@ -472,33 +495,40 @@ function AuthPage() {
             }
           >
             <div className="space-y-3">
-              <input
-                autoFocus
-                type="password"
-                autoComplete="new-password"
-                {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-                value={form.pin}
-                onChange={(e) => {
-                  setPinError(null);
-                  const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
-                  setForm({ ...form, pin: v });
-                }}
-                placeholder={adminMode ? "Sua chave" : "••••••"}
-                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-              />
-              <input
-                type="password"
-                autoComplete="new-password"
-                {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-                value={form.pinConfirm}
-                onChange={(e) => {
-                  setPinError(null);
-                  const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
-                  setForm({ ...form, pinConfirm: v });
-                }}
-                placeholder={adminMode ? "Confirme sua chave" : "Confirme seu PIN"}
-                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-              />
+              <div className="relative">
+                <input
+                  autoFocus
+                  type={showPin ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  value={form.pin}
+                  onChange={(e) => {
+                    setPinError(null);
+                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    setForm({ ...form, pin: v });
+                  }}
+                  placeholder={adminMode ? "Sua chave" : "••••••"}
+                  className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+                />
+                <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />
+              </div>
+              <div className="relative">
+                <input
+                  type={showPin ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  value={form.pinConfirm}
+                  onChange={(e) => {
+                    setPinError(null);
+                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    setForm({ ...form, pinConfirm: v });
+                  }}
+                  placeholder={adminMode ? "Confirme sua chave" : "Confirme seu PIN"}
+                  className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+                />
+                <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />
+              </div>
+
               {pinError && <p className="text-red-400 text-sm">{pinError}</p>}
             </div>
           </Step>

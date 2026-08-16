@@ -71,14 +71,28 @@ function DescobrirPage() {
     },
   });
 
+  const origin =
+    coords ??
+    (profile?.latitude != null && profile?.longitude != null
+      ? { lat: profile.latitude, lng: profile.longitude }
+      : null);
+
   const enriched: PeladaCardData[] = peladas.map((p) => ({
     ...p,
-    distance_km: coords ? haversineKm(coords.lat, coords.lng, p.latitude, p.longitude) : undefined,
+    distance_km: origin ? haversineKm(origin.lat, origin.lng, p.latitude, p.longitude) : undefined,
   }));
 
+  // Respeita o raio de notificação escolhido pelo usuário (null = qualquer distância)
+  const notifyRadius = profile?.notify_radius_km ?? null;
+  const withinRadius =
+    notifyRadius != null && origin
+      ? enriched.filter((p) => p.distance_km != null && p.distance_km <= notifyRadius)
+      : enriched;
+
   const filtered = activeFilters.has("5km")
-    ? enriched.filter((p) => p.distance_km == null || p.distance_km <= 5)
-    : enriched;
+    ? withinRadius.filter((p) => p.distance_km == null || p.distance_km <= 5)
+    : withinRadius;
+
 
   const [featured, ...rest] = filtered;
 
