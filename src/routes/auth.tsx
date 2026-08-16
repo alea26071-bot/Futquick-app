@@ -102,6 +102,9 @@ function AuthPage() {
   // Login-mode state
   const [loginPhone, setLoginPhone] = useState("");
   const [loginPin, setLoginPin] = useState("");
+  const [showLoginPin, setShowLoginPin] = useState(false);
+  const [showPin, setShowPin] = useState(false);
+
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
 
