@@ -29,7 +29,23 @@ import {
   LocateFixed,
   Image as ImageIcon,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+
+function RevealButton({ shown, onToggle }: { shown: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={shown ? "Ocultar senha" : "Mostrar senha"}
+      className="absolute right-3 top-1/2 -translate-y-1/2 size-9 grid place-items-center rounded-xl text-white/60 hover:text-cyan"
+    >
+      {shown ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+    </button>
+  );
+}
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
