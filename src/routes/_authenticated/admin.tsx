@@ -8,7 +8,9 @@ import {
   adminOverview,
   adminUpdateProfile,
   adminDeletePelada,
+  adminUpdatePelada,
   adminDeleteUser,
+
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
