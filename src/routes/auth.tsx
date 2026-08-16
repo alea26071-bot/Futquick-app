@@ -495,33 +495,40 @@ function AuthPage() {
             }
           >
             <div className="space-y-3">
-              <input
-                autoFocus
-                type="password"
-                autoComplete="new-password"
-                {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-                value={form.pin}
-                onChange={(e) => {
-                  setPinError(null);
-                  const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
-                  setForm({ ...form, pin: v });
-                }}
-                placeholder={adminMode ? "Sua chave" : "••••••"}
-                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-              />
-              <input
-                type="password"
-                autoComplete="new-password"
-                {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
-                value={form.pinConfirm}
-                onChange={(e) => {
-                  setPinError(null);
-                  const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
-                  setForm({ ...form, pinConfirm: v });
-                }}
-                placeholder={adminMode ? "Confirme sua chave" : "Confirme seu PIN"}
-                className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 px-4 focus:border-cyan outline-none text-white placeholder:text-white/30"
-              />
+              <div className="relative">
+                <input
+                  autoFocus
+                  type={showPin ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  value={form.pin}
+                  onChange={(e) => {
+                    setPinError(null);
+                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    setForm({ ...form, pin: v });
+                  }}
+                  placeholder={adminMode ? "Sua chave" : "••••••"}
+                  className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+                />
+                <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />
+              </div>
+              <div className="relative">
+                <input
+                  type={showPin ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  value={form.pinConfirm}
+                  onChange={(e) => {
+                    setPinError(null);
+                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    setForm({ ...form, pinConfirm: v });
+                  }}
+                  placeholder={adminMode ? "Confirme sua chave" : "Confirme seu PIN"}
+                  className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
+                />
+                <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />
+              </div>
+
               {pinError && <p className="text-red-400 text-sm">{pinError}</p>}
             </div>
           </Step>
