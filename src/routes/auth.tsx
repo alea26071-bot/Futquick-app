@@ -9,7 +9,7 @@ import { uploadUserPhoto } from "@/lib/storage-helpers";
 import {
   maskPhoneBR,
   validatePhoneBR,
-  validatePin,
+
   validateSecretForPhone,
   isAdminPhone,
   ADMIN_SECRET,
