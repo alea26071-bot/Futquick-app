@@ -36,7 +36,20 @@ function AdminPage() {
   const deletePelada = useServerFn(adminDeletePelada);
   const deleteUser = useServerFn(adminDeleteUser);
   const [tab, setTab] = useState<Tab>("users");
+  const updatePelada = useServerFn(adminUpdatePelada);
+  const [editingPelada, setEditingPelada] = useState<string | null>(null);
+  const [pDraft, setPDraft] = useState({
+    name: "",
+    location_name: "",
+    city: "",
+    starts_at: "",
+    total_slots: "",
+    filled_slots: "",
+    price: "",
+    status: "open",
+  });
   const [editing, setEditing] = useState<string | null>(null);
+
   const [draft, setDraft] = useState<{ name: string; city: string; state: string; age: string; radius: string }>({
     name: "",
     city: "",
