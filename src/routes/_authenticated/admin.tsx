@@ -119,6 +119,48 @@ function AdminPage() {
     }
   };
 
+  const startEditPelada = (p: (typeof peladas)[number]) => {
+    setEditingPelada(p.id);
+    const d = new Date(p.starts_at);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setPDraft({
+      name: p.name ?? "",
+      location_name: p.location_name ?? "",
+      city: p.city ?? "",
+      starts_at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+      total_slots: p.total_slots?.toString() ?? "",
+      filled_slots: p.filled_slots?.toString() ?? "",
+      price: ((p.price_cents ?? 0) / 100).toString(),
+      status: p.status ?? "open",
+    });
+  };
+
+  const savePelada = async (id: string) => {
+    try {
+      const total = parseInt(pDraft.total_slots, 10);
+      const filled = parseInt(pDraft.filled_slots, 10);
+      await updatePelada({
+        data: {
+          id,
+          name: pDraft.name.trim(),
+          location_name: pDraft.location_name.trim(),
+          city: pDraft.city.trim() || null,
+          starts_at: new Date(pDraft.starts_at).toISOString(),
+          ...(Number.isFinite(total) ? { total_slots: total } : {}),
+          ...(Number.isFinite(filled) ? { filled_slots: filled } : {}),
+          price_cents: Math.round((parseFloat(pDraft.price.replace(",", ".")) || 0) * 100),
+          status: pDraft.status,
+        },
+      });
+      toast.success("Pelada atualizada");
+      setEditingPelada(null);
+      qc.invalidateQueries({ queryKey: ["admin-overview"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar");
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-navy pb-16">
       <header className="pt-12 px-5 pb-4 bg-navy-soft/60 border-b border-white/5">
