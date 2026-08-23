@@ -1,0 +1,201 @@
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+/** Public: browser needs the VAPID public key to subscribe. */
+export const getPushConfig = createServerFn({ method: "GET" }).handler(async () => ({
+  publicKey: process.env["VAPID_PUBLIC_KEY"] ?? null,
+}));
+
+export const savePushSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { endpoint: string; p256dh: string; auth: string; userAgent?: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("push_subscriptions").upsert(
+      {
+        user_id: context.userId,
+        endpoint: data.endpoint,
+        p256dh: data.p256dh,
+        auth: data.auth,
+        user_agent: data.userAgent ?? null,
+      },
+      { onConflict: "endpoint" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const removePushSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { endpoint: string }) => input)
+  .handler(async ({ data, context }) => {
+    await context.supabase
+      .from("push_subscriptions")
+      .delete()
+      .eq("endpoint", data.endpoint)
+      .eq("user_id", context.userId);
+    return { ok: true };
+  });
+
+/** Called right after a player creates a join request: warns the organizer. */
+export const notifyJoinRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { requestId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: request } = await context.supabase
+      .from("pelada_requests")
+      .select("id, status, user_id, pelada_id, peladas(id, name, organizer_id)")
+      .eq("id", data.requestId)
+      .maybeSingle();
+    if (!request || request.user_id !== context.userId) throw new Error("Solicitação não encontrada");
+    const pelada = request.peladas as unknown as { id: string; name: string; organizer_id: string } | null;
+    if (!pelada) throw new Error("Pelada não encontrada");
+
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const playerName = profile?.name?.trim() || "Um jogador";
+
+    const { notifyUser } = await import("@/lib/notifications.server");
+    await notifyUser({
+      userId: pelada.organizer_id,
+      type: request.status === "accepted" ? "request_auto_accepted" : "request_received",
+      title: request.status === "accepted" ? "Novo jogador confirmado" : "Nova solicitação de vaga",
+      body:
+        request.status === "accepted"
+          ? `${playerName} entrou na pelada ${pelada.name}.`
+          : `${playerName} quer jogar na pelada ${pelada.name}. Toque para aceitar.`,
+      url: `/pelada/${pelada.id}`,
+      data: { peladaId: pelada.id, requestId: request.id },
+      dedupeKey: `request:${request.id}:${request.status}`,
+    });
+    return { ok: true };
+  });
+
+/** Organizer accepts or rejects a request; the player is notified. */
+export const respondToJoinRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { requestId: string; status: "accepted" | "rejected" }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: request } = await context.supabase
+      .from("pelada_requests")
+      .select("id, status, user_id, pelada_id, peladas(id, name, organizer_id, starts_at, location_name)")
+      .eq("id", data.requestId)
+      .maybeSingle();
+    if (!request) throw new Error("Solicitação não encontrada");
+    const pelada = request.peladas as unknown as {
+      id: string;
+      name: string;
+      organizer_id: string;
+      starts_at: string;
+      location_name: string;
+    } | null;
+    if (!pelada || pelada.organizer_id !== context.userId) throw new Error("Apenas o organizador pode responder");
+
+    const { error } = await context.supabase
+      .from("pelada_requests")
+      .update({ status: data.status, responded_at: new Date().toISOString() })
+      .eq("id", request.id);
+    if (error) throw new Error(error.message);
+
+    const when = new Date(pelada.starts_at).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Sao_Paulo",
+    });
+
+    const { notifyUser } = await import("@/lib/notifications.server");
+    await notifyUser({
+      userId: request.user_id,
+      type: data.status === "accepted" ? "request_accepted" : "request_rejected",
+      title: data.status === "accepted" ? "Pelada confirmada! ⚽" : "Solicitação recusada",
+      body:
+        data.status === "accepted"
+          ? `Você está dentro da ${pelada.name} — ${when} em ${pelada.location_name}.`
+          : `O organizador da ${pelada.name} não pôde confirmar sua vaga desta vez.`,
+      url: `/pelada/${pelada.id}`,
+      data: { peladaId: pelada.id, requestId: request.id },
+      dedupeKey: `request:${request.id}:${data.status}`,
+    });
+    return { ok: true, status: data.status };
+  });
+
+/** Notifies the other chat participant about a new message. */
+export const notifyChatMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { messageId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: message } = await context.supabase
+      .from("chat_messages")
+      .select("id, thread_id, sender_id, body, kind, chat_threads(id, organizer_id, player_id, peladas(name))")
+      .eq("id", data.messageId)
+      .maybeSingle();
+    if (!message || message.sender_id !== context.userId) throw new Error("Mensagem não encontrada");
+    const thread = message.chat_threads as unknown as {
+      id: string;
+      organizer_id: string;
+      player_id: string;
+      peladas: { name: string } | null;
+    } | null;
+    if (!thread) throw new Error("Conversa não encontrada");
+
+    const recipient = thread.organizer_id === context.userId ? thread.player_id : thread.organizer_id;
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const preview =
+      message.kind === "image" ? "📷 Foto" : message.kind === "location" ? "📍 Localização" : message.body;
+
+    const { notifyUser } = await import("@/lib/notifications.server");
+    await notifyUser({
+      userId: recipient,
+      type: "chat_message",
+      title: `${profile?.name?.trim() || "Nova mensagem"}${thread.peladas?.name ? ` · ${thread.peladas.name}` : ""}`,
+      body: preview ?? "Nova mensagem",
+      url: `/chat/${thread.id}`,
+      data: { threadId: thread.id },
+    });
+    return { ok: true };
+  });
+
+/** Opens (or reuses) the chat between the organizer and a player of a pelada. */
+export const openChatThread = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { peladaId: string; otherUserId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: pelada } = await context.supabase
+      .from("peladas")
+      .select("id, organizer_id")
+      .eq("id", data.peladaId)
+      .maybeSingle();
+    if (!pelada) throw new Error("Pelada não encontrada");
+
+    const organizerId = pelada.organizer_id;
+    const playerId = organizerId === context.userId ? data.otherUserId : context.userId;
+    if (organizerId !== context.userId && data.otherUserId !== organizerId) {
+      throw new Error("Conversa permitida apenas com o organizador");
+    }
+
+    const { data: existing } = await context.supabase
+      .from("chat_threads")
+      .select("id")
+      .eq("pelada_id", pelada.id)
+      .eq("organizer_id", organizerId)
+      .eq("player_id", playerId)
+      .maybeSingle();
+    if (existing) return { threadId: existing.id };
+
+    const { data: created, error } = await context.supabase
+      .from("chat_threads")
+      .insert({ pelada_id: pelada.id, organizer_id: organizerId, player_id: playerId })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { threadId: created.id };
+  });
