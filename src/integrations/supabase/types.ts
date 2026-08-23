@@ -16,23 +16,38 @@ export type Database = {
     Tables: {
       chat_messages: {
         Row: {
+          attachment_url: string | null
           body: string
           created_at: string
           id: string
+          kind: string
+          latitude: number | null
+          longitude: number | null
+          read_at: string | null
           sender_id: string
           thread_id: string
         }
         Insert: {
+          attachment_url?: string | null
           body: string
           created_at?: string
           id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          read_at?: string | null
           sender_id: string
           thread_id: string
         }
         Update: {
+          attachment_url?: string | null
           body?: string
           created_at?: string
           id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          read_at?: string | null
           sender_id?: string
           thread_id?: string
         }
@@ -86,6 +101,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          dedupe_key: string | null
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          dedupe_key?: string | null
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          dedupe_key?: string | null
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       pelada_likes: {
         Row: {
@@ -284,6 +338,7 @@ export type Database = {
           organizer_id: string
           photo_url: string | null
           price_cents: number
+          rating_reminder_sent_at: string | null
           starts_at: string
           status: string
           template_id: string | null
@@ -309,6 +364,7 @@ export type Database = {
           organizer_id: string
           photo_url?: string | null
           price_cents?: number
+          rating_reminder_sent_at?: string | null
           starts_at: string
           status?: string
           template_id?: string | null
@@ -334,6 +390,7 @@ export type Database = {
           organizer_id?: string
           photo_url?: string | null
           price_cents?: number
+          rating_reminder_sent_at?: string | null
           starts_at?: string
           status?: string
           template_id?: string | null
@@ -419,6 +476,39 @@ export type Database = {
           state?: string | null
           theme_preference?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
