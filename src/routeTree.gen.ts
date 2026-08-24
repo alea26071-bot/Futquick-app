@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
 import { Route as AuthenticatedDescobrirRouteImport } from './routes/_authenticated/descobrir'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
@@ -47,6 +48,12 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificacoesRoute =
+  AuthenticatedNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/criar': typeof AuthenticatedCriarRoute
   '/descobrir': typeof AuthenticatedDescobrirRoute
   '/mapa': typeof AuthenticatedMapaRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
   '/criar': typeof AuthenticatedCriarRoute
   '/descobrir': typeof AuthenticatedDescobrirRoute
   '/mapa': typeof AuthenticatedMapaRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
@@ -130,6 +139,7 @@ export interface FileRoutesById {
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
   '/_authenticated/descobrir': typeof AuthenticatedDescobrirRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
+  '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/criar'
     | '/descobrir'
     | '/mapa'
+    | '/notificacoes'
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/criar'
     | '/descobrir'
     | '/mapa'
+    | '/notificacoes'
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
     | '/_authenticated/criar'
     | '/_authenticated/descobrir'
     | '/_authenticated/mapa'
+    | '/_authenticated/notificacoes'
     | '/_authenticated/perfil'
     | '/_authenticated/chat/$threadId'
     | '/_authenticated/pelada/$peladaId'
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       path: '/perfil'
       fullPath: '/perfil'
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notificacoes': {
+      id: '/_authenticated/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mapa': {
@@ -302,6 +322,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
   AuthenticatedDescobrirRoute: typeof AuthenticatedDescobrirRoute
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
+  AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedPeladaPeladaIdRoute: typeof AuthenticatedPeladaPeladaIdRoute
 }
@@ -312,6 +333,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
   AuthenticatedDescobrirRoute: AuthenticatedDescobrirRoute,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
+  AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedPeladaPeladaIdRoute: AuthenticatedPeladaPeladaIdRoute,
 }
