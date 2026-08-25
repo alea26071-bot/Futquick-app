@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { MessageCircle, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/chat")({
+export const Route = createFileRoute("/_authenticated/chat/")({
   ssr: false,
   component: ChatListPage,
 });

@@ -18,8 +18,8 @@ import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authent
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
 import { Route as AuthenticatedDescobrirRouteImport } from './routes/_authenticated/descobrir'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
-import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authenticated/pelada.$peladaId'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
@@ -69,14 +69,14 @@ const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
   path: '/criar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPeladaPeladaIdRoute =
@@ -87,9 +87,9 @@ const AuthenticatedPeladaPeladaIdRoute =
   } as any)
 const AuthenticatedChatThreadIdRoute =
   AuthenticatedChatThreadIdRouteImport.update({
-    id: '/$threadId',
-    path: '/$threadId',
-    getParentRoute: () => AuthenticatedChatRoute,
+    id: '/chat/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicCronRecurringPeladasRoute =
   ApiPublicCronRecurringPeladasRouteImport.update({
@@ -103,7 +103,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/chat': typeof AuthenticatedChatRouteWithChildren
   '/criar': typeof AuthenticatedCriarRoute
   '/descobrir': typeof AuthenticatedDescobrirRoute
   '/mapa': typeof AuthenticatedMapaRoute
@@ -111,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/chat/': typeof AuthenticatedChatIndexRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesByTo {
@@ -118,7 +118,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/chat': typeof AuthenticatedChatRouteWithChildren
   '/criar': typeof AuthenticatedCriarRoute
   '/descobrir': typeof AuthenticatedDescobrirRoute
   '/mapa': typeof AuthenticatedMapaRoute
@@ -126,6 +125,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/chat': typeof AuthenticatedChatIndexRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesById {
@@ -135,7 +135,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/chat': typeof AuthenticatedChatRouteWithChildren
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
   '/_authenticated/descobrir': typeof AuthenticatedDescobrirRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
@@ -143,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
+  '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRouteTypes {
@@ -152,7 +152,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/admin'
-    | '/chat'
     | '/criar'
     | '/descobrir'
     | '/mapa'
@@ -160,6 +159,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
+    | '/chat/'
     | '/api/public/cron/recurring-peladas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -167,7 +167,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/admin'
-    | '/chat'
     | '/criar'
     | '/descobrir'
     | '/mapa'
@@ -175,6 +174,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/chat/$threadId'
     | '/pelada/$peladaId'
+    | '/chat'
     | '/api/public/cron/recurring-peladas'
   id:
     | '__root__'
@@ -183,7 +183,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/_authenticated/admin'
-    | '/_authenticated/chat'
     | '/_authenticated/criar'
     | '/_authenticated/descobrir'
     | '/_authenticated/mapa'
@@ -191,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/chat/$threadId'
     | '/_authenticated/pelada/$peladaId'
+    | '/_authenticated/chat/'
     | '/api/public/cron/recurring-peladas'
   fileRoutesById: FileRoutesById
 }
@@ -267,18 +267,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCriarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/chat': {
-      id: '/_authenticated/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof AuthenticatedChatRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/chat/': {
+      id: '/_authenticated/chat/'
+      path: '/chat'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthenticatedChatIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pelada/$peladaId': {
@@ -290,10 +290,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/chat/$threadId': {
       id: '/_authenticated/chat/$threadId'
-      path: '/$threadId'
+      path: '/chat/$threadId'
       fullPath: '/chat/$threadId'
       preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
-      parentRoute: typeof AuthenticatedChatRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/cron/recurring-peladas': {
       id: '/api/public/cron/recurring-peladas'
@@ -305,37 +305,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedChatRouteChildren {
-  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
-}
-
-const AuthenticatedChatRouteChildren: AuthenticatedChatRouteChildren = {
-  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
-}
-
-const AuthenticatedChatRouteWithChildren =
-  AuthenticatedChatRoute._addFileChildren(AuthenticatedChatRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedChatRoute: typeof AuthenticatedChatRouteWithChildren
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
   AuthenticatedDescobrirRoute: typeof AuthenticatedDescobrirRoute
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
   AuthenticatedPeladaPeladaIdRoute: typeof AuthenticatedPeladaPeladaIdRoute
+  AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedChatRoute: AuthenticatedChatRouteWithChildren,
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
   AuthenticatedDescobrirRoute: AuthenticatedDescobrirRoute,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
   AuthenticatedPeladaPeladaIdRoute: AuthenticatedPeladaPeladaIdRoute,
+  AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
