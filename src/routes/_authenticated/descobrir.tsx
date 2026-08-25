@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { PeladaCard, type PeladaCardData } from "@/components/PeladaCard";
 import { haversineKm } from "@/lib/pelada-utils";
-import { Zap, Bell } from "lucide-react";
+import { Zap } from "lucide-react";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
