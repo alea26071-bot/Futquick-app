@@ -23,7 +23,7 @@ async function fileToJpegBlob(file: File, maxDim = 1200, quality = 0.85): Promis
 }
 
 export async function uploadUserPhoto(
-  bucket: "avatars" | "peladas",
+  bucket: "avatars" | "peladas" | "chat",
   userId: string,
   file: File,
   keyHint?: string,
