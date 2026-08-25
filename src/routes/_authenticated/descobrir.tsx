@@ -109,13 +109,7 @@ function DescobrirPage() {
     <div className="min-h-screen bg-navy pb-28">
       <header className="pt-12 px-5 pb-4 sticky top-0 bg-navy/95 backdrop-blur-md z-30">
         <div className="relative flex items-center justify-center mb-6 h-10">
-          <button
-            aria-label="Notificações"
-            className="absolute left-0 size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
-          >
-            <Bell className="size-4 text-white/70" />
-            <span className="absolute top-2 right-2 size-2 bg-cyan rounded-full" />
-          </button>
+          <NotificationsBell userId={user.id} className="absolute left-0" />
 
           <div className="flex items-center gap-2">
             <Logo className="size-9 rounded-xl" />
