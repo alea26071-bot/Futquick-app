@@ -109,9 +109,8 @@ function DescobrirPage() {
   return (
     <div className="min-h-screen bg-navy pb-28">
       <header className="pt-12 px-5 pb-4 sticky top-0 bg-navy/95 backdrop-blur-md z-30">
-        <div className="relative flex items-center justify-center mb-6 h-10">
-          <NotificationsBell userId={user.id} className="absolute left-0" />
-
+        <div className="relative flex items-center justify-between mb-6 h-10">
+          <div className="w-10" aria-hidden="true" />
           <div className="flex items-center gap-2">
             <Logo className="size-9 rounded-xl" />
             <h1 className="text-2xl font-display font-extrabold italic tracking-tight text-white">
