@@ -110,6 +110,8 @@ function DescobrirPage() {
     <div className="min-h-screen bg-navy pb-28">
       <header className="pt-12 px-5 pb-4 sticky top-0 bg-navy/95 backdrop-blur-md z-30">
         <div className="flex items-center justify-between mb-6">
+          <NotificationsBell userId={user.id} />
+
           <div className="flex items-center gap-2 mx-auto absolute left-1/2 -translate-x-1/2">
             <Logo className="size-9 rounded-xl" />
             <h1 className="text-2xl font-display font-extrabold italic tracking-tight text-white">
@@ -117,21 +119,18 @@ function DescobrirPage() {
             </h1>
           </div>
 
-          <div className="ml-auto flex items-center gap-3">
-            <NotificationsBell userId={user.id} />
-            <Link
-              to="/perfil"
-              className="size-10 rounded-full bg-cyan/10 border border-cyan/20 grid place-items-center overflow-hidden"
-            >
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="Você" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-cyan font-bold text-sm">
-                  {(profile?.name || user.email || "?")[0]?.toUpperCase()}
-                </span>
-              )}
-            </Link>
-          </div>
+          <Link
+            to="/perfil"
+            className="size-10 rounded-full bg-cyan/10 border border-cyan/20 grid place-items-center overflow-hidden"
+          >
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Você" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-cyan font-bold text-sm">
+                {(profile?.name || user.email || "?")[0]?.toUpperCase()}
+              </span>
+            )}
+          </Link>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
