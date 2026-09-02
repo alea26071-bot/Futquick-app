@@ -102,6 +102,50 @@ export type Database = {
           },
         ]
       }
+      live_locations: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          expires_at: string
+          id: string
+          latitude: number
+          longitude: number
+          thread_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          latitude: number
+          longitude: number
+          thread_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          thread_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_locations_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
