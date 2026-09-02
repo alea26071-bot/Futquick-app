@@ -104,7 +104,7 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
             {formatPrice(pelada.price_cents)}
           </span>
           {pelada.distance_km != null && (
-            <span className="ml-auto px-3 py-1 rounded-full backdrop-blur-sm text-[11px] font-bold flex items-center gap-1 drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
+            <span className="ml-auto px-3 py-1 rounded-full backdrop-blur-sm text-xs font-stat font-bold flex items-center gap-1 drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
               <MapPin className="size-3" /> {pelada.distance_km.toFixed(1)} km
             </span>
           )}
