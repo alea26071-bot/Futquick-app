@@ -197,6 +197,13 @@ html.light {
   color: var(--cyan);
 }
 
+/* Números, horários, vagas, distâncias — leitura rápida */
+@utility font-stat {
+  font-family: var(--font-stat);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
 @keyframes slideUp {
   from { transform: translateY(16px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
