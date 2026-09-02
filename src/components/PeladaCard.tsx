@@ -104,7 +104,7 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
             {formatPrice(pelada.price_cents)}
           </span>
           {pelada.distance_km != null && (
-            <span className="ml-auto px-3 py-1 rounded-full backdrop-blur-sm text-xs font-stat font-bold flex items-center gap-1 drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
+            <span className="ml-auto px-3 py-1 rounded-full backdrop-blur-sm text-[11px] font-bold flex items-center gap-1 drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
               <MapPin className="size-3" /> {pelada.distance_km.toFixed(1)} km
             </span>
           )}
@@ -130,15 +130,15 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
 
       {/* Bottom bar */}
       <div className="flex items-center gap-3 px-4 py-3" style={{ backgroundColor: "#1e293b" }}>
-        <div className="flex items-center gap-1.5 text-base font-stat font-bold" style={{ color: "#ffffff" }}>
+        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
           <Calendar className="size-4" style={{ color: "#ffffff" }} />
           {formatDayMonth(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-base font-stat font-bold" style={{ color: "#ffffff" }}>
+        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
           <Clock className="size-4" style={{ color: "#ffffff" }} />
           {formatHM(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-base font-stat font-bold">
+        <div className="flex items-center gap-1.5 text-sm font-bold">
           <Users className="size-4" style={{ color: "#ffffff" }} />
           <span style={{ color: isFull ? "rgba(255,255,255,0.5)" : "#22d3ee" }}>
             {isFull ? "LOTADA" : `${remaining} ${remaining === 1 ? "vaga" : "vagas"}`}
