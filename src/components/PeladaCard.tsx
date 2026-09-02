@@ -130,15 +130,15 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
 
       {/* Bottom bar */}
       <div className="flex items-center gap-3 px-4 py-3" style={{ backgroundColor: "#1e293b" }}>
-        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
+        <div className="flex items-center gap-1.5 text-base font-stat font-bold" style={{ color: "#ffffff" }}>
           <Calendar className="size-4" style={{ color: "#ffffff" }} />
           {formatDayMonth(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
+        <div className="flex items-center gap-1.5 text-base font-stat font-bold" style={{ color: "#ffffff" }}>
           <Clock className="size-4" style={{ color: "#ffffff" }} />
           {formatHM(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-sm font-bold">
+        <div className="flex items-center gap-1.5 text-base font-stat font-bold">
           <Users className="size-4" style={{ color: "#ffffff" }} />
           <span style={{ color: isFull ? "rgba(255,255,255,0.5)" : "#22d3ee" }}>
             {isFull ? "LOTADA" : `${remaining} ${remaining === 1 ? "vaga" : "vagas"}`}
