@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
 import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
+import { PeladaPlayersSection } from "@/components/PeladaPlayersSheet";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
@@ -345,6 +346,10 @@ function PeladaDetailPage() {
             </p>
           </div>
         </div>
+
+        <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
+
+
 
         {pelada.description && (
           <div className="p-4 bg-navy-soft/40 rounded-2xl border border-white/5">

@@ -474,6 +474,7 @@ export type Database = {
           state: string | null
           theme_preference: string
           updated_at: string
+          username: string | null
         }
         Insert: {
           age?: number | null
@@ -497,6 +498,7 @@ export type Database = {
           state?: string | null
           theme_preference?: string
           updated_at?: string
+          username?: string | null
         }
         Update: {
           age?: number | null
@@ -520,6 +522,7 @@ export type Database = {
           state?: string | null
           theme_preference?: string
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -553,6 +556,24 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
         }
         Relationships: []
       }
