@@ -346,6 +346,10 @@ function PeladaDetailPage() {
           </div>
         </div>
 
+        <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
+
+
+
         {pelada.description && (
           <div className="p-4 bg-navy-soft/40 rounded-2xl border border-white/5">
             <p className="text-mono-label mb-2">Descrição</p>
