@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
 import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
+import { PeladaPlayersSection } from "@/components/PeladaPlayersSheet";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
