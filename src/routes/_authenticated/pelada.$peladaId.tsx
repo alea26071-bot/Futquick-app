@@ -296,8 +296,9 @@ function PeladaDetailPage() {
         {/* Organizer */}
         {organizer && (
           <Link
-            to="/perfil"
-            className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/5"
+            to="/jogador/$userId"
+            params={{ userId: pelada.organizer_id }}
+            className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/5 active:scale-[0.98] transition-transform"
           >
             <div className="flex items-center gap-3">
               <div className="size-12 rounded-full bg-cyan/20 grid place-items-center overflow-hidden">
