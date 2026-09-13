@@ -40,7 +40,7 @@ function OnboardingPage() {
     step === 2 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
     step === 3 ? form.city.trim().length >= 2 :
     step === 4 ? true : // position optional
-    true; // photo optional
+    !!avatarUrl; // foto de perfil obrigatória
 
   const pickAvatar = async (file: File) => {
     setUploadingAvatar(true);
@@ -56,6 +56,11 @@ function OnboardingPage() {
   };
 
   const finish = async () => {
+    if (!avatarUrl) {
+      toast.error("Adicione uma foto de perfil para continuar");
+      setStep(5);
+      return;
+    }
     setSaving(true);
     try {
       const { error } = await supabase
@@ -178,7 +183,7 @@ function OnboardingPage() {
         )}
 
         {step === 5 && (
-          <StepContainer icon={<ImageIcon className="size-6 text-cyan" />} title="Foto de perfil" hint="Adicione uma foto para que outros jogadores te reconheçam.">
+          <StepContainer icon={<ImageIcon className="size-6 text-cyan" />} title="Foto de perfil" hint="Obrigatória: é assim que outros jogadores te reconhecem. Você pode trocar depois.">
             <input
               ref={fileRef}
               type="file"
@@ -218,7 +223,9 @@ function OnboardingPage() {
                 {avatarUrl ? "Trocar foto" : "Escolher foto"}
               </button>
               {!avatarUrl && (
-                <p className="text-xs text-white/40 text-center">Você pode adicionar depois no seu perfil.</p>
+                <p className="text-xs text-white/40 text-center">
+                  Sem foto não é possível entrar no app. Nada de nudez ou conteúdo ofensivo — as fotos são verificadas.
+                </p>
               )}
             </div>
           </StepContainer>

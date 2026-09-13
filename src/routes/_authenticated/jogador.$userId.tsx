@@ -181,11 +181,11 @@ function PlayerProfilePage() {
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-background/15 via-transparent to-background" />
         <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="size-11 rounded-full bg-background/20 text-primary-foreground backdrop-blur-md hover:bg-background/30">
-            <ArrowLeft className="size-6" />
+          <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
+            <ArrowLeft className="size-6" strokeWidth={2.5} />
           </Button>
-          <Button aria-label="Compartilhar perfil" onClick={shareProfile} variant="ghost" size="icon" className="size-11 rounded-full bg-background/20 text-primary-foreground backdrop-blur-md hover:bg-background/30">
-            <MoreHorizontal className="size-6" />
+          <Button aria-label="Compartilhar perfil" onClick={shareProfile} variant="ghost" size="icon" className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
+            <MoreHorizontal className="size-6" strokeWidth={2.5} />
           </Button>
         </div>
       </section>
