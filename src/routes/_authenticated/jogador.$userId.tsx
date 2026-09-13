@@ -16,7 +16,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { invitePlayerToPelada } from "@/lib/notifications.functions";
@@ -142,6 +142,21 @@ function PlayerProfilePage() {
     }
   };
 
+  const shareProfile = async () => {
+    const url = window.location.href;
+    const title = `${profile?.name || "Jogador"} no Futquick`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {
+        return;
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link do perfil copiado!");
+    }
+  };
+
   if (isLoading) {
     return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Carregando...</div>;
   }
@@ -169,7 +184,7 @@ function PlayerProfilePage() {
           <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="size-11 rounded-full bg-background/20 text-primary-foreground backdrop-blur-md hover:bg-background/30">
             <ArrowLeft className="size-6" />
           </Button>
-          <Button aria-label="Mais opções" variant="ghost" size="icon" className="size-11 rounded-full bg-background/20 text-primary-foreground backdrop-blur-md hover:bg-background/30">
+          <Button aria-label="Compartilhar perfil" onClick={shareProfile} variant="ghost" size="icon" className="size-11 rounded-full bg-background/20 text-primary-foreground backdrop-blur-md hover:bg-background/30">
             <MoreHorizontal className="size-6" />
           </Button>
         </div>
@@ -252,7 +267,7 @@ function PlayerProfilePage() {
   );
 }
 
-function Stat({ icon, value, label, tone }: { icon: React.ReactNode; value: string | number; label: string; tone: "primary" | "warning" | "success" }) {
+function Stat({ icon, value, label, tone }: { icon: ReactNode; value: string | number; label: string; tone: "primary" | "warning" | "success" }) {
   const toneClass = tone === "primary" ? "text-primary" : tone === "warning" ? "text-warning" : "text-success";
   return (
     <div className="rounded-2xl border border-border bg-card px-2 py-4 shadow-sm">
