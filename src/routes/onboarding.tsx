@@ -40,7 +40,7 @@ function OnboardingPage() {
     step === 2 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
     step === 3 ? form.city.trim().length >= 2 :
     step === 4 ? true : // position optional
-    true; // photo optional
+    !!avatarUrl; // foto de perfil obrigatória
 
   const pickAvatar = async (file: File) => {
     setUploadingAvatar(true);
