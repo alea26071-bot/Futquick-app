@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { moderateImage } from "@/lib/moderation.functions";
 
 const SIGNED_URL_TTL = 60 * 60 * 24 * 365; // 1 year
 
