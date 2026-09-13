@@ -36,6 +36,13 @@ export async function uploadUserPhoto(
     cacheControl: "3600",
   });
   if (error) throw error;
+
+  // Moderação automática: recusa nudez, conteúdo sexual, violência ou ofensas.
+  const verdict = await moderateImage({ data: { bucket, path } });
+  if (!verdict.allowed) {
+    throw new Error(verdict.reason || "Esta imagem não segue as diretrizes do Futquick.");
+  }
+
   const { data, error: signErr } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
   if (signErr) throw signErr;
   return data.signedUrl;
