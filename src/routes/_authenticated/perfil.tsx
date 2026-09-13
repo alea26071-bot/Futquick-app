@@ -4,20 +4,45 @@ import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { toast } from "sonner";
-import { LogOut, Edit3, Check, Camera, Sun, Moon, Pin, Repeat, MapPin, ShieldCheck } from "lucide-react";
+import {
+  LogOut,
+  Edit3,
+  Check,
+  Camera,
+  Sun,
+  Moon,
+  Pin,
+  Repeat,
+  MapPin,
+  ShieldCheck,
+  BadgeCheck,
+  CalendarDays,
+  CircleUserRound,
+  Star,
+  ExternalLink,
+} from "lucide-react";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { useTheme } from "@/lib/theme";
 import { WEEKDAY_LABEL } from "@/lib/pelada-utils";
 import { createNextFromTemplate, setTemplateActive } from "@/lib/pelada-templates.functions";
 import { claimAdminAccess } from "@/lib/admin.functions";
 import { ADMIN_PHONE_DIGITS } from "@/lib/phone-utils";
-
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Meu perfil | Futquick" },
+      { name: "description", content: "Gerencie seu perfil, suas peladas fixas e suas preferências no Futquick." },
+      { property: "og:title", content: "Meu perfil | Futquick" },
+      { property: "og:description", content: "Gerencie seu perfil, suas peladas fixas e suas preferências no Futquick." },
+      { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: PerfilPage,
 });
-
 
 const POSITIONS = ["Goleiro", "Zagueiro", "Lateral", "Volante", "Meia", "Atacante"];
 
@@ -98,7 +123,6 @@ function PerfilPage() {
   const [busyTemplate, setBusyTemplate] = useState<string | null>(null);
 
   const repeatTemplate = async (templateId: string) => {
-
     setBusyTemplate(templateId);
     try {
       const res = await createNextFromTemplate({ data: { templateId } });
@@ -124,8 +148,6 @@ function PerfilPage() {
       setBusyTemplate(null);
     }
   };
-
-
 
   const [form, setForm] = useState({ name: "", bio: "", city: "", age: "", favorite_position: "" });
   useEffect(() => {
@@ -180,89 +202,128 @@ function PerfilPage() {
     navigate({ to: "/auth", replace: true });
   };
 
-  if (isLoading) return <div className="min-h-screen bg-navy" />;
+  if (isLoading) return <div className="min-h-screen bg-background" />;
+
+  const handle =
+    profile?.username || (profile?.name || "jogador").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const memberSince = profile?.created_at ? new Date(profile.created_at).getFullYear() : null;
 
   return (
-    <div className="min-h-screen bg-navy pb-28">
-      <div className="relative pt-12 px-6 pb-6 bg-gradient-to-b from-navy-soft to-navy">
-        <div className="flex justify-end gap-2 mb-6">
+    <main className="min-h-screen bg-background pb-28 text-foreground">
+      {/* Capa sincronizada com a foto de perfil */}
+      <section className="relative h-[40vh] min-h-72 max-h-[420px] overflow-hidden rounded-b-[2rem] bg-secondary">
+        {profile?.avatar_url ? (
+          <img src={profile.avatar_url} alt="" className="h-full w-full object-cover object-center" />
+        ) : (
+          <div className="grid h-full w-full place-items-center bg-secondary">
+            <CircleUserRound className="size-28 text-muted-foreground/40" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background" />
+
+        <div className="absolute inset-x-0 top-0 flex items-center justify-end gap-2 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <button
             onClick={toggle}
             aria-label="Alternar tema"
-            className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
+            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
           >
-            {theme === "dark" ? <Sun className="size-4 text-cyan" /> : <Moon className="size-4 text-cyan" />}
+            {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
           </button>
           <button
             onClick={() => (editing ? save() : setEditing(true))}
-            className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center"
+            aria-label={editing ? "Salvar perfil" : "Editar perfil"}
+            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
           >
-            {editing ? <Check className="size-4 text-cyan" /> : <Edit3 className="size-4 text-white/70" />}
+            {editing ? <Check className="size-5" /> : <Edit3 className="size-5" />}
           </button>
-          <button onClick={signOut} className="size-10 rounded-full bg-navy-soft border border-white/10 grid place-items-center">
-            <LogOut className="size-4 text-white/70" />
+          <button
+            onClick={signOut}
+            aria-label="Sair da conta"
+            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
+          >
+            <LogOut className="size-5" />
           </button>
         </div>
+      </section>
 
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="relative size-20 rounded-full bg-cyan/20 border-2 border-cyan/40 grid place-items-center overflow-hidden group"
-            aria-label="Trocar foto de perfil"
-          >
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-cyan text-2xl font-bold">
-                {(profile?.name || user.email || "?")[0]?.toUpperCase()}
-              </span>
-            )}
-            <div className="absolute inset-0 bg-navy/50 opacity-0 group-hover:opacity-100 grid place-items-center transition-opacity">
-              <Camera className="size-5 text-white" />
+      <section className="relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
+        <button
+          onClick={() => fileRef.current?.click()}
+          aria-label="Trocar foto de perfil"
+          className="group relative mx-auto block size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl"
+        >
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="Sua foto de perfil" className="h-full w-full object-cover" />
+          ) : (
+            <div className="grid h-full w-full place-items-center">
+              <CircleUserRound className="size-12 text-muted-foreground" />
             </div>
-            {uploadingAvatar && (
-              <div className="absolute inset-0 bg-navy/70 grid place-items-center">
-                <div className="size-5 rounded-full border-2 border-cyan border-t-transparent animate-spin" />
-              </div>
-            )}
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) onPickAvatar(f);
-              e.currentTarget.value = "";
-            }}
-          />
-          <div className="flex-1 min-w-0">
-            {editing ? (
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full text-2xl font-display font-extrabold italic uppercase bg-transparent border-b border-white/20 pb-1 text-white focus:border-cyan outline-none"
-              />
-            ) : (
-              <h1 className="text-2xl font-display font-extrabold italic uppercase text-white truncate">
-                {profile?.name || "Sem nome"}
-              </h1>
-            )}
-            <p className="text-white/50 text-sm truncate">{user.email}</p>
+          )}
+          <div className="absolute inset-0 grid place-items-center bg-navy/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <Camera className="size-6 text-white" />
           </div>
+          {uploadingAvatar && (
+            <div className="absolute inset-0 grid place-items-center bg-navy/70">
+              <div className="size-6 animate-spin rounded-full border-2 border-cyan border-t-transparent" />
+            </div>
+          )}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onPickAvatar(f);
+            e.currentTarget.value = "";
+          }}
+        />
+
+        {editing ? (
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="mt-4 w-full border-b border-border bg-transparent pb-1 text-center text-3xl font-extrabold text-foreground outline-none focus:border-primary"
+          />
+        ) : (
+          <h1 className="mt-4 text-3xl font-extrabold">{profile?.name || "Sem nome"}</h1>
+        )}
+        <p className="mt-1 text-sm text-muted-foreground">@{handle}</p>
+
+        {profile?.phone_verified && (
+          <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
+            <BadgeCheck className="size-5 fill-primary text-primary-foreground" /> Jogador verificado
+          </p>
+        )}
+        {!editing && (profile?.city || profile?.state) && (
+          <p className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+            <MapPin className="size-3.5" /> {[profile?.city, profile?.state].filter(Boolean).join(", ")}
+            {profile?.age ? ` · ${profile.age} anos` : ""}
+          </p>
+        )}
+
+        <div className="mt-6 grid grid-cols-3 gap-3">
+          <Stat icon={<CircleUserRound />} value={profile?.peladas_played ?? 0} label="Peladas" tone="primary" />
+          <Stat
+            icon={<Star />}
+            value={profile?.rating_avg ? Number(profile.rating_avg).toFixed(1) : "—"}
+            label="Avaliação"
+            tone="warning"
+          />
+          <Stat icon={<ShieldCheck />} value={`${profile?.postura_score ?? 100}%`} label="Postura" tone="success" />
         </div>
 
         {editing ? (
-          <div className="space-y-3">
+          <div className="mt-6 space-y-3 rounded-2xl border border-border bg-card p-5 text-left shadow-sm">
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="text-mono-label">Cidade</label>
                 <input
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="w-full mt-1 p-3 rounded-xl bg-navy-soft border border-white/10 text-white text-sm focus:border-cyan outline-none"
+                  className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary"
                 />
               </div>
               <div className="w-24">
@@ -271,19 +332,21 @@ function PerfilPage() {
                   type="number"
                   value={form.age}
                   onChange={(e) => setForm({ ...form, age: e.target.value })}
-                  className="w-full mt-1 p-3 rounded-xl bg-navy-soft border border-white/10 text-white text-sm focus:border-cyan outline-none"
+                  className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary"
                 />
               </div>
             </div>
             <div>
               <label className="text-mono-label">Posição favorita</label>
-              <div className="flex gap-2 flex-wrap mt-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {POSITIONS.map((p) => (
                   <button
                     key={p}
                     onClick={() => setForm({ ...form, favorite_position: p })}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase border ${
-                      form.favorite_position === p ? "bg-cyan text-navy border-cyan" : "border-white/10 text-white/60"
+                    className={`rounded-full border px-3 py-1.5 text-xs font-bold uppercase ${
+                      form.favorite_position === p
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-muted-foreground"
                     }`}
                   >
                     {p}
@@ -296,83 +359,84 @@ function PerfilPage() {
               <textarea
                 value={form.bio}
                 onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                rows={2}
-                className="w-full mt-1 p-3 rounded-xl bg-navy-soft border border-white/10 text-white text-sm focus:border-cyan outline-none resize-none"
+                rows={3}
+                className="mt-1 w-full resize-none rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary"
               />
             </div>
+            <Button onClick={save} className="w-full rounded-full font-bold">
+              Salvar alterações
+            </Button>
           </div>
         ) : (
-          <>
-            {profile?.city && (
-              <p className="text-white/70 text-sm">
-                {profile.city}{profile.age ? ` · ${profile.age} anos` : ""}
+          <article className="mt-6 rounded-2xl border border-border bg-card p-5 text-left shadow-sm">
+            <h2 className="flex items-center gap-2 text-sm font-bold">
+              <CircleUserRound className="size-5 text-primary" /> Sobre mim
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-card-foreground">
+              {profile?.bio ||
+                (profile?.favorite_position
+                  ? `${profile.favorite_position} em campo.`
+                  : "Você ainda não escreveu uma apresentação. Toque no lápis para editar.")}
+            </p>
+            {memberSince && (
+              <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <CalendarDays className="size-4" /> Membro desde {memberSince}
               </p>
             )}
-            {profile?.bio && <p className="text-white/60 text-sm mt-2">{profile.bio}</p>}
-          </>
+            <Button
+              variant="outline"
+              onClick={() => navigate({ to: "/jogador/$userId", params: { userId: user.id } })}
+              className="mt-4 w-full rounded-full font-bold"
+            >
+              <ExternalLink /> Ver meu perfil público
+            </Button>
+          </article>
         )}
-
-        <div className="grid grid-cols-3 gap-3 mt-6">
-          <div className="p-3 bg-navy-soft/60 rounded-2xl border border-white/5 text-center">
-            <p className="text-2xl font-display font-extrabold italic text-white">{profile?.peladas_played ?? 0}</p>
-            <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Peladas</p>
-          </div>
-          <div className="p-3 bg-navy-soft/60 rounded-2xl border border-white/5 text-center">
-            <p className="text-2xl font-display font-extrabold italic text-white">
-              {profile?.rating_avg ? Number(profile.rating_avg).toFixed(1) : "—"}
-            </p>
-            <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Nota</p>
-          </div>
-          <div className="p-3 bg-navy-soft/60 rounded-2xl border border-cyan/20 text-center">
-            <p className="text-2xl font-display font-extrabold italic text-cyan">{profile?.postura_score ?? 100}%</p>
-            <p className="text-[10px] text-cyan/70 uppercase font-bold tracking-wider">Postura</p>
-          </div>
-        </div>
-      </div>
+      </section>
 
       {templates.length > 0 && (
-        <div className="px-6 mt-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Pin className="size-4 text-cyan" />
-            <p className="text-mono-label text-cyan">Minhas peladas fixas</p>
+        <section className="mx-auto mt-6 max-w-lg px-5">
+          <div className="mb-3 flex items-center gap-2">
+            <Pin className="size-4 text-primary" />
+            <p className="text-mono-label text-primary">Minhas peladas fixas</p>
           </div>
           <div className="space-y-2">
             {templates.map((t) => (
-              <div key={t.id} className="p-4 bg-navy-soft/60 rounded-2xl border border-cyan/20">
-                <p className="font-bold text-white truncate">{t.name}</p>
-                <p className="text-xs text-cyan/80 font-mono uppercase tracking-wider mt-0.5">
+              <div key={t.id} className="rounded-2xl border border-primary/25 bg-card p-4 shadow-sm">
+                <p className="truncate font-bold">{t.name}</p>
+                <p className="mt-0.5 font-mono text-xs uppercase tracking-wider text-primary">
                   toda {WEEKDAY_LABEL[t.weekday]} · {t.time_of_day.slice(0, 5)}
                 </p>
-                <p className="text-xs text-white/50 truncate flex items-center gap-1 mt-1">
+                <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground">
                   <MapPin className="size-3 flex-none" /> {t.location_name}
                 </p>
-                <div className="flex gap-2 mt-3">
-                  <button
+                <div className="mt-3 flex gap-2">
+                  <Button
                     onClick={() => repeatTemplate(t.id)}
                     disabled={busyTemplate === t.id}
-                    className="flex-1 py-2.5 rounded-xl bg-cyan text-navy font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 rounded-xl font-bold uppercase"
                   >
-                    <Repeat className="size-4" /> Criar próxima
-                  </button>
-                  <button
+                    <Repeat /> Criar próxima
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => deactivateTemplate(t.id)}
                     disabled={busyTemplate === t.id}
-                    className="px-4 py-2.5 rounded-xl bg-navy border border-white/10 text-white/70 font-bold uppercase text-xs disabled:opacity-50"
+                    className="rounded-xl font-bold uppercase"
                   >
                     Desativar
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      <div className="px-6 mt-6">
+      <section className="mx-auto mt-6 max-w-lg px-5">
         <p className="text-mono-label mb-3">Peladas que organizei</p>
-
         {myPeladas.length === 0 ? (
-          <p className="text-sm text-white/50 py-8 text-center bg-navy-soft/40 rounded-2xl border border-white/5">
+          <p className="rounded-2xl border border-border bg-card py-8 text-center text-sm text-muted-foreground">
             Você ainda não organizou nenhuma pelada.
           </p>
         ) : (
@@ -381,25 +445,24 @@ function PerfilPage() {
               <a
                 key={p.id}
                 href={`/pelada/${p.id}`}
-                className="flex justify-between items-center p-4 bg-navy-soft/60 rounded-2xl border border-white/5"
+                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-bold text-white truncate">{p.name}</p>
+                    <p className="truncate font-bold">{p.name}</p>
                     {p.template_id && (
-                      <span className="px-1.5 py-0.5 rounded bg-cyan/15 text-cyan text-[9px] font-bold uppercase flex items-center gap-1 flex-none">
+                      <span className="flex flex-none items-center gap-1 rounded bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary">
                         <Pin className="size-2.5" /> Fixa
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-white/50 truncate">
+                  <p className="truncate font-mono text-xs tabular-nums text-muted-foreground">
                     {new Date(p.starts_at).toLocaleDateString("pt-BR")} · {p.filled_slots}/{p.total_slots} vagas
                   </p>
                 </div>
-
                 <span
-                  className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                    p.status === "open" ? "bg-cyan/10 text-cyan" : "bg-white/5 text-white/40"
+                  className={`rounded px-2 py-1 text-[10px] font-bold uppercase ${
+                    p.status === "open" ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
                   }`}
                 >
                   {p.status === "open" ? "Aberta" : p.status}
@@ -408,41 +471,54 @@ function PerfilPage() {
             ))}
           </div>
         )}
-      </div>
+      </section>
 
       {isAdmin ? (
-        <div className="px-6 mt-8">
-          <button
-            onClick={() => navigate({ to: "/admin" })}
-            className="w-full py-4 rounded-2xl bg-cyan text-navy font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
-          >
+        <section className="mx-auto mt-8 max-w-lg px-5">
+          <Button onClick={() => navigate({ to: "/admin" })} className="h-14 w-full rounded-2xl font-extrabold uppercase">
             <ShieldCheck className="size-5" /> Painel do administrador
-          </button>
-        </div>
+          </Button>
+        </section>
       ) : profile?.phone === ADMIN_PHONE_DIGITS ? (
-        <div className="px-6 mt-8">
+        <section className="mx-auto mt-8 max-w-lg px-5">
           <p className="text-mono-label mb-3">Modo desenvolvedor</p>
-          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5 space-y-3">
+          <div className="space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
             <input
               type="password"
               value={devKey}
               onChange={(e) => setDevKey(e.target.value)}
               placeholder="Chave de desenvolvedor"
-              className="w-full p-3 rounded-xl bg-navy border border-white/10 text-white text-sm focus:border-cyan outline-none"
+              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary"
             />
-            <button
-              onClick={unlockDev}
-              disabled={devBusy || devKey.length < 4}
-              className="w-full py-3 rounded-xl bg-cyan text-navy font-bold uppercase text-xs disabled:opacity-40"
-            >
+            <Button onClick={unlockDev} disabled={devBusy || devKey.length < 4} className="w-full rounded-xl font-bold uppercase">
               {devBusy ? "..." : "Desbloquear"}
-            </button>
+            </Button>
           </div>
-        </div>
+        </section>
       ) : null}
 
       <BottomNav />
+    </main>
+  );
+}
 
+function Stat({
+  icon,
+  value,
+  label,
+  tone,
+}: {
+  icon: React.ReactNode;
+  value: string | number;
+  label: string;
+  tone: "primary" | "warning" | "success";
+}) {
+  const toneClass = tone === "primary" ? "text-primary" : tone === "warning" ? "text-warning" : "text-success";
+  return (
+    <div className="rounded-2xl border border-border bg-card px-2 py-4 shadow-sm">
+      <div className={`mx-auto flex size-5 items-center justify-center [&>svg]:size-5 ${toneClass}`}>{icon}</div>
+      <p className="mt-2 font-mono text-xl font-bold tabular-nums">{value}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase text-muted-foreground">{label}</p>
     </div>
   );
 }
