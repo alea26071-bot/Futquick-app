@@ -164,6 +164,51 @@ export const notifyChatMessage = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Organizer invites a player to one of their upcoming matches. */
+export const invitePlayerToPelada = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { peladaId: string; playerId: string }) => input)
+  .handler(async ({ data, context }) => {
+    if (data.playerId === context.userId) throw new Error("Você não pode convidar a si mesmo");
+
+    const { data: pelada } = await context.supabase
+      .from("peladas")
+      .select("id, name, organizer_id, starts_at, location_name, status")
+      .eq("id", data.peladaId)
+      .maybeSingle();
+    if (!pelada || pelada.organizer_id !== context.userId) {
+      throw new Error("Apenas o organizador pode enviar este convite");
+    }
+    if (pelada.status !== "open" || new Date(pelada.starts_at).getTime() <= Date.now()) {
+      throw new Error("Esta pelada não está mais disponível");
+    }
+
+    const { data: organizer } = await context.supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const when = new Date(pelada.starts_at).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Sao_Paulo",
+    });
+
+    const { notifyUser } = await import("@/lib/notifications.server");
+    await notifyUser({
+      userId: data.playerId,
+      type: "pelada_invite",
+      title: `${organizer?.name?.trim() || "Um jogador"} convidou você`,
+      body: `${pelada.name} · ${when} em ${pelada.location_name}.`,
+      url: `/pelada/${pelada.id}`,
+      data: { peladaId: pelada.id, organizerId: context.userId },
+      dedupeKey: `invite:${pelada.id}:${data.playerId}`,
+    });
+    return { ok: true };
+  });
+
 /** Opens (or reuses) the chat between the organizer and a player of a pelada. */
 export const openChatThread = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
