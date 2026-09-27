@@ -24,6 +24,7 @@ import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authe
 import { Route as AuthenticatedJogadorUserIdRouteImport } from './routes/_authenticated/jogador.$userId'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
+import { Route as ApiPublicCronRatingRemindersRouteImport } from './routes/api/public/cron/rating-reminders'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -104,6 +105,12 @@ const ApiPublicCronRecurringPeladasRoute =
     path: '/api/public/cron/recurring-peladas',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronRatingRemindersRoute =
+  ApiPublicCronRatingRemindersRouteImport.update({
+    id: '/api/public/cron/rating-reminders',
+    path: '/api/public/cron/rating-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesByTo {
@@ -135,6 +143,7 @@ export interface FileRoutesByTo {
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRoutesById {
@@ -153,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
 }
 export interface FileRouteTypes {
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat/'
+    | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat'
+    | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
   id:
     | '__root__'
@@ -204,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/jogador/$userId'
     | '/_authenticated/pelada/$peladaId'
     | '/_authenticated/chat/'
+    | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
   fileRoutesById: FileRoutesById
 }
@@ -212,6 +225,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiPublicCronRatingRemindersRoute: typeof ApiPublicCronRatingRemindersRoute
   ApiPublicCronRecurringPeladasRoute: typeof ApiPublicCronRecurringPeladasRoute
 }
 
@@ -322,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronRecurringPeladasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/rating-reminders': {
+      id: '/api/public/cron/rating-reminders'
+      path: '/api/public/cron/rating-reminders'
+      fullPath: '/api/public/cron/rating-reminders'
+      preLoaderRoute: typeof ApiPublicCronRatingRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -359,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiPublicCronRatingRemindersRoute: ApiPublicCronRatingRemindersRoute,
   ApiPublicCronRecurringPeladasRoute: ApiPublicCronRecurringPeladasRoute,
 }
 export const routeTree = rootRouteImport
