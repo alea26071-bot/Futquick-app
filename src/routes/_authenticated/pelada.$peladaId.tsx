@@ -9,6 +9,7 @@ import { useState } from "react";
 import { PostMatchRating } from "@/components/PostMatchRating";
 import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
 import { PeladaPlayersSection } from "@/components/PeladaPlayersSheet";
+import { PeladaRequestsPanel } from "@/components/PeladaRequestsPanel";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
@@ -349,6 +350,17 @@ function PeladaDetailPage() {
         </div>
 
         <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
+
+        {isOrganizer && (
+          <PeladaRequestsPanel
+            peladaId={pelada.id}
+            organizerId={pelada.organizer_id}
+            hasFinished={
+              pelada.status === "finished" ||
+              new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000 < Date.now()
+            }
+          />
+        )}
 
 
 
