@@ -610,6 +610,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      recompute_player_stats: { Args: { _user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

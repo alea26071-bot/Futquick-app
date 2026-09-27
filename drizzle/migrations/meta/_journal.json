@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790520306711,
+      "tag": "0000_player_stats_recompute",
+      "breakpoints": true
+    }
+  ]
+}
