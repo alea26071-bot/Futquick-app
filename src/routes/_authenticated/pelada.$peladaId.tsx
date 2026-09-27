@@ -351,6 +351,17 @@ function PeladaDetailPage() {
 
         <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
 
+        {isOrganizer && (
+          <PeladaRequestsPanel
+            peladaId={pelada.id}
+            organizerId={pelada.organizer_id}
+            hasFinished={
+              pelada.status === "finished" ||
+              new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000 < Date.now()
+            }
+          />
+        )}
+
 
 
         {pelada.description && (
