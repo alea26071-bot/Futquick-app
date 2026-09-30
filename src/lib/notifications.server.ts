@@ -35,6 +35,18 @@ export async function notifyUser(input: NotifyInput): Promise<{ delivered: numbe
   });
   if (error) console.error("[notify] insert failed", error.message);
 
+  // Respeita "Silenciar notificações" por pelada: registra no app, mas não envia push.
+  const peladaId = typeof input.data?.peladaId === "string" ? input.data.peladaId : null;
+  if (peladaId) {
+    const { data: muted } = await supabaseAdmin
+      .from("pelada_mutes")
+      .select("pelada_id")
+      .eq("pelada_id", peladaId)
+      .eq("user_id", input.userId)
+      .maybeSingle();
+    if (muted) return { delivered: 0, skipped: true };
+  }
+
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
     .select("endpoint, p256dh, auth")

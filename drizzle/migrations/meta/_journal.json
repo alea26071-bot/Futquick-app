@@ -8,6 +8,13 @@
       "when": 1790520306711,
       "tag": "0000_player_stats_recompute",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790729209921,
+      "tag": "0001_pelada_groups_security",
+      "breakpoints": true
     }
   ]
 }
