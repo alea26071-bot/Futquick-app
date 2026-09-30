@@ -185,6 +185,56 @@ export type Database = {
         }
         Relationships: []
       }
+      pelada_group_messages: {
+        Row: {
+          attachment_url: string | null
+          body: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          kind: string
+          latitude: number | null
+          longitude: number | null
+          pelada_id: string
+          sender_id: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          pelada_id: string
+          sender_id: string
+        }
+        Update: {
+          attachment_url?: string | null
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          pelada_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_group_messages_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pelada_likes: {
         Row: {
           created_at: string
@@ -204,6 +254,32 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pelada_likes_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pelada_mutes: {
+        Row: {
+          created_at: string
+          pelada_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pelada_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pelada_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_mutes_pelada_id_fkey"
             columns: ["pelada_id"]
             isOneToOne: false
             referencedRelation: "peladas"
@@ -388,6 +464,7 @@ export type Database = {
           template_id: string | null
           total_slots: number
           updated_at: string
+          waitlist_enabled: boolean
         }
         Insert: {
           address: string
@@ -414,6 +491,7 @@ export type Database = {
           template_id?: string | null
           total_slots: number
           updated_at?: string
+          waitlist_enabled?: boolean
         }
         Update: {
           address?: string
@@ -440,6 +518,7 @@ export type Database = {
           template_id?: string | null
           total_slots?: number
           updated_at?: string
+          waitlist_enabled?: boolean
         }
         Relationships: [
           {
@@ -472,6 +551,7 @@ export type Database = {
           postura_score: number
           rating_avg: number
           state: string | null
+          suspended_at: string | null
           theme_preference: string
           updated_at: string
           username: string | null
@@ -496,6 +576,7 @@ export type Database = {
           postura_score?: number
           rating_avg?: number
           state?: string | null
+          suspended_at?: string | null
           theme_preference?: string
           updated_at?: string
           username?: string | null
@@ -520,6 +601,7 @@ export type Database = {
           postura_score?: number
           rating_avg?: number
           state?: string | null
+          suspended_at?: string | null
           theme_preference?: string
           updated_at?: string
           username?: string | null
@@ -556,6 +638,83 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          message_body: string | null
+          message_id: string | null
+          message_source: string | null
+          pelada_id: string | null
+          reason: string
+          reported_user_id: string | null
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          message_body?: string | null
+          message_id?: string | null
+          message_source?: string | null
+          pelada_id?: string | null
+          reason: string
+          reported_user_id?: string | null
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          message_body?: string | null
+          message_id?: string | null
+          message_source?: string | null
+          pelada_id?: string | null
+          reason?: string
+          reported_user_id?: string | null
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
         }
         Relationships: []
       }
@@ -610,7 +769,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_pelada_member: {
+        Args: { _pelada_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_pelada_organizer: {
+        Args: { _pelada_id: string; _user_id: string }
+        Returns: boolean
+      }
+      join_pelada: { Args: { _pelada_id: string }; Returns: string }
+      leave_pelada: { Args: { _pelada_id: string }; Returns: string }
       recompute_player_stats: { Args: { _user_id: string }; Returns: undefined }
+      remove_pelada_participant: {
+        Args: { _pelada_id: string; _user_id: string }
+        Returns: string
+      }
+      transfer_pelada: {
+        Args: { _new_organizer: string; _pelada_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
