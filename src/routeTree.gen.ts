@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authenticated/pelada.$peladaId'
 import { Route as AuthenticatedJogadorUserIdRouteImport } from './routes/_authenticated/jogador.$userId'
+import { Route as AuthenticatedGrupoPeladaIdRouteImport } from './routes/_authenticated/grupo.$peladaId'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
 import { Route as ApiPublicCronRatingRemindersRouteImport } from './routes/api/public/cron/rating-reminders'
@@ -93,6 +94,12 @@ const AuthenticatedJogadorUserIdRoute =
     path: '/jogador/$userId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGrupoPeladaIdRoute =
+  AuthenticatedGrupoPeladaIdRouteImport.update({
+    id: '/grupo/$peladaId',
+    path: '/grupo/$peladaId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatThreadIdRoute =
   AuthenticatedChatThreadIdRouteImport.update({
     id: '/chat/$threadId',
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/grupo/$peladaId': typeof AuthenticatedGrupoPeladaIdRoute
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
@@ -140,6 +148,7 @@ export interface FileRoutesByTo {
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/grupo/$peladaId': typeof AuthenticatedGrupoPeladaIdRoute
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat': typeof AuthenticatedChatIndexRoute
@@ -159,6 +168,7 @@ export interface FileRoutesById {
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/grupo/$peladaId': typeof AuthenticatedGrupoPeladaIdRoute
   '/_authenticated/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/notificacoes'
     | '/perfil'
     | '/chat/$threadId'
+    | '/grupo/$peladaId'
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat/'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/notificacoes'
     | '/perfil'
     | '/chat/$threadId'
+    | '/grupo/$peladaId'
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat'
@@ -213,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notificacoes'
     | '/_authenticated/perfil'
     | '/_authenticated/chat/$threadId'
+    | '/_authenticated/grupo/$peladaId'
     | '/_authenticated/jogador/$userId'
     | '/_authenticated/pelada/$peladaId'
     | '/_authenticated/chat/'
@@ -322,6 +335,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJogadorUserIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/grupo/$peladaId': {
+      id: '/_authenticated/grupo/$peladaId'
+      path: '/grupo/$peladaId'
+      fullPath: '/grupo/$peladaId'
+      preLoaderRoute: typeof AuthenticatedGrupoPeladaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chat/$threadId': {
       id: '/_authenticated/chat/$threadId'
       path: '/chat/$threadId'
@@ -354,6 +374,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedGrupoPeladaIdRoute: typeof AuthenticatedGrupoPeladaIdRoute
   AuthenticatedJogadorUserIdRoute: typeof AuthenticatedJogadorUserIdRoute
   AuthenticatedPeladaPeladaIdRoute: typeof AuthenticatedPeladaPeladaIdRoute
   AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
@@ -367,6 +388,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedGrupoPeladaIdRoute: AuthenticatedGrupoPeladaIdRoute,
   AuthenticatedJogadorUserIdRoute: AuthenticatedJogadorUserIdRoute,
   AuthenticatedPeladaPeladaIdRoute: AuthenticatedPeladaPeladaIdRoute,
   AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,

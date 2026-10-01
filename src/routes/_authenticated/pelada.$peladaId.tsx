@@ -486,9 +486,12 @@ function PeladaDetailPage() {
         <div className="max-w-[430px] mx-auto">
           {isOrganizer ? (
             <div className="flex gap-2">
-              <div className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/60 rounded-2xl font-display font-extrabold italic uppercase text-center">
-                Você organiza
-              </div>
+              <button
+                onClick={() => setManageOpen(true)}
+                className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/80 rounded-2xl font-display font-extrabold italic uppercase text-center flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              >
+                <Settings2 className="size-5 text-cyan" /> Gerenciar pelada
+              </button>
               <button
                 onClick={deletePelada}
                 className="px-4 rounded-2xl bg-destructive/10 border border-destructive/40 text-destructive grid place-items-center active:scale-95 transition-transform"
@@ -503,7 +506,7 @@ function PeladaDetailPage() {
               disabled={requesting}
               className="w-full py-4 bg-navy-soft border border-cyan/30 text-cyan rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
             >
-              <Check className="size-5" /> Você está dentro — Sair
+              <Check className="size-5" /> Você entrou na pelada — Sair
             </button>
           ) : myRequest?.status === "pending" ? (
             <button
@@ -511,16 +514,48 @@ function PeladaDetailPage() {
               disabled={requesting}
               className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
             >
-              Solicitação pendente — Cancelar
+              Solicitação enviada — Cancelar
             </button>
-          ) : myRequest?.status === "rejected" ? (
+          ) : myRequest?.status === "waitlist" ? (
+            isFull ? (
+              <button
+                onClick={cancelRequest}
+                disabled={requesting}
+                className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
+              >
+                Na lista de espera — Sair
+              </button>
+            ) : (
+              <button
+                onClick={requestJoin}
+                disabled={requesting}
+                className="w-full py-5 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase text-lg active:scale-95 transition-transform"
+              >
+                {requesting ? "..." : "Abriu vaga — Entrar agora"}
+              </button>
+            )
+          ) : myRequest?.status === "rejected" || myRequest?.status === "removed" ? (
             <div className="w-full py-4 bg-navy-soft border border-destructive/40 text-destructive rounded-2xl font-display font-extrabold italic uppercase text-center flex items-center justify-center gap-2">
               <X className="size-5" /> Solicitação recusada
             </div>
-          ) : isFull ? (
+          ) : isClosed ? (
             <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold italic uppercase text-center">
-              Pelada lotada
+              Pelada encerrada
             </div>
+          ) : isFull ? (
+            pelada.waitlist_enabled ? (
+              <button
+                onClick={requestJoin}
+                disabled={requesting}
+                className="w-full py-4 bg-navy-soft border border-cyan/40 text-cyan rounded-2xl font-display font-extrabold italic uppercase active:scale-95 transition-transform"
+              >
+                {requesting ? "..." : `Lotada ${pelada.filled_slots}/${pelada.total_slots} — Entrar na lista de espera`}
+              </button>
+            ) : (
+              <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold italic uppercase text-center">
+                Pelada lotada
+              </div>
+            )
           ) : (
             <button
               onClick={requestJoin}
@@ -532,6 +567,14 @@ function PeladaDetailPage() {
           )}
         </div>
       </div>
+
+      {isOrganizer && <OrganizerManageSheet pelada={pelada} open={manageOpen} onOpenChange={setManageOpen} />}
+      <ReportSheet
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        target={{ type: "pelada", peladaId: pelada.id, reportedUserId: pelada.organizer_id }}
+        reporterId={user.id}
+      />
     </div>
   );
 }
