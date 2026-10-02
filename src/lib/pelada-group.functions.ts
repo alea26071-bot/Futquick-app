@@ -235,3 +235,29 @@ export const notifyGroupMessage = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const addParticipant = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ peladaId: z.string().uuid(), userId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: status, error } = await context.supabase.rpc("add_pelada_participant", {
+      _pelada_id: data.peladaId,
+      _user_id: data.userId,
+    });
+    if (error) throw new Error(error.message);
+    if (status === "accepted") {
+      const { data: p } = await context.supabase.from("peladas").select("id, name").eq("id", data.peladaId).single();
+      const who = await nameOf(context.supabase, context.userId);
+      const { notifyUser } = await import("@/lib/notifications.server");
+      await notifyUser({
+        userId: data.userId,
+        type: "added_to_pelada",
+        title: "Você foi adicionado a uma pelada ⚽",
+        body: `${who} te adicionou na ${p?.name ?? "pelada"}. O chat do grupo já está liberado.`,
+        url: `/grupo/${data.peladaId}`,
+        data: { peladaId: data.peladaId },
+        dedupeKey: `added:${data.peladaId}:${data.userId}`,
+      });
+    }
+    return { status: status as string };
+  });

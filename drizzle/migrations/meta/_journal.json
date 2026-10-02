@@ -15,6 +15,13 @@
       "when": 1790729209921,
       "tag": "0001_pelada_groups_security",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790977821259,
+      "tag": "0002_add_pelada_participant",
+      "breakpoints": true
     }
   ]
 }
