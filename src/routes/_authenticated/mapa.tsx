@@ -140,6 +140,10 @@ function MapaPage() {
 
       {/* Top: back + search */}
       <div className="absolute top-0 left-0 right-0 pt-12 px-4 pb-4 z-20">
+        <div className="grid grid-cols-2 p-1 mb-3 rounded-full bg-navy border border-white/10 shadow-lg">
+          <span className="py-2 rounded-full text-center text-xs font-bold uppercase tracking-wider bg-cyan text-navy">Mapa</span>
+          <Link to="/descobrir" className="py-2 rounded-full text-center text-xs font-bold uppercase tracking-wider text-white/60">Lista</Link>
+        </div>
         <div className="flex items-center gap-2">
           <Link to="/descobrir" className="size-11 rounded-full bg-navy border border-white/10 grid place-items-center shadow-lg flex-none">
             <ArrowLeft className="size-5 text-white" />

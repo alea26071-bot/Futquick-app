@@ -133,6 +133,14 @@ function DescobrirPage() {
           </Link>
         </div>
 
+        <div className="grid grid-cols-2 p-1 mb-3 rounded-full bg-navy-soft border border-white/10">
+          <Link to="/mapa" className="py-2 rounded-full text-center text-xs font-bold uppercase tracking-wider text-white/60">
+            Mapa
+          </Link>
+          <span className="py-2 rounded-full text-center text-xs font-bold uppercase tracking-wider bg-cyan text-navy">
+            Lista
+          </span>
+        </div>
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
           {FILTERS.map((f) => {
             const active = activeFilters.has(f.id);

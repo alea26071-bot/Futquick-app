@@ -170,6 +170,8 @@ export const invitePlayerToPelada = createServerFn({ method: "POST" })
   .inputValidator((input: { peladaId: string; playerId: string }) => input)
   .handler(async ({ data, context }) => {
     if (data.playerId === context.userId) throw new Error("Você não pode convidar a si mesmo");
+    const { data: blockedPair } = await context.supabase.rpc("is_blocked", { _a: context.userId, _b: data.playerId });
+    if (blockedPair) throw new Error("Não é possível convidar este jogador");
 
     const { data: pelada } = await context.supabase
       .from("peladas")
