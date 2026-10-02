@@ -142,6 +142,7 @@ function PlayerProfilePage() {
     }
   };
 
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const shareProfile = async () => {
     const url = window.location.href;
     const title = `${profile?.name || "Jogador"} no Futquick`;
@@ -184,11 +185,19 @@ function PlayerProfilePage() {
           <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
             <ArrowLeft className="size-6" strokeWidth={2.5} />
           </Button>
-          <Button aria-label="Compartilhar perfil" onClick={shareProfile} variant="ghost" size="icon" className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
+          <Button aria-label="Mais opções" onClick={() => setOptionsOpen(true)} variant="ghost" size="icon" className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
             <MoreHorizontal className="size-6" strokeWidth={2.5} />
           </Button>
         </div>
       </section>
+      <ProfileOptionsSheet
+        open={optionsOpen}
+        onOpenChange={setOptionsOpen}
+        isMe={isMe}
+        meId={user.id}
+        otherId={userId}
+        onShare={shareProfile}
+      />
 
       <section className="relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
         <div className="mx-auto size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl">
