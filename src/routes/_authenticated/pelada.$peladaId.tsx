@@ -3,13 +3,17 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, WEEKDAY_LABEL, brTimeString, brWeekday, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin, Flag, Users, Lock, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { PostMatchRating } from "@/components/PostMatchRating";
 import { pinPelada, setTemplateActive, createNextFromTemplate } from "@/lib/pelada-templates.functions";
 import { PeladaPlayersSection } from "@/components/PeladaPlayersSheet";
 import { PeladaRequestsPanel } from "@/components/PeladaRequestsPanel";
+import { joinPelada, leavePelada } from "@/lib/pelada-group.functions";
+import { OrganizerManageSheet } from "@/components/OrganizerManageSheet";
+import { ReportSheet } from "@/components/ReportSheet";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
@@ -86,6 +90,10 @@ function PeladaDetailPage() {
   });
 
   const [pinning, setPinning] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const joinFn = useServerFn(joinPelada);
+  const leaveFn = useServerFn(leavePelada);
 
   if (isLoading || !pelada) {
     return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Carregando...</div>;
@@ -94,6 +102,7 @@ function PeladaDetailPage() {
   const isOrganizer = pelada.organizer_id === user.id;
   const remaining = pelada.total_slots - pelada.filled_slots;
   const isFull = remaining <= 0;
+  const isClosed = pelada.status !== "open" || new Date(pelada.starts_at).getTime() < Date.now();
   const peladaWeekday = brWeekday(new Date(pelada.starts_at));
   const peladaTime = brTimeString(new Date(pelada.starts_at));
   const isPinned = !!template?.active;
@@ -144,29 +153,20 @@ function PeladaDetailPage() {
 
 
 
+  const refreshMine = () => {
+    qc.invalidateQueries({ queryKey: ["pelada", peladaId] });
+    qc.invalidateQueries({ queryKey: ["pelada-request", peladaId, user.id] });
+    qc.invalidateQueries({ queryKey: ["peladas"] });
+  };
+
   const requestJoin = async () => {
     setRequesting(true);
     try {
-      if (pelada.auto_approve) {
-        const { error } = await supabase.from("pelada_requests").insert({
-          pelada_id: pelada.id,
-          user_id: user.id,
-          status: "accepted",
-          responded_at: new Date().toISOString(),
-        });
-        if (error) throw error;
-        toast.success("Você está dentro! Boa pelada.");
-      } else {
-        const { error } = await supabase.from("pelada_requests").insert({
-          pelada_id: pelada.id,
-          user_id: user.id,
-          status: "pending",
-        });
-        if (error) throw error;
-        toast.success("Solicitação enviada. Aguarde a resposta do organizador.");
-      }
-      qc.invalidateQueries({ queryKey: ["pelada", peladaId] });
-      qc.invalidateQueries({ queryKey: ["pelada-request", peladaId, user.id] });
+      const { status } = await joinFn({ data: { peladaId: pelada.id } });
+      if (status === "accepted") toast.success("Você entrou na pelada! O grupo já está liberado.");
+      else if (status === "pending") toast.success("Solicitação enviada. Aguarde a resposta do organizador.");
+      else if (status === "waitlist") toast.success("Você está na lista de espera. Avisaremos se abrir vaga.");
+      refreshMine();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao entrar");
     } finally {
@@ -176,17 +176,16 @@ function PeladaDetailPage() {
 
   const cancelRequest = async () => {
     if (!myRequest) return;
+    if (myRequest.status === "accepted" && !window.confirm("Sair da pelada? Sua vaga será liberada.")) return;
     setRequesting(true);
-    const { error } = await supabase
-      .from("pelada_requests")
-      .update({ status: "cancelled" })
-      .eq("id", myRequest.id);
-    setRequesting(false);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Você saiu da pelada.");
-      qc.invalidateQueries({ queryKey: ["pelada", peladaId] });
-      qc.invalidateQueries({ queryKey: ["pelada-request", peladaId, user.id] });
+    try {
+      await leaveFn({ data: { peladaId: pelada.id } });
+      toast.success(myRequest.status === "accepted" ? "Você saiu da pelada." : "Pedido cancelado.");
+      refreshMine();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro");
+    } finally {
+      setRequesting(false);
     }
   };
 
@@ -280,6 +279,11 @@ function PeladaDetailPage() {
             <button onClick={share} className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
               <Share2 className="size-5 text-white" />
             </button>
+            {!isOrganizer && (
+              <button onClick={() => setReportOpen(true)} aria-label="Denunciar pelada" className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
+                <Flag className="size-5 text-white" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -350,6 +354,20 @@ function PeladaDetailPage() {
         </div>
 
         <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
+
+        {isOrganizer || myRequest?.status === "accepted" ? (
+          <Link
+            to="/grupo/$peladaId"
+            params={{ peladaId: pelada.id }}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-cyan/10 border border-cyan/40 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
+          >
+            <Users className="size-5" /> Grupo da pelada
+          </Link>
+        ) : (
+          <p className="text-center text-xs text-white/40 flex items-center justify-center gap-1">
+            <Lock className="size-3" /> O grupo é liberado quando sua entrada for confirmada.
+          </p>
+        )}
 
         {isOrganizer && (
           <PeladaRequestsPanel
