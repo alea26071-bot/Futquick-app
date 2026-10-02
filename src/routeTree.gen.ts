@@ -9,31 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
-import { Route as AuthenticatedDescobrirRouteImport } from './routes/_authenticated/descobrir'
-import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
-import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
+import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
+import { Route as AuthenticatedDescobrirRouteImport } from './routes/_authenticated/descobrir'
+import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
-import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
-import { Route as AuthenticatedGrupoPeladaIdRouteImport } from './routes/_authenticated/grupo.$peladaId'
-import { Route as AuthenticatedJogadorUserIdRouteImport } from './routes/_authenticated/jogador.$userId'
 import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authenticated/pelada.$peladaId'
-import { Route as ApiPublicCronRatingRemindersRouteImport } from './routes/api/public/cron/rating-reminders'
+import { Route as AuthenticatedJogadorUserIdRouteImport } from './routes/_authenticated/jogador.$userId'
+import { Route as AuthenticatedGrupoPeladaIdRouteImport } from './routes/_authenticated/grupo.$peladaId'
+import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
+import { Route as ApiPublicCronRatingRemindersRouteImport } from './routes/api/public/cron/rating-reminders'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -41,29 +37,18 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
-  id: '/criar',
-  path: '/criar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDescobrirRoute = AuthenticatedDescobrirRouteImport.update({
-  id: '/descobrir',
-  path: '/descobrir',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
-  id: '/mapa',
-  path: '/mapa',
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificacoesRoute =
@@ -72,9 +57,24 @@ const AuthenticatedNotificacoesRoute =
     path: '/notificacoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
+const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDescobrirRoute = AuthenticatedDescobrirRouteImport.update({
+  id: '/descobrir',
+  path: '/descobrir',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
+  id: '/criar',
+  path: '/criar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
@@ -82,16 +82,10 @@ const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
   path: '/chat/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedChatThreadIdRoute =
-  AuthenticatedChatThreadIdRouteImport.update({
-    id: '/chat/$threadId',
-    path: '/chat/$threadId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedGrupoPeladaIdRoute =
-  AuthenticatedGrupoPeladaIdRouteImport.update({
-    id: '/grupo/$peladaId',
-    path: '/grupo/$peladaId',
+const AuthenticatedPeladaPeladaIdRoute =
+  AuthenticatedPeladaPeladaIdRouteImport.update({
+    id: '/pelada/$peladaId',
+    path: '/pelada/$peladaId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedJogadorUserIdRoute =
@@ -100,22 +94,28 @@ const AuthenticatedJogadorUserIdRoute =
     path: '/jogador/$userId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedPeladaPeladaIdRoute =
-  AuthenticatedPeladaPeladaIdRouteImport.update({
-    id: '/pelada/$peladaId',
-    path: '/pelada/$peladaId',
+const AuthenticatedGrupoPeladaIdRoute =
+  AuthenticatedGrupoPeladaIdRouteImport.update({
+    id: '/grupo/$peladaId',
+    path: '/grupo/$peladaId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicCronRatingRemindersRoute =
-  ApiPublicCronRatingRemindersRouteImport.update({
-    id: '/api/public/cron/rating-reminders',
-    path: '/api/public/cron/rating-reminders',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedChatThreadIdRoute =
+  AuthenticatedChatThreadIdRouteImport.update({
+    id: '/chat/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicCronRecurringPeladasRoute =
   ApiPublicCronRecurringPeladasRouteImport.update({
     id: '/api/public/cron/recurring-peladas',
     path: '/api/public/cron/recurring-peladas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCronRatingRemindersRoute =
+  ApiPublicCronRatingRemindersRouteImport.update({
+    id: '/api/public/cron/rating-reminders',
+    path: '/api/public/cron/rating-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -244,18 +244,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -265,39 +258,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/criar': {
-      id: '/_authenticated/criar'
-      path: '/criar'
-      fullPath: '/criar'
-      preLoaderRoute: typeof AuthenticatedCriarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/descobrir': {
-      id: '/_authenticated/descobrir'
-      path: '/descobrir'
-      fullPath: '/descobrir'
-      preLoaderRoute: typeof AuthenticatedDescobrirRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/mapa': {
-      id: '/_authenticated/mapa'
-      path: '/mapa'
-      fullPath: '/mapa'
-      preLoaderRoute: typeof AuthenticatedMapaRouteImport
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notificacoes': {
@@ -307,11 +286,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/perfil': {
-      id: '/_authenticated/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+    '/_authenticated/mapa': {
+      id: '/_authenticated/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof AuthenticatedMapaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/descobrir': {
+      id: '/_authenticated/descobrir'
+      path: '/descobrir'
+      fullPath: '/descobrir'
+      preLoaderRoute: typeof AuthenticatedDescobrirRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/criar': {
+      id: '/_authenticated/criar'
+      path: '/criar'
+      fullPath: '/criar'
+      preLoaderRoute: typeof AuthenticatedCriarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chat/': {
@@ -321,18 +321,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/chat/$threadId': {
-      id: '/_authenticated/chat/$threadId'
-      path: '/chat/$threadId'
-      fullPath: '/chat/$threadId'
-      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/grupo/$peladaId': {
-      id: '/_authenticated/grupo/$peladaId'
-      path: '/grupo/$peladaId'
-      fullPath: '/grupo/$peladaId'
-      preLoaderRoute: typeof AuthenticatedGrupoPeladaIdRouteImport
+    '/_authenticated/pelada/$peladaId': {
+      id: '/_authenticated/pelada/$peladaId'
+      path: '/pelada/$peladaId'
+      fullPath: '/pelada/$peladaId'
+      preLoaderRoute: typeof AuthenticatedPeladaPeladaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/jogador/$userId': {
@@ -342,25 +335,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJogadorUserIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/pelada/$peladaId': {
-      id: '/_authenticated/pelada/$peladaId'
-      path: '/pelada/$peladaId'
-      fullPath: '/pelada/$peladaId'
-      preLoaderRoute: typeof AuthenticatedPeladaPeladaIdRouteImport
+    '/_authenticated/grupo/$peladaId': {
+      id: '/_authenticated/grupo/$peladaId'
+      path: '/grupo/$peladaId'
+      fullPath: '/grupo/$peladaId'
+      preLoaderRoute: typeof AuthenticatedGrupoPeladaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/cron/rating-reminders': {
-      id: '/api/public/cron/rating-reminders'
-      path: '/api/public/cron/rating-reminders'
-      fullPath: '/api/public/cron/rating-reminders'
-      preLoaderRoute: typeof ApiPublicCronRatingRemindersRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/chat/$threadId': {
+      id: '/_authenticated/chat/$threadId'
+      path: '/chat/$threadId'
+      fullPath: '/chat/$threadId'
+      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/cron/recurring-peladas': {
       id: '/api/public/cron/recurring-peladas'
       path: '/api/public/cron/recurring-peladas'
       fullPath: '/api/public/cron/recurring-peladas'
       preLoaderRoute: typeof ApiPublicCronRecurringPeladasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/rating-reminders': {
+      id: '/api/public/cron/rating-reminders'
+      path: '/api/public/cron/rating-reminders'
+      fullPath: '/api/public/cron/rating-reminders'
+      preLoaderRoute: typeof ApiPublicCronRatingRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
