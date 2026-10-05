@@ -95,3 +95,6 @@ export function nextOccurrenceISO(weekday: number, timeOfDay: string, from: Date
   }
   return null;
 }
+
+export const MAX_SLOTS: Record<string, number> = { campo: 30, society: 21, futsal: 16 };
+export const maxSlotsFor = (field: string) => MAX_SLOTS[field] ?? 30;
