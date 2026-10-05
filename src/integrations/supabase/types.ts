@@ -448,6 +448,7 @@ export type Database = {
           duration_minutes: number
           field_type: string
           filled_slots: number
+          group_mode: string
           id: string
           latitude: number
           level: string
@@ -475,6 +476,7 @@ export type Database = {
           duration_minutes?: number
           field_type: string
           filled_slots?: number
+          group_mode?: string
           id?: string
           latitude: number
           level: string
@@ -502,6 +504,7 @@ export type Database = {
           duration_minutes?: number
           field_type?: string
           filled_slots?: number
+          group_mode?: string
           id?: string
           latitude?: number
           level?: string
@@ -774,6 +777,7 @@ export type Database = {
         Returns: boolean
       }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_group_open: { Args: { _pelada_id: string }; Returns: boolean }
       is_pelada_member: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: boolean
@@ -784,6 +788,8 @@ export type Database = {
       }
       join_pelada: { Args: { _pelada_id: string }; Returns: string }
       leave_pelada: { Args: { _pelada_id: string }; Returns: string }
+      max_slots_for: { Args: { _field: string }; Returns: number }
+      pelada_group_maintenance: { Args: never; Returns: undefined }
       recompute_player_stats: { Args: { _user_id: string }; Returns: undefined }
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }

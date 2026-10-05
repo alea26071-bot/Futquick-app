@@ -22,6 +22,13 @@
       "when": 1790977821259,
       "tag": "0002_add_pelada_participant",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791241284316,
+      "tag": "0003_group_limits_retention",
+      "breakpoints": true
     }
   ]
 }
