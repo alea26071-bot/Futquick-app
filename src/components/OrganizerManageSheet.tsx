@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
-import { updatePeladaDetails, removeParticipant, transferPelada } from "@/lib/pelada-group.functions";
+import { updatePeladaDetails, removeParticipant, transferPelada, addParticipant } from "@/lib/pelada-group.functions";
 import type { Database } from "@/integrations/supabase/types";
 
 type Pelada = Database["public"]["Tables"]["peladas"]["Row"];
@@ -21,6 +21,7 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
   const save = useServerFn(updatePeladaDetails);
   const remove = useServerFn(removeParticipant);
   const transfer = useServerFn(transferPelada);
+  const add = useServerFn(addParticipant);
   const [form, setForm] = useState(() => ({
     name: pelada.name,
     description: pelada.description ?? "",
@@ -58,6 +59,23 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
     },
   });
 
+  const [search, setSearch] = useState("");
+  const term = search.trim().replace(/^@/, "").replace(/[%,()]/g, "");
+  const { data: results = [] } = useQuery({
+    queryKey: ["pelada-add-search", pelada.id, term],
+    enabled: open && term.length >= 2,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, name, username, avatar_url")
+        .or(`name.ilike.%${term}%,username.ilike.%${term}%`)
+        .neq("id", pelada.organizer_id)
+        .is("suspended_at", null)
+        .limit(8);
+      return data ?? [];
+    },
+  });
+
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["pelada", pelada.id] });
     qc.invalidateQueries({ queryKey: ["pelada-manage-members", pelada.id] });
@@ -91,6 +109,16 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
       toast.error(e instanceof Error ? e.message : "Erro ao salvar");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const doAdd = async (id: string, name: string) => {
+    try {
+      const r = await add({ data: { peladaId: pelada.id, userId: id } });
+      toast.success(r.status === "already" ? `${name} já está no grupo` : `${name} adicionado à pelada e ao chat`);
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro");
     }
   };
 
@@ -163,6 +191,30 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
             <button onClick={() => submit(false)} disabled={busy} className="w-full py-4 rounded-2xl bg-cyan text-navy font-display font-extrabold italic uppercase disabled:opacity-50">
               Salvar alterações
             </button>
+
+            <div className="space-y-2">
+              <p className="text-mono-label text-white/50">Adicionar jogador</p>
+              <input className={input} placeholder="Buscar pelo nome ou usuário" value={search} onChange={(e) => setSearch(e.target.value)} />
+              {results.map((u) => {
+                const isIn = members.some((m) => m.id === u.id);
+                return (
+                  <div key={u.id} className="flex items-center justify-between gap-2 p-3 rounded-2xl bg-navy-soft border border-white/5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="size-9 rounded-full bg-cyan/20 overflow-hidden grid place-items-center flex-none">
+                        {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : <span className="text-cyan text-sm font-bold">{u.name?.[0]}</span>}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white font-bold truncate">{u.name}</p>
+                        {u.username && <p className="text-xs text-white/50 truncate">@{u.username}</p>}
+                      </div>
+                    </div>
+                    <button disabled={isIn} onClick={() => doAdd(u.id, u.name)} className="px-3 py-1.5 rounded-lg bg-cyan text-navy text-[11px] font-bold uppercase disabled:opacity-40 flex-none">
+                      {isIn ? "No grupo" : "Adicionar"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
 
             {members.length > 0 && (
               <div className="space-y-2">
