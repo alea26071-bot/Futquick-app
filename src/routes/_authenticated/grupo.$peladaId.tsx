@@ -194,6 +194,9 @@ function GroupChatPage() {
     );
   }
 
+  const endsAt = new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000;
+  const groupOpen = pelada.status !== "finished" && (pelada.group_mode === "permanent" || endsAt > Date.now());
+
   return (
     <div className="h-[100dvh] bg-navy flex flex-col">
       <header className="pt-12 px-4 pb-3 flex items-center gap-3 border-b border-white/10 bg-navy">
