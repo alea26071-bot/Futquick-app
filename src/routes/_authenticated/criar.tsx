@@ -6,7 +6,7 @@ import { LocationPicker, type LocationResult } from "@/components/LocationPicker
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { pinPelada } from "@/lib/pelada-templates.functions";
-import { WEEKDAY_LABEL, brWeekday } from "@/lib/pelada-utils";
+import { WEEKDAY_LABEL, brWeekday, maxSlotsFor } from "@/lib/pelada-utils";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
 
 
