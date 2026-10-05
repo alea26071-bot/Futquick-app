@@ -194,6 +194,9 @@ function GroupChatPage() {
     );
   }
 
+  const endsAt = new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000;
+  const groupOpen = pelada.status !== "finished" && (pelada.group_mode === "permanent" || endsAt > Date.now());
+
   return (
     <div className="h-[100dvh] bg-navy flex flex-col">
       <header className="pt-12 px-4 pb-3 flex items-center gap-3 border-b border-white/10 bg-navy">
@@ -266,6 +269,11 @@ function GroupChatPage() {
         })}
       </div>
 
+      {!groupOpen ? (
+        <div className="p-4 border-t border-white/10 bg-navy pb-6 text-center text-sm text-white/50">
+          Grupo encerrado — a pelada já terminou. Mensagens ficam guardadas por {pelada.template_id ? "7 dias" : "24h"}.
+        </div>
+      ) : (
       <div className="p-3 border-t border-white/10 flex items-center gap-2 bg-navy pb-6">
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && sendPhoto(e.target.files[0])} />
         <button onClick={() => fileRef.current?.click()} disabled={sending} className="size-11 rounded-full bg-navy-soft grid place-items-center" aria-label="Enviar foto">
@@ -282,6 +290,7 @@ function GroupChatPage() {
           <Send className="size-5 text-navy" />
         </button>
       </div>
+      )}
 
       <Sheet open={infoOpen} onOpenChange={setInfoOpen}>
         <SheetContent side="bottom" className="bg-navy border-white/10 rounded-t-3xl max-h-[90vh] overflow-y-auto">

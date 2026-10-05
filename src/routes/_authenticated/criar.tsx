@@ -6,7 +6,7 @@ import { LocationPicker, type LocationResult } from "@/components/LocationPicker
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { pinPelada } from "@/lib/pelada-templates.functions";
-import { WEEKDAY_LABEL, brWeekday } from "@/lib/pelada-utils";
+import { WEEKDAY_LABEL, brWeekday, maxSlotsFor } from "@/lib/pelada-utils";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
 
 
@@ -77,6 +77,7 @@ function CriarPage() {
   }, [search.lat, search.lng]);
 
   const canNext1 = name.trim().length >= 3 && location !== null;
+  useEffect(() => { setTotalSlots((s) => Math.min(s, maxSlotsFor(fieldType))); }, [fieldType]);
   const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;
 
   const pickCover = async (file: File) => {
@@ -366,13 +367,13 @@ function CriarPage() {
                   </span>
                 </div>
                 <button
-                  onClick={() => setTotalSlots((s) => Math.min(40, s + 1))}
+                  onClick={() => setTotalSlots((s) => Math.min(maxSlotsFor(fieldType), s + 1))}
                   className="size-12 rounded-full bg-cyan text-navy grid place-items-center"
                 >
                   <Plus className="size-5" strokeWidth={3} />
                 </button>
               </div>
-              <p className="text-xs text-white/50">Você já conta como 1 jogador. Total do time: {totalSlots}.</p>
+              <p className="text-xs text-white/50">Você já conta como 1 jogador. Total do time: {totalSlots} (máx. {maxSlotsFor(fieldType)}).</p>
             </div>
 
             <div className="space-y-3">

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { LocationPicker, type LocationResult } from "@/components/LocationPicker";
 import { updatePeladaDetails, removeParticipant, transferPelada, addParticipant } from "@/lib/pelada-group.functions";
+import { maxSlotsFor } from "@/lib/pelada-utils";
 import type { Database } from "@/integrations/supabase/types";
 
 type Pelada = Database["public"]["Tables"]["peladas"]["Row"];
@@ -29,6 +30,7 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
     totalSlots: pelada.total_slots,
     autoApprove: pelada.auto_approve,
     waitlistEnabled: pelada.waitlist_enabled,
+    groupPermanent: pelada.group_mode === "permanent",
     loc: { name: pelada.location_name, address: pelada.address, lat: pelada.latitude, lng: pelada.longitude },
   }));
   const [picking, setPicking] = useState(false);
@@ -43,6 +45,7 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
       totalSlots: pelada.total_slots,
       autoApprove: pelada.auto_approve,
       waitlistEnabled: pelada.waitlist_enabled,
+    groupPermanent: pelada.group_mode === "permanent",
       loc: { name: pelada.location_name, address: pelada.address, lat: pelada.latitude, lng: pelada.longitude },
     });
   }, [open, pelada]);
@@ -95,6 +98,7 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
           totalSlots: Number(form.totalSlots),
           autoApprove: form.autoApprove,
           waitlistEnabled: form.waitlistEnabled,
+          groupMode: form.groupPermanent ? "permanent" : "temporary",
           locationName: form.loc.name,
           address: form.loc.address,
           latitude: form.loc.lat,
@@ -167,7 +171,7 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
               </div>
               <div>
                 <span className={label}>Total de vagas</span>
-                <input type="number" min={2} max={100} className={input} value={form.totalSlots} onChange={(e) => setForm({ ...form, totalSlots: Number(e.target.value) })} />
+                <input type="number" min={2} max={maxSlotsFor(pelada.field_type)} className={input} value={form.totalSlots} onChange={(e) => setForm({ ...form, totalSlots: Number(e.target.value) })} />
               </div>
             </div>
             <div>
@@ -187,6 +191,10 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
             <label className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/10">
               <span className="text-sm text-white font-bold">Lista de espera quando lotar</span>
               <input type="checkbox" checked={form.waitlistEnabled} onChange={(e) => setForm({ ...form, waitlistEnabled: e.target.checked })} className="size-5 accent-[var(--color-cyan)]" />
+            </label>
+            <label className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/10">
+              <span className="text-sm text-white font-bold">Manter o grupo ativo após a pelada (até eu encerrar)</span>
+              <input type="checkbox" checked={form.groupPermanent} onChange={(e) => setForm({ ...form, groupPermanent: e.target.checked })} className="size-5 accent-[var(--color-cyan)]" />
             </label>
             <button onClick={() => submit(false)} disabled={busy} className="w-full py-4 rounded-2xl bg-cyan text-navy font-display font-extrabold italic uppercase disabled:opacity-50">
               Salvar alterações
