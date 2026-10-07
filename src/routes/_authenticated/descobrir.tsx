@@ -8,6 +8,7 @@ import { haversineKm } from "@/lib/pelada-utils";
 import { Zap } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { Logo } from "@/components/Logo";
+import { useGameTerm } from "@/components/GameTermProvider";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
   ssr: false,
@@ -24,6 +25,7 @@ const FILTERS = [
 ] as const;
 
 function DescobrirPage() {
+  const { createLabel } = useGameTerm();
   const { user } = Route.useRouteContext();
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(["hoje"]));
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -190,7 +192,7 @@ function DescobrirPage() {
               to="/criar"
               className="inline-block px-6 py-3 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase text-sm"
             >
-              Criar Pelada
+              {createLabel}
             </Link>
           </div>
         ) : (

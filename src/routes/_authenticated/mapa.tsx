@@ -188,7 +188,7 @@ function MapaPage() {
           </button>
         </div>
         <p className="text-[11px] text-white/60 text-center mt-3 bg-navy/60 backdrop-blur-md rounded-full py-1.5 px-3 mx-auto w-fit">
-          Toque em qualquer lugar do mapa para criar uma pelada
+          Toque em qualquer lugar do mapa para criar um jogo
         </p>
       </div>
 
@@ -255,7 +255,7 @@ function MapaPage() {
               className="w-full py-3 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2 active:scale-95 transition-transform"
             >
               <Plus className="size-5" strokeWidth={3} />
-              Criar pelada aqui
+              Criar jogo aqui
             </button>
           </div>
         </div>
