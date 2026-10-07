@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, WEEKDAY_LABEL, brTimeString, brWeekday, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
-import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin, Flag, Users, Lock, Settings2 } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin, Flag, Users, Lock, Settings2, Tag, ChartNoAxesColumnIncreasing } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -17,6 +18,14 @@ import { ReportSheet } from "@/components/ReportSheet";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Informações da pelada | Futquick" },
+    { name: "description", content: "Confira horário, organizador, vagas, valor e localização da pelada no Futquick." },
+    { property: "og:title", content: "Informações da pelada | Futquick" },
+    { property: "og:description", content: "Veja os detalhes da partida e os jogadores confirmados no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: PeladaDetailPage,
 });
 
@@ -255,8 +264,8 @@ function PeladaDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-navy pb-32">
-      <div className="relative h-72">
+    <div className="pelada-detail min-h-screen bg-background pb-32">
+      <div className="pelada-cover relative">
         {pelada.photo_url ? (
           <img src={pelada.photo_url} alt={pelada.name} className="w-full h-full object-cover" />
         ) : (
@@ -266,88 +275,88 @@ function PeladaDetailPage() {
             </span>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-navy/60" />
+        <div className="pelada-cover-fade absolute inset-0" />
 
         <div className="absolute top-0 left-0 right-0 pt-12 px-4 flex justify-between">
-          <button onClick={() => navigate({ to: "/descobrir" })} className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
-            <ArrowLeft className="size-5 text-white" />
-          </button>
+          <Button variant="ghost" size="icon" aria-label="Voltar" onClick={() => navigate({ to: "/descobrir" })} className="pelada-cover-action">
+            <ArrowLeft />
+          </Button>
           <div className="flex gap-2">
-            <button onClick={toggleLike} className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
-              <Heart className={`size-5 ${myLike ? "fill-cyan text-cyan" : "text-white"}`} />
-            </button>
-            <button onClick={share} className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
-              <Share2 className="size-5 text-white" />
-            </button>
+            <Button variant="ghost" size="icon" aria-label="Favoritar pelada" aria-pressed={myLike} onClick={toggleLike} className="pelada-cover-action">
+              <Heart className={myLike ? "fill-primary text-primary" : "text-foreground"} />
+            </Button>
+            <Button variant="ghost" size="icon" aria-label="Compartilhar pelada" onClick={share} className="pelada-cover-action">
+              <Share2 />
+            </Button>
             {!isOrganizer && (
-              <button onClick={() => setReportOpen(true)} aria-label="Denunciar pelada" className="size-10 rounded-full bg-navy/60 backdrop-blur-md grid place-items-center">
-                <Flag className="size-5 text-white" />
-              </button>
+              <Button variant="ghost" size="icon" onClick={() => setReportOpen(true)} aria-label="Denunciar pelada" className="pelada-cover-action">
+                <Flag />
+              </Button>
             )}
           </div>
         </div>
 
-        <div className="absolute bottom-6 left-5 right-5">
-          <p className="text-cyan font-mono text-xs font-bold uppercase tracking-widest mb-1">
+        <div className="absolute bottom-5 left-6 right-6">
+          <p className="pelada-date text-primary uppercase mb-1">
             {formatMatchDate(pelada.starts_at)}
           </p>
-          <h2 className="text-3xl font-display font-extrabold italic text-white uppercase leading-tight text-balance">
+          <h1 className="pelada-title text-foreground uppercase text-balance">
             {pelada.name}
-          </h2>
+          </h1>
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-6">
+      <div className="pelada-information px-6 py-6 space-y-5">
         {/* Organizer */}
         {organizer && (
           <Link
             to="/jogador/$userId"
             params={{ userId: pelada.organizer_id }}
-            className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/5 active:scale-[0.98] transition-transform"
+            className="pelada-organizer flex items-center justify-between gap-3 p-4 rounded-2xl bg-card border border-border active:scale-[0.98] transition-transform"
           >
-            <div className="flex items-center gap-3">
-              <div className="size-12 rounded-full bg-cyan/20 grid place-items-center overflow-hidden">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="size-14 rounded-full bg-primary/15 grid place-items-center overflow-hidden shrink-0">
                 {organizer.avatar_url ? (
                   <img src={organizer.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-cyan font-bold">{organizer.name?.[0]?.toUpperCase() || "?"}</span>
                 )}
               </div>
-              <div>
-                <p className="text-xs text-white/60 uppercase font-bold">Organizado por</p>
-                <p className="text-white font-bold">{organizer.name || "Anônimo"}</p>
+              <div className="min-w-0">
+                <p className="pelada-info-label">Organizado por</p>
+                <p className="pelada-organizer-name text-foreground break-words">{organizer.name || "Anônimo"}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-mono-label text-white/40">Postura</p>
-              <p className="text-cyan font-mono font-bold text-lg">{organizer.postura_score}%</p>
+            <div className="text-right border-l border-border pl-4 shrink-0">
+              <p className="pelada-info-label">Postura</p>
+              <p className="pelada-posture text-primary">{organizer.postura_score}%</p>
             </div>
           </Link>
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5">
-            <p className="text-mono-label text-white/40">Vagas restantes</p>
-            <p className="text-2xl font-display font-extrabold italic text-white mt-1">
+        <div className="pelada-stats grid grid-cols-2 gap-3">
+          <div className="pelada-stat">
+            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><Users /></span>Vagas restantes</p>
+            <p className="pelada-stat-value pelada-slots">
               {isFull ? "LOTADA" : `${remaining} / ${pelada.total_slots}`}
             </p>
           </div>
-          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5">
-            <p className="text-mono-label text-white/40">Valor</p>
-            <p className="text-2xl font-display font-extrabold italic text-white mt-1">
+          <div className="pelada-stat">
+            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><Tag /></span>Valor</p>
+            <p className="pelada-stat-value">
               {formatPrice(pelada.price_cents)}
             </p>
           </div>
-          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5">
-            <p className="text-mono-label text-white/40">Campo</p>
-            <p className="text-lg font-display font-extrabold text-white mt-1">
+          <div className="pelada-stat">
+            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><MapPin /></span>Campo</p>
+            <p className="pelada-stat-value">
               {FIELD_TYPE_LABEL[pelada.field_type]}
             </p>
           </div>
-          <div className="p-4 bg-navy-soft/60 rounded-2xl border border-white/5">
-            <p className="text-mono-label text-white/40">Nível</p>
-            <p className="text-lg font-display font-extrabold text-white mt-1">
+          <div className="pelada-stat">
+            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><ChartNoAxesColumnIncreasing /></span>Nível</p>
+            <p className="pelada-stat-value">
               {LEVEL_LABEL[pelada.level]}
             </p>
           </div>
@@ -410,8 +419,8 @@ function PeladaDetailPage() {
             {isPinned ? (
               <>
                 <p className="text-sm text-white/80">
-                  Fixa toda <span className="font-bold text-white">{WEEKDAY_LABEL[template!.weekday]}</span> ·{" "}
-                  {template!.time_of_day.slice(0, 5)} — criamos a próxima automaticamente.
+                  Fixa toda <span className="font-bold text-white">{template && WEEKDAY_LABEL[template.weekday]}</span> ·{" "}
+                  {template?.time_of_day.slice(0, 5)} — criamos a próxima automaticamente.
                 </p>
                 <div className="flex gap-2">
                   <button

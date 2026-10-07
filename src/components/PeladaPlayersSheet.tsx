@@ -5,6 +5,7 @@ import { Users, Star, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 type PlayerRow = {
   id: string;
@@ -171,24 +172,23 @@ export function PeladaPlayersSection({
 
   return (
     <>
-      <button
+      <Button variant="ghost"
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/5 active:scale-[0.99] transition-transform"
+        className="pelada-players-summary w-full h-auto whitespace-normal flex items-center justify-between p-4 rounded-2xl bg-card border border-border active:scale-[0.99] transition-transform"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="size-10 rounded-full bg-cyan/15 grid place-items-center flex-none">
-            <Users className="size-5 text-cyan" />
+          <div className="pelada-players-icon size-10 rounded-full bg-primary/15 grid place-items-center flex-none">
+            <Users className="size-5 text-primary" />
           </div>
           <div className="text-left min-w-0">
-            <p className="text-mono-label text-white/40">Ver jogadores</p>
-            <p className="text-white font-bold">
-              <span className="font-mono">{list.length}</span> de{" "}
-              <span className="font-mono">{totalSlots}</span> jogadores
+            <p className="pelada-info-label text-xs text-muted-foreground uppercase">Ver jogadores</p>
+            <p className="pelada-players-count text-foreground font-bold">
+              {list.length} de {totalSlots} jogadores
             </p>
           </div>
         </div>
-        <ChevronRight className="size-5 text-white/40 flex-none" />
-      </button>
+        <ChevronRight className="size-5 text-muted-foreground flex-none" />
+      </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
