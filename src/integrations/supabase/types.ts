@@ -541,6 +541,7 @@ export type Database = {
           city: string | null
           created_at: string
           favorite_position: string | null
+          game_term: string | null
           id: string
           latitude: number | null
           location_updated_at: string | null
@@ -566,6 +567,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           favorite_position?: string | null
+          game_term?: string | null
           id: string
           latitude?: number | null
           location_updated_at?: string | null
@@ -591,6 +593,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           favorite_position?: string | null
+          game_term?: string | null
           id?: string
           latitude?: number | null
           location_updated_at?: string | null

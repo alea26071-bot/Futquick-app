@@ -1,0 +1,3 @@
+ALTER TABLE public.profiles ADD COLUMN game_term text;
+ALTER TABLE public.profiles ADD CONSTRAINT profiles_game_term_valid CHECK (game_term IS NULL OR (game_term = btrim(game_term) AND char_length(game_term) BETWEEN 2 AND 30 AND game_term !~ '[[:cntrl:]<>]'));
+COMMENT ON COLUMN public.profiles.game_term IS 'Nome regional escolhido pelo usuário para jogos de futebol; NULL solicita escolha no primeiro acesso após cadastro.';
