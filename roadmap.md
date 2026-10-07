@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Ajustar informações e tipografia da página de pelada conforme a imagem enviada, preservando ações existentes.
+- [x] Ajustar informações e tipografia da página de pelada conforme a imagem enviada, preservando ações existentes (compilação validada; conferência autenticada depende de login no preview).
 
 - [x] Redesenhar o perfil público do jogador conforme a referência enviada.
 - [x] Preservar seguir e adicionar ações funcionais de mensagem e convite para pelada.
