@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Scope pelada detail presentation styles under `.pelada-detail` and use existing font and theme tokens so other screens remain unchanged.
