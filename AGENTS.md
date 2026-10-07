@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Scope pelada detail presentation styles under `.pelada-detail` and use existing font and theme tokens so other screens remain unchanged.
+- Store regional game terminology on the authenticated profile; share creation labels through the authenticated layout provider and validate preference writes in an authenticated server function.

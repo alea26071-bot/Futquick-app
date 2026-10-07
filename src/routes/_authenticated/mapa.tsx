@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
+import { useGameTerm } from "@/components/GameTermProvider";
 import { GoogleMap, loadGoogleMaps } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatPrice, timeUntil } from "@/lib/pelada-utils";
 import { ChevronRight, MapPin, ArrowLeft, Search, Plus, X, LocateFixed } from "lucide-react";
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/mapa")({
 const DEFAULT_CENTER = { lat: -23.5505, lng: -46.6333 };
 
 function MapaPage() {
+  const { createLabel } = useGameTerm();
   const navigate = useNavigate();
   const [center, setCenter] = useState(DEFAULT_CENTER);
   const [selected, setSelected] = useState<string | null>(null);
@@ -188,7 +190,7 @@ function MapaPage() {
           </button>
         </div>
         <p className="text-[11px] text-white/60 text-center mt-3 bg-navy/60 backdrop-blur-md rounded-full py-1.5 px-3 mx-auto w-fit">
-          Toque em qualquer lugar do mapa para criar uma pelada
+          Toque em qualquer lugar do mapa para criar um jogo
         </p>
       </div>
 
@@ -255,7 +257,7 @@ function MapaPage() {
               className="w-full py-3 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2 active:scale-95 transition-transform"
             >
               <Plus className="size-5" strokeWidth={3} />
-              Criar pelada aqui
+              {createLabel} aqui
             </button>
           </div>
         </div>

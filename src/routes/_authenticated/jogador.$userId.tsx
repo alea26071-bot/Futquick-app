@@ -1,4 +1,5 @@
 import { ProfileOptionsSheet } from "@/components/ProfileOptionsSheet";
+import { useGameTerm } from "@/components/GameTermProvider";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/jogador/$userId")({
 });
 
 function PlayerProfilePage() {
+  const { createLabel } = useGameTerm();
   const { userId } = Route.useParams();
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
@@ -262,7 +264,7 @@ function PlayerProfilePage() {
             {ownedPeladas.length === 0 ? (
               <div className="py-8 text-center">
                 <p className="text-sm text-muted-foreground">Você não tem uma pelada aberta no momento.</p>
-                <Button className="mt-4 rounded-full" onClick={() => navigate({ to: "/criar" })}>Criar pelada</Button>
+                <Button className="mt-4 rounded-full" onClick={() => navigate({ to: "/criar" })}>{createLabel}</Button>
               </div>
             ) : ownedPeladas.map((pelada) => (
               <Button key={pelada.id} variant="ghost" disabled={busyInvite === pelada.id} onClick={() => sendInvite(pelada.id)} className="h-auto w-full justify-between rounded-xl border border-border p-4 text-left">

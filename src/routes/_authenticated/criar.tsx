@@ -8,12 +8,21 @@ import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { pinPelada } from "@/lib/pelada-templates.functions";
 import { WEEKDAY_LABEL, brWeekday, maxSlotsFor } from "@/lib/pelada-utils";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
+import { useGameTerm } from "@/components/GameTermProvider";
 
 
 type CriarSearch = { lat?: number; lng?: number; address?: string };
 
 export const Route = createFileRoute("/_authenticated/criar")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Criar jogo | Futquick" },
+    { name: "description", content: "Organize um jogo de futebol no Futquick e convide jogadores." },
+    { property: "og:title", content: "Criar jogo | Futquick" },
+    { property: "og:description", content: "Escolha local, horário e vagas para sua partida." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (s: Record<string, unknown>): CriarSearch => ({
     lat: typeof s.lat === "number" ? s.lat : s.lat ? Number(s.lat) : undefined,
     lng: typeof s.lng === "number" ? s.lng : s.lng ? Number(s.lng) : undefined,
@@ -36,6 +45,7 @@ const LEVELS = [
 ] as const;
 
 function CriarPage() {
+  const { createLabel } = useGameTerm();
   const { user } = Route.useRouteContext();
   const search = Route.useSearch();
   const navigate = useNavigate();
@@ -145,11 +155,11 @@ function CriarPage() {
           toast.error("Pelada criada, mas não foi possível fixá-la.");
         }
       }
-      toast.success("Pelada criada! Bora completar o time.");
+      toast.success("Jogo criado! Bora completar o time.");
       navigate({ to: "/pelada/$peladaId", params: { peladaId: data.id } });
 
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao criar pelada");
+      toast.error(e instanceof Error ? e.message : "Erro ao criar jogo");
     } finally {
       setSaving(false);
     }
@@ -187,7 +197,7 @@ function CriarPage() {
       <main className="flex-1 px-6 pb-6 overflow-y-auto">
         <h2 className="font-display font-extrabold italic uppercase text-white text-3xl leading-tight mb-8">
           {step === 1 ? (
-            <>Criar nova<br />pelada</>
+            <>{createLabel}</>
           ) : (
             <>Configure<br />a partida</>
           )}

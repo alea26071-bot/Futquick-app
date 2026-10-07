@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Compass, Map, Plus, MessageCircle, User } from "lucide-react";
+import { useGameTerm } from "@/components/GameTermProvider";
 
 const items = [
   { to: "/descobrir", label: "Descobrir", icon: Compass },
@@ -8,6 +9,7 @@ const items = [
 ] as const;
 
 export function BottomNav() {
+  const { createLabel } = useGameTerm();
   const pathname = useLocation({ select: (l) => l.pathname });
 
   return (
@@ -36,7 +38,7 @@ export function BottomNav() {
         <Link
           to="/criar"
           className="size-14 -mt-8 bg-cyan rounded-2xl grid place-items-center shadow-lg shadow-cyan/30 border-4 border-navy active:scale-95 transition-transform"
-          aria-label="Criar pelada"
+          aria-label={createLabel}
         >
           <Plus className="size-6 text-navy" strokeWidth={3} />
         </Link>
