@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { saveGameTerm } from "@/lib/game-term.functions";
+import { REGIONAL_GAME_TERMS, gameTermSchema } from "@/lib/game-term";
 
 const GameTermContext = createContext({ createLabel: "Criar jogo" });
 export const useGameTerm = () => useContext(GameTermContext);
@@ -19,7 +20,7 @@ export function GameTermProvider({ initialTerm, userId, children }: { initialTer
   const save = useServerFn(saveGameTerm);
   const qc = useQueryClient();
   const selected = choice === "Outro" ? custom.trim() : choice;
-  const valid = selected.length >= 2 && selected.length <= 30 && !/[\p{Cc}<>]/u.test(selected);
+  const valid = gameTermSchema.safeParse(selected).success;
   const persist = async (value: string) => {
     setBusy(true);
     try {
@@ -40,7 +41,7 @@ export function GameTermProvider({ initialTerm, userId, children }: { initialTer
           <DialogDescription>Escolha o nome que você costuma usar.</DialogDescription>
         </DialogHeader>
         <div role="radiogroup" aria-label="Nome regional" className="grid grid-cols-2 gap-3">
-          {["Baba", "Rachão", "Pelada", "Outro"].map((name) => <Button key={name} role="radio" aria-checked={choice === name} disabled={busy} variant={choice === name ? "default" : "outline"} className="h-12 rounded-xl" onClick={() => setChoice(name)}>{choice === name && <Check aria-hidden="true" />}{name}</Button>)}
+          {REGIONAL_GAME_TERMS.map((name) => <Button key={name} role="radio" aria-checked={choice === name} disabled={busy} variant={choice === name ? "default" : "outline"} className="h-12 rounded-xl" onClick={() => setChoice(name)}>{choice === name && <Check aria-hidden="true" />}{name}</Button>)}
         </div>
         {choice === "Outro" && <div className="space-y-2">
           <label htmlFor="regional-game-name" className="text-sm font-semibold">Qual nome você usa?</label>
