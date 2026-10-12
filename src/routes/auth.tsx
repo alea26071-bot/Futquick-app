@@ -125,7 +125,7 @@ function AuthPage() {
     step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
     step === 5 ? !!form.state && form.city.trim().length >= 2 :
     step === 6 ? radiusTouched || form.radius !== null :
-    true;
+    !!avatarUrl && !uploadingAvatar;
 
 
   // Create the account (auth + profile.phone) at end of step 3.
@@ -661,7 +661,7 @@ function AuthPage() {
                 {avatarUrl ? "Trocar foto" : "Escolher foto"}
               </button>
               {!avatarUrl && (
-                <p className="text-xs text-white/40 text-center">Você pode adicionar depois no seu perfil.</p>
+                <p className="text-xs text-white/40 text-center">A foto é obrigatória para começar a jogar.</p>
               )}
             </div>
           </Step>
