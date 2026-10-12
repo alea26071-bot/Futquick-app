@@ -29,17 +29,31 @@ export async function uploadUserPhoto(
   file: File,
   keyHint?: string,
 ): Promise<string> {
-  const blob = await fileToJpegBlob(file, bucket === "avatars" ? 512 : 1200);
-  const path = `${userId}/${keyHint ?? "img"}-${Date.now()}.jpg`;
+  let blob: Blob = file;
+  let ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  let contentType = file.type || "image/jpeg";
+  try {
+    blob = await fileToJpegBlob(file, bucket === "avatars" ? 512 : 1200);
+    ext = "jpg";
+    contentType = "image/jpeg";
+  } catch {
+    // Formato não decodificável no navegador (ex.: HEIC): envia o original.
+  }
+  const path = `${userId}/${keyHint ?? "img"}-${Date.now()}.${ext}`;
   const { error } = await supabase.storage.from(bucket).upload(path, blob, {
     upsert: true,
-    contentType: "image/jpeg",
+    contentType,
     cacheControl: "3600",
   });
-  if (error) throw error;
+  if (error) throw new Error("Não foi possível enviar a foto. Tente outra imagem.");
 
   // Moderação automática: recusa nudez, conteúdo sexual, violência ou ofensas.
-  const verdict = await moderateImage({ data: { bucket, path } });
+  let verdict: { allowed: boolean; reason?: string } = { allowed: true };
+  try {
+    verdict = await moderateImage({ data: { bucket, path } });
+  } catch (e) {
+    console.error("[uploadUserPhoto] moderação indisponível", e);
+  }
   if (!verdict.allowed) {
     throw new Error(verdict.reason || "Esta imagem não segue as diretrizes do Futquick.");
   }
