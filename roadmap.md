@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Adicionar modalidades em Outro, capas correspondentes e validar criação sem alterar etapas.
+
 - [x] Trocar chamadas de criação por “Criar jogo” e salvar a escolha regional após cadastro (Baba, Rachão, Pelada ou Outro).
 
 - [x] Ajustar informações e tipografia da página de pelada conforme a imagem enviada, preservando ações existentes (compilação validada; conferência autenticada depende de login no preview).
