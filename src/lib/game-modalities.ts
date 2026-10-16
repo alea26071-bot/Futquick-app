@@ -16,6 +16,24 @@ export const OTHER_MODALITIES = [
 
 export const GAME_MODALITIES = [...FOOTBALL_MODALITIES, ...OTHER_MODALITIES];
 
+/** Nome do esporte de cada modalidade: futebol para Futsal/Society/Campo, a própria modalidade para o resto. */
+export const SPORT_LABELS: Record<string, string> = {
+  futsal: "Futebol",
+  society: "Futebol",
+  campo: "Futebol",
+  basquete: "Basquete",
+  volei: "Vôlei",
+  futvolei: "Futvôlei",
+  beach_tenis: "Beach Tênis",
+  tenis: "Tênis",
+  corrida: "Corrida",
+  pedal: "Pedal",
+};
+
+export function sportLabelFor(fieldType: string): string {
+  return SPORT_LABELS[fieldType] ?? fieldType;
+}
+
 export function isGameModality(value: string): boolean {
   return GAME_MODALITIES.some((modality) => modality.id === value);
 }
