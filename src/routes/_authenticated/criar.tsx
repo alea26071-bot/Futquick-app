@@ -9,6 +9,8 @@ import { pinPelada } from "@/lib/pelada-templates.functions";
 import { WEEKDAY_LABEL, brWeekday, maxSlotsFor } from "@/lib/pelada-utils";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
 import { useGameTerm } from "@/components/GameTermProvider";
+import { Button } from "@/components/ui/button";
+import { FOOTBALL_MODALITIES, OTHER_MODALITIES, isGameModality } from "@/lib/game-modalities";
 
 
 type CriarSearch = { lat?: number; lng?: number; address?: string };
@@ -32,11 +34,7 @@ export const Route = createFileRoute("/_authenticated/criar")({
 });
 
 
-const FIELD_TYPES = [
-  { id: "society", label: "Society" },
-  { id: "futsal", label: "Futsal" },
-  { id: "campo", label: "Campo" },
-] as const;
+const FIELD_TYPES = [...FOOTBALL_MODALITIES, { id: "outro", label: "Outro" }];
 
 const LEVELS = [
   { id: "iniciante", label: "Iniciante" },
@@ -61,6 +59,7 @@ function CriarPage() {
   const [date, setDate] = useState(today.toISOString().slice(0, 10));
   const [time, setTime] = useState("20:00");
   const [fieldType, setFieldType] = useState<string>("society");
+  const [showOtherModalities, setShowOtherModalities] = useState(false);
   const [level, setLevel] = useState<string>("intermediario");
   const [totalSlots, setTotalSlots] = useState(12);
   const [price, setPrice] = useState("");
@@ -88,7 +87,7 @@ function CriarPage() {
 
   const canNext1 = name.trim().length >= 3 && location !== null;
   useEffect(() => { setTotalSlots((s) => Math.min(s, maxSlotsFor(fieldType))); }, [fieldType]);
-  const canSubmit = canNext1 && fieldType && level && totalSlots >= 2;
+  const canSubmit = canNext1 && isGameModality(fieldType) && level && totalSlots >= 2 && !uploadingCover;
 
   const pickCover = async (file: File) => {
     setUploadingCover(true);
@@ -103,7 +102,7 @@ function CriarPage() {
   };
 
   const submit = async () => {
-    if (!location) return;
+    if (!location || !canSubmit || saving) return;
     setSaving(true);
     try {
       let finalPhoto = coverUrl;
@@ -119,6 +118,7 @@ function CriarPage() {
           finalPhoto = res.url;
         } catch (e) {
           console.warn("AI image failed", e);
+          toast.error(e instanceof Error ? e.message : "Não foi possível gerar a imagem do jogo.");
         }
       }
       const startsAt = new Date(`${date}T${time}:00`);
@@ -324,22 +324,51 @@ function CriarPage() {
         {step === 2 && (
           <div className="space-y-8 animate-slide-up">
             <div className="space-y-3">
-              <label className="text-mono-label">Tipo de campo</label>
-              <div className="grid grid-cols-3 gap-2">
+              <label className="text-mono-label">Modalidade</label>
+              <div className="grid grid-cols-2 min-[420px]:grid-cols-4 gap-2">
                 {FIELD_TYPES.map((t) => (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
                     key={t.id}
-                    onClick={() => setFieldType(t.id)}
-                    className={`py-3 rounded-xl border font-bold text-xs uppercase transition-colors ${
-                      fieldType === t.id
+                    aria-pressed={t.id === "outro" ? showOtherModalities : !showOtherModalities && fieldType === t.id}
+                    onClick={() => {
+                      setShowOtherModalities(t.id === "outro");
+                      if (t.id === "outro") {
+                        if (!OTHER_MODALITIES.some((m) => m.id === fieldType)) setFieldType("outro");
+                      } else {
+                        setFieldType(t.id);
+                      }
+                    }}
+                    className={`h-12 rounded-xl border font-bold text-xs uppercase transition-colors ${
+                      (t.id === "outro" ? showOtherModalities : !showOtherModalities && fieldType === t.id)
                         ? "border-cyan bg-cyan/10 text-cyan"
-                        : "border-white/10 text-white/60"
+                        : "border-border text-muted-foreground"
                     }`}
                   >
                     {t.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
+              {showOtherModalities && (
+                <div className="space-y-3 animate-slide-up">
+                  <p className="text-mono-label">Escolha a modalidade</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {OTHER_MODALITIES.map((modality) => (
+                      <Button
+                        key={modality.id}
+                        type="button"
+                        variant="ghost"
+                        aria-pressed={fieldType === modality.id}
+                        onClick={() => setFieldType(modality.id)}
+                        className={`h-12 rounded-xl border font-bold text-xs uppercase ${fieldType === modality.id ? "border-cyan bg-cyan/10 text-cyan" : "border-border text-muted-foreground"}`}
+                      >
+                        {modality.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
