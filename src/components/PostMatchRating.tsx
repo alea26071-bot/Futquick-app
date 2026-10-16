@@ -50,7 +50,7 @@ export function PostMatchRating({ peladaId, organizerId, userId, isOrganizer, ha
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Avaliação enviada. Valeu!");
+      toast.success("Nível enviado. Valeu!");
       qc.invalidateQueries({ queryKey: ["pelada-rating", peladaId, userId] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao avaliar"),
@@ -61,7 +61,7 @@ export function PostMatchRating({ peladaId, organizerId, userId, isOrganizer, ha
   if (existing) {
     return (
       <div className="p-4 rounded-2xl bg-navy-soft/60 border border-cyan/20">
-        <p className="text-mono-label mb-2">Sua avaliação</p>
+        <p className="text-mono-label mb-2">Seu nível</p>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((n) => (
             <Star
@@ -105,7 +105,7 @@ export function PostMatchRating({ peladaId, organizerId, userId, isOrganizer, ha
         disabled={rating === 0 || submit.isPending}
         className="w-full py-3 rounded-xl bg-cyan text-navy font-display font-extrabold italic uppercase disabled:opacity-30"
       >
-        {submit.isPending ? "Enviando..." : "Enviar avaliação"}
+        {submit.isPending ? "Enviando..." : "Enviar nível"}
       </button>
     </div>
   );

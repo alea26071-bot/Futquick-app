@@ -104,7 +104,7 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
       toast.error(error.message);
       return;
     }
-    toast.success("Avaliação registrada. Valeu!");
+    toast.success("Nível registrado. Valeu!");
     qc.invalidateQueries({ queryKey: ["pelada-player-ratings", peladaId, organizerId] });
   };
 

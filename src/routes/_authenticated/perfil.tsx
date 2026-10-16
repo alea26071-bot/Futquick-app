@@ -309,7 +309,7 @@ function PerfilPage() {
           <Stat
             icon={<Star />}
             value={profile?.rating_avg ? Number(profile.rating_avg).toFixed(1) : "—"}
-            label="Avaliação"
+            label="Nível"
             tone="warning"
           />
           <Stat icon={<ShieldCheck />} value={`${profile?.postura_score ?? 100}%`} label="Postura" tone="success" />

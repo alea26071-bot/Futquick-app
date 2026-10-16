@@ -28,9 +28,9 @@ export const Route = createFileRoute("/_authenticated/jogador/$userId")({
   head: () => ({
     meta: [
       { title: "Perfil do jogador | Futquick" },
-      { name: "description", content: "Veja o perfil, as avaliações e a postura de um jogador no Futquick." },
+      { name: "description", content: "Veja o perfil, os níveis e a postura de um jogador no Futquick." },
       { property: "og:title", content: "Perfil do jogador | Futquick" },
-      { property: "og:description", content: "Veja o perfil, as avaliações e a postura de um jogador no Futquick." },
+      { property: "og:description", content: "Veja o perfil, os níveis e a postura de um jogador no Futquick." },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -244,7 +244,7 @@ function PlayerProfilePage() {
 
         <div className="mt-7 grid grid-cols-3 gap-3">
           <Stat icon={<CircleUserRound />} value={profile.peladas_played} label="Peladas" tone="primary" />
-          <Stat icon={<Star />} value={Number(profile.rating_avg ?? 0).toFixed(1)} label="Avaliação" tone="warning" />
+          <Stat icon={<Star />} value={Number(profile.rating_avg ?? 0).toFixed(1)} label="Nível" tone="warning" />
           <Stat icon={<ShieldCheck />} value={`${profile.postura_score}%`} label="Postura" tone="success" />
         </div>
 
