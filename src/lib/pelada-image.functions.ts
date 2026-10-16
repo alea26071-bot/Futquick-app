@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { buildGameImagePrompt, isGameModality } from "@/lib/game-modalities";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/images/generations";
 const MODEL = "openai/gpt-image-1-mini";
@@ -7,20 +8,10 @@ const SIGNED_URL_TTL = 60 * 60 * 24 * 365;
 
 type Input = { peladaName: string; fieldType: string; city?: string | null };
 
-function buildPrompt({ peladaName, fieldType, city }: Input) {
-  const surface =
-    fieldType === "futsal"
-      ? "an indoor futsal court with polished wood floor and bright ceiling lights"
-      : fieldType === "campo"
-        ? "a full-size grass soccer pitch at golden hour"
-        : "a well-kept synthetic-turf society soccer field under evening stadium lights";
-  return `Cinematic wide-angle photo of ${surface}, empty and ready for a pickup match. Vivid colors, deep blue sky, subtle rim light, no players, no text, no logos. Editorial soccer/football vibe${city ? ` in ${city}, Brazil` : ""}. Poster for a pickup match called "${peladaName}". Ultra sharp, high detail.`;
-}
-
 export const generatePeladaImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: Input) => {
-    if (!input || typeof input.peladaName !== "string" || typeof input.fieldType !== "string") {
+    if (!input || typeof input.peladaName !== "string" || typeof input.fieldType !== "string" || !isGameModality(input.fieldType)) {
       throw new Error("Invalid input");
     }
     return input;
@@ -37,7 +28,7 @@ export const generatePeladaImage = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         model: MODEL,
-        prompt: buildPrompt(data),
+        prompt: buildGameImagePrompt(data),
         size: "1024x1024",
         quality: "low",
         n: 1,

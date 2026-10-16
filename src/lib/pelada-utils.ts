@@ -1,8 +1,8 @@
-export const FIELD_TYPE_LABEL: Record<string, string> = {
-  society: "Society",
-  campo: "Campo",
-  futsal: "Futsal",
-};
+import { GAME_MODALITIES } from "./game-modalities";
+
+export const FIELD_TYPE_LABEL: Record<string, string> = Object.fromEntries(
+  GAME_MODALITIES.map(({ id, label }) => [id, label]),
+);
 
 export const LEVEL_LABEL: Record<string, string> = {
   iniciante: "Iniciante",

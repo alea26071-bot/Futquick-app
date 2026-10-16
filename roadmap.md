@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Adicionar modalidades em Outro e capas correspondentes, mantendo etapas (13 testes e geração real de basquete validados).
+- [ ] Conferir criação autenticada com as novas modalidades — depende de login do usuário no preview.
+
 - [x] Trocar chamadas de criação por “Criar jogo” e salvar a escolha regional após cadastro (Baba, Rachão, Pelada ou Outro).
 
 - [x] Ajustar informações e tipografia da página de pelada conforme a imagem enviada, preservando ações existentes (compilação validada; conferência autenticada depende de login no preview).
