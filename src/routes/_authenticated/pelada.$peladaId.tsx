@@ -349,10 +349,13 @@ function PeladaDetailPage() {
             </p>
           </div>
           <div className="pelada-stat">
-            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><MapPin /></span>Campo</p>
+            <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><MapPin /></span>Esporte</p>
             <p className="pelada-stat-value">
-              {FIELD_TYPE_LABEL[pelada.field_type]}
+              {sportLabelFor(pelada.field_type)}
             </p>
+            {sportLabelFor(pelada.field_type) !== FIELD_TYPE_LABEL[pelada.field_type] && (
+              <p className="pelada-info-label mt-0.5">{FIELD_TYPE_LABEL[pelada.field_type]}</p>
+            )}
           </div>
           <div className="pelada-stat">
             <p className="pelada-info-label flex items-center gap-2"><span className="pelada-stat-icon"><ChartNoAxesColumnIncreasing /></span>Nível</p>
