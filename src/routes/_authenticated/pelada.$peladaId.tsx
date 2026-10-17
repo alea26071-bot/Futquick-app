@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GoogleMap } from "@/components/GoogleMap";
 import { FIELD_TYPE_LABEL, LEVEL_LABEL, WEEKDAY_LABEL, brTimeString, brWeekday, formatMatchDate, formatPrice } from "@/lib/pelada-utils";
+import { sportLabelFor } from "@/lib/game-modalities";
 import { ArrowLeft, MapPin, Heart, Share2, Navigation, Check, X, MessageCircle, Trash2, Repeat, Pin, Flag, Users, Lock, Settings2, Tag, ChartNoAxesColumnIncreasing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
