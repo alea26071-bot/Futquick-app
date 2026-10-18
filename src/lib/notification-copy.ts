@@ -1,0 +1,31 @@
+// Textos das notificações push — troque aqui pelas frases definitivas.
+export const NEARBY_MAX_KM = 5;
+
+export const COPY = {
+  nearbyPelada: (name: string) => ({
+    title: "Nova pelada perto de você ⚽",
+    body: `${name} acabou de ser criada a poucos km de você. Garanta sua vaga!`,
+  }),
+  newMessage: (from: string) => ({
+    title: "Você tem uma nova mensagem",
+    body: `${from} te mandou uma mensagem.`,
+  }),
+  nearbyReminder: (count: number) => ({
+    title: "Verifique as peladas próximas de você",
+    body: count === 1 ? "Tem 1 pelada aberta perto de você." : `Tem ${count} peladas abertas perto de você.`,
+  }),
+};
+
+/** Distância em km entre dois pontos (Haversine). */
+export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const r = (d: number) => (d * Math.PI) / 180;
+  const dLat = r(bLat - aLat);
+  const dLng = r(bLng - aLng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(aLat)) * Math.cos(r(bLat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+
+/** Raio efetivo do usuário: o escolhido, limitado a 5 km. */
+export function effectiveRadiusKm(chosen: number | null | undefined): number {
+  return Math.min(chosen ?? NEARBY_MAX_KM, NEARBY_MAX_KM);
+}
