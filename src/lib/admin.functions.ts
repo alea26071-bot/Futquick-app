@@ -1,14 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminRole } from "@/lib/admin-authorization.server";
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    await requireAdminRole(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: users }, { data: peladas }, { data: requests }] = await Promise.all([
       supabaseAdmin
@@ -52,15 +49,11 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
     }) => input,
   )
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    await requireAdminRole(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { id, ...patch } = data;
     const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("Não foi possível atualizar o usuário");
     return { ok: true };
   });
 
@@ -80,15 +73,11 @@ export const adminUpdatePelada = createServerFn({ method: "POST" })
     }) => input,
   )
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    await requireAdminRole(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { id, ...patch } = data;
     const { error } = await supabaseAdmin.from("peladas").update(patch).eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("Não foi possível atualizar a pelada");
     return { ok: true };
   });
 
@@ -97,14 +86,10 @@ export const adminDeletePelada = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { peladaId: string }) => input)
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    await requireAdminRole(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("peladas").delete().eq("id", data.peladaId);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("Não foi possível excluir a pelada");
     return { ok: true };
   });
 
@@ -112,14 +97,10 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { userId: string }) => input)
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso restrito ao administrador");
+    await requireAdminRole(context.supabase, context.userId);
     if (data.userId === context.userId) throw new Error("Você não pode excluir sua própria conta");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("Não foi possível excluir o usuário");
     return { ok: true };
   });
