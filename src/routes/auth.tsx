@@ -10,9 +10,7 @@ import {
   maskPhoneBR,
   validatePhoneBR,
 
-  validateSecretForPhone,
-  isAdminPhone,
-  ADMIN_SECRET,
+  validatePin,
   phoneToSyntheticEmail,
   onlyDigits,
 } from "@/lib/phone-utils";
@@ -49,6 +47,14 @@ function RevealButton({ shown, onToggle }: { shown: boolean; onToggle: () => voi
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Entrar ou cadastrar | Futquick" },
+    { name: "description", content: "Entre no Futquick ou crie sua conta para participar dos jogos." },
+    { property: "og:title", content: "Entrar ou cadastrar | Futquick" },
+    { property: "og:description", content: "Entre no Futquick ou crie sua conta para participar dos jogos." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AuthPage,
 });
 
@@ -115,13 +121,11 @@ function AuthPage() {
   }, [navigate]);
 
   const phoneCheck = validatePhoneBR(form.phone);
-  const adminMode = isAdminPhone(form.phone);
-  const loginAdminMode = isAdminPhone(loginPhone);
 
   const canNext =
     step === 1 ? form.name.trim().length >= 2 :
     step === 2 ? phoneCheck.ok :
-    step === 3 ? validateSecretForPhone(form.phone, form.pin) && form.pin === form.pinConfirm :
+    step === 3 ? validatePin(form.pin) && form.pin === form.pinConfirm :
     step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
     step === 5 ? !!form.state && form.city.trim().length >= 2 :
     step === 6 ? radiusTouched || form.radius !== null :
@@ -135,8 +139,8 @@ function AuthPage() {
       setStep(2);
       return false;
     }
-    if (!validateSecretForPhone(form.phone, form.pin) || form.pin !== form.pinConfirm) {
-      setPinError(adminMode ? "Chave de administrador inválida" : "PIN inválido");
+    if (!validatePin(form.pin) || form.pin !== form.pinConfirm) {
+      setPinError("PIN inválido");
       return false;
     }
     const email = phoneToSyntheticEmail(phoneCheck.digits);
@@ -263,7 +267,7 @@ function AuthPage() {
     }
     if (step === 3) {
       if (form.pin !== form.pinConfirm) {
-        setPinError(adminMode ? "As chaves não conferem" : "Os PINs não conferem");
+        setPinError("Os PINs não conferem");
         return;
       }
       setPinError(null);
@@ -298,8 +302,8 @@ function AuthPage() {
       setLoginError(check.error ?? "Telefone inválido");
       return;
     }
-    if (!validateSecretForPhone(loginPhone, loginPin)) {
-      setLoginError(loginAdminMode ? "Chave de administrador inválida" : "PIN deve ter 6 dígitos");
+    if (!validatePin(loginPin)) {
+      setLoginError("PIN deve ter 6 dígitos");
       return;
     }
     setLoginError(null);
@@ -371,20 +375,21 @@ function AuthPage() {
 
           <div className="space-y-2">
             <label className="text-white/60 text-xs uppercase tracking-wide">
-              {loginAdminMode ? "Chave de administrador" : "PIN de 6 dígitos"}
+              PIN de 6 dígitos
             </label>
             <div className="relative">
               <input
                 type={showLoginPin ? "text" : "password"}
                 autoComplete="current-password"
-                {...(loginAdminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                inputMode="numeric"
+                maxLength={6}
                 value={loginPin}
                 onChange={(e) =>
                   setLoginPin(
-                    loginAdminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6),
+                    onlyDigits(e.target.value).slice(0, 6),
                   )
                 }
-                placeholder={loginAdminMode ? "Digite sua chave" : "••••••"}
+                placeholder="••••••"
                 className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
               />
               <RevealButton shown={showLoginPin} onToggle={() => setShowLoginPin((s) => !s)} />
@@ -487,12 +492,8 @@ function AuthPage() {
         {step === 3 && (
           <Step
             icon={<Lock className="size-6 text-cyan" />}
-            title={adminMode ? "Crie sua chave de acesso" : "Crie um PIN"}
-            hint={
-              adminMode
-                ? `Conta de desenvolvedor: use a chave ${ADMIN_SECRET}`
-                : "6 dígitos. Use para entrar na sua conta no futuro."
-            }
+            title="Crie um PIN"
+            hint="6 dígitos. Use para entrar na sua conta no futuro."
           >
             <div className="space-y-3">
               <div className="relative">
@@ -500,14 +501,15 @@ function AuthPage() {
                   autoFocus
                   type={showPin ? "text" : "password"}
                   autoComplete="new-password"
-                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  inputMode="numeric"
+                  maxLength={6}
                   value={form.pin}
                   onChange={(e) => {
                     setPinError(null);
-                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    const v = onlyDigits(e.target.value).slice(0, 6);
                     setForm({ ...form, pin: v });
                   }}
-                  placeholder={adminMode ? "Sua chave" : "••••••"}
+                  placeholder="••••••"
                   className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
                 />
                 <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />
@@ -516,14 +518,15 @@ function AuthPage() {
                 <input
                   type={showPin ? "text" : "password"}
                   autoComplete="new-password"
-                  {...(adminMode ? {} : { inputMode: "numeric" as const, maxLength: 6 })}
+                  inputMode="numeric"
+                  maxLength={6}
                   value={form.pinConfirm}
                   onChange={(e) => {
                     setPinError(null);
-                    const v = adminMode ? e.target.value : onlyDigits(e.target.value).slice(0, 6);
+                    const v = onlyDigits(e.target.value).slice(0, 6);
                     setForm({ ...form, pinConfirm: v });
                   }}
-                  placeholder={adminMode ? "Confirme sua chave" : "Confirme seu PIN"}
+                  placeholder="Confirme seu PIN"
                   className="w-full text-xl font-bold tracking-widest bg-navy-soft rounded-2xl border-2 border-cyan/40 py-4 pl-4 pr-14 focus:border-cyan outline-none text-white placeholder:text-white/30"
                 />
                 <RevealButton shown={showPin} onToggle={() => setShowPin((s) => !s)} />

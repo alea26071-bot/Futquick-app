@@ -28,8 +28,6 @@ import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { useTheme } from "@/lib/theme";
 import { WEEKDAY_LABEL } from "@/lib/pelada-utils";
 import { createNextFromTemplate, setTemplateActive } from "@/lib/pelada-templates.functions";
-import { claimAdminAccess } from "@/lib/admin.functions";
-import { ADMIN_PHONE_DIGITS } from "@/lib/phone-utils";
 import { Button } from "@/components/ui/button";
 import { ProfileStat as Stat, ProfileAbout, ProfileSportIcon } from "@/components/ProfilePresentation";
 
@@ -105,24 +103,6 @@ function PerfilPage() {
       return !!data;
     },
   });
-
-  const [devKey, setDevKey] = useState("");
-  const [devBusy, setDevBusy] = useState(false);
-
-  const unlockDev = async () => {
-    setDevBusy(true);
-    try {
-      await claimAdminAccess({ data: { key: devKey } });
-      toast.success("Modo desenvolvedor liberado");
-      setDevKey("");
-      await qc.invalidateQueries({ queryKey: ["is-admin", user.id] });
-      navigate({ to: "/admin" });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Chave inválida");
-    } finally {
-      setDevBusy(false);
-    }
-  };
 
   const [busyTemplate, setBusyTemplate] = useState<string | null>(null);
 
@@ -449,22 +429,6 @@ function PerfilPage() {
           <Button onClick={() => navigate({ to: "/admin" })} className="h-14 w-full rounded-2xl font-extrabold uppercase">
             <ShieldCheck className="size-5" /> Painel do administrador
           </Button>
-        </section>
-      ) : profile?.phone === ADMIN_PHONE_DIGITS ? (
-        <section className="mx-auto mt-8 max-w-lg px-5">
-          <p className="text-mono-label mb-3">Modo desenvolvedor</p>
-          <div className="space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <input
-              type="password"
-              value={devKey}
-              onChange={(e) => setDevKey(e.target.value)}
-              placeholder="Chave de desenvolvedor"
-              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary"
-            />
-            <Button onClick={unlockDev} disabled={devBusy || devKey.length < 4} className="w-full rounded-xl font-bold uppercase">
-              {devBusy ? "..." : "Desbloquear"}
-            </Button>
-          </div>
         </section>
       ) : null}
 

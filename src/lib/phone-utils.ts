@@ -24,18 +24,8 @@ export function maskPhoneBR(v: string): string {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
-// Telefone reservado da conta de administrador (desenvolvedor).
-export const ADMIN_PHONE_DIGITS = "84981387683";
-// Senha (com letras) exigida somente para o telefone de administrador.
-export const ADMIN_SECRET = "adm.futquick.";
-
-export function isAdminPhone(raw: string): boolean {
-  return onlyDigits(raw) === ADMIN_PHONE_DIGITS;
-}
-
 export function validatePhoneBR(raw: string): { ok: boolean; digits: string; error?: string } {
   const digits = onlyDigits(raw);
-  if (digits === ADMIN_PHONE_DIGITS) return { ok: true, digits };
 
   if (digits.length !== 11) {
     return { ok: false, digits, error: "Telefone incompleto. Use (99) 99999-9999" };
@@ -63,8 +53,4 @@ export function validatePin(pin: string): boolean {
   return /^\d{6}$/.test(pin);
 }
 
-/** Senha válida para o telefone informado: PIN numérico, ou a chave de adm. */
-export function validateSecretForPhone(phone: string, secret: string): boolean {
-  return isAdminPhone(phone) ? secret === ADMIN_SECRET : validatePin(secret);
-}
 

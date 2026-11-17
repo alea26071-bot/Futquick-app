@@ -1,28 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { ADMIN_PHONE_DIGITS, ADMIN_SECRET } from "@/lib/phone-utils";
-
-/** Desbloqueia o modo desenvolvedor: telefone reservado + chave secreta. */
-export const claimAdminAccess = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: { key: string }) => input)
-  .handler(async ({ data, context }) => {
-    if (data.key !== ADMIN_SECRET) throw new Error("Chave inválida");
-    const { data: profile } = await context.supabase
-      .from("profiles")
-      .select("phone")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (!profile || profile.phone !== ADMIN_PHONE_DIGITS) {
-      throw new Error("Esta conta não pode ser administradora");
-    }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: context.userId, role: "admin" }, { onConflict: "user_id,role" });
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

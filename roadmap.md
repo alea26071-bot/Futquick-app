@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Remover credenciais administrativas expostas e conferir autorização no servidor e RLS sem alterar contas ou outras funcionalidades.
+
 - [x] Remodelar perfil pessoal e público conforme as duas referências, preservando ações e navegação.
 - [x] Conferir os perfis com sessão real no celular e no computador (fotos carregadas, edição salva, perfil público e tema escuro sem erros; conta sem peladas para conferir listas preenchidas).
 
