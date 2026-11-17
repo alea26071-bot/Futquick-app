@@ -12,3 +12,4 @@
 - Scope pelada detail presentation styles under `.pelada-detail` and use existing font and theme tokens so other screens remain unchanged.
 - Store regional game terminology on the authenticated profile; share creation labels through the authenticated layout provider and validate preference writes in an authenticated server function.
 - Share supported sport IDs, labels and cover prompt subjects through the browser-safe modality catalog; persist the chosen sport in field_type so creation, recurring games and existing displays use the same identity.
+- Share profile statistics and biography presentation between personal and public profiles, with styles scoped to `.profile-page` so other screens keep their existing appearance.

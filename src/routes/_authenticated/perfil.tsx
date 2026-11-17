@@ -20,6 +20,9 @@ import {
   CircleUserRound,
   Star,
   ExternalLink,
+  Clock3,
+  UsersRound,
+  ChevronRight,
 } from "lucide-react";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { useTheme } from "@/lib/theme";
@@ -28,6 +31,7 @@ import { createNextFromTemplate, setTemplateActive } from "@/lib/pelada-template
 import { claimAdminAccess } from "@/lib/admin.functions";
 import { ADMIN_PHONE_DIGITS } from "@/lib/phone-utils";
 import { Button } from "@/components/ui/button";
+import { ProfileStat as Stat, ProfileAbout, ProfileSportIcon } from "@/components/ProfilePresentation";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
@@ -209,9 +213,9 @@ function PerfilPage() {
   const memberSince = profile?.created_at ? new Date(profile.created_at).getFullYear() : null;
 
   return (
-    <main className="min-h-screen bg-background pb-28 text-foreground">
+    <main className="profile-page min-h-screen bg-background pb-28 text-foreground">
       {/* Capa sincronizada com a foto de perfil */}
-      <section className="relative h-[40vh] min-h-72 max-h-[420px] overflow-hidden rounded-b-[2rem] bg-secondary">
+      <section className="profile-cover relative h-[40vh] min-h-72 max-h-[420px] overflow-hidden rounded-b-[2rem] bg-secondary">
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt="" className="h-full w-full object-cover object-center" />
         ) : (
@@ -219,38 +223,38 @@ function PerfilPage() {
             <CircleUserRound className="size-28 text-muted-foreground/40" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background" />
+        <div className="profile-cover-fade absolute inset-0" />
 
         <div className="absolute inset-x-0 top-0 flex items-center justify-end gap-2 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <button
+          <Button variant="ghost" size="icon"
             onClick={toggle}
             aria-label="Alternar tema"
-            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
+            className="profile-cover-action"
           >
             {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </button>
-          <button
+          </Button>
+          <Button variant="ghost" size="icon"
             onClick={() => (editing ? save() : setEditing(true))}
             aria-label={editing ? "Salvar perfil" : "Editar perfil"}
-            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
+            className="profile-cover-action"
           >
             {editing ? <Check className="size-5" /> : <Edit3 className="size-5" />}
-          </button>
-          <button
+          </Button>
+          <Button variant="ghost" size="icon"
             onClick={signOut}
             aria-label="Sair da conta"
-            className="grid size-11 place-items-center rounded-full bg-navy/60 text-white ring-1 ring-white/25 backdrop-blur-md transition-colors hover:bg-navy/80"
+            className="profile-cover-action"
           >
             <LogOut className="size-5" />
-          </button>
+          </Button>
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
-        <button
+      <section className="profile-identity relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
+        <Button variant="ghost"
           onClick={() => fileRef.current?.click()}
           aria-label="Trocar foto de perfil"
-          className="group relative mx-auto block size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl"
+          className="profile-avatar group relative mx-auto block size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl"
         >
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="Sua foto de perfil" className="h-full w-full object-cover" />
@@ -259,15 +263,15 @@ function PerfilPage() {
               <CircleUserRound className="size-12 text-muted-foreground" />
             </div>
           )}
-          <div className="absolute inset-0 grid place-items-center bg-navy/50 opacity-0 transition-opacity group-hover:opacity-100">
-            <Camera className="size-6 text-white" />
+          <div className="absolute inset-0 grid place-items-center bg-background/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <Camera className="size-6 text-foreground" />
           </div>
           {uploadingAvatar && (
-            <div className="absolute inset-0 grid place-items-center bg-navy/70">
+            <div className="absolute inset-0 grid place-items-center bg-background/70">
               <div className="size-6 animate-spin rounded-full border-2 border-cyan border-t-transparent" />
             </div>
           )}
-        </button>
+        </Button>
         <input
           ref={fileRef}
           type="file"
@@ -288,9 +292,9 @@ function PerfilPage() {
             className="mt-4 w-full border-b border-border bg-transparent pb-1 text-center text-3xl font-extrabold text-foreground outline-none focus:border-primary"
           />
         ) : (
-          <h1 className="mt-4 text-3xl font-extrabold">{profile?.name || "Sem nome"}</h1>
+          <h1 className="profile-name mt-4 text-3xl font-extrabold">{profile?.name || "Sem nome"}</h1>
         )}
-        <p className="mt-1 text-sm text-muted-foreground">@{handle}</p>
+        <p className="profile-handle mt-1 text-sm text-muted-foreground">@{handle}</p>
 
         {profile?.phone_verified && (
           <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
@@ -298,13 +302,13 @@ function PerfilPage() {
           </p>
         )}
         {!editing && (profile?.city || profile?.state) && (
-          <p className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+          <p className="profile-location mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
             <MapPin className="size-3.5" /> {[profile?.city, profile?.state].filter(Boolean).join(", ")}
             {profile?.age ? ` · ${profile.age} anos` : ""}
           </p>
         )}
 
-        <div className="mt-6 grid grid-cols-3 gap-3">
+        <div className="profile-stats mt-6 grid grid-cols-3 gap-3">
           <Stat icon={<CircleUserRound />} value={profile?.peladas_played ?? 0} label="Peladas" tone="primary" />
           <Stat
             icon={<Star />}
@@ -340,7 +344,7 @@ function PerfilPage() {
               <label className="text-mono-label">Posição favorita</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {POSITIONS.map((p) => (
-                  <button
+                  <Button variant="ghost"
                     key={p}
                     onClick={() => setForm({ ...form, favorite_position: p })}
                     className={`rounded-full border px-3 py-1.5 text-xs font-bold uppercase ${
@@ -350,7 +354,7 @@ function PerfilPage() {
                     }`}
                   >
                     {p}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -368,62 +372,41 @@ function PerfilPage() {
             </Button>
           </div>
         ) : (
-          <article className="mt-6 rounded-2xl border border-border bg-card p-5 text-left shadow-sm">
-            <h2 className="flex items-center gap-2 text-sm font-bold">
-              <CircleUserRound className="size-5 text-primary" /> Sobre mim
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-card-foreground">
-              {profile?.bio ||
-                (profile?.favorite_position
-                  ? `${profile.favorite_position} em campo.`
-                  : "Você ainda não escreveu uma apresentação. Toque no lápis para editar.")}
-            </p>
-            {memberSince && (
-              <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays className="size-4" /> Membro desde {memberSince}
-              </p>
-            )}
+          <ProfileAbout
+            title="Sobre mim"
+            bio={profile?.bio || (profile?.favorite_position ? `${profile.favorite_position} em campo.` : "Sem apresentação.")}
+            memberSince={memberSince}
+          >
             <Button
-              variant="outline"
+              variant="link"
               onClick={() => navigate({ to: "/jogador/$userId", params: { userId: user.id } })}
-              className="mt-4 w-full rounded-full font-bold"
+              className="profile-public-link w-full font-semibold"
             >
               <ExternalLink /> Ver meu perfil público
             </Button>
-          </article>
+          </ProfileAbout>
         )}
       </section>
 
       {templates.length > 0 && (
         <section className="mx-auto mt-6 max-w-lg px-5">
-          <div className="mb-3 flex items-center gap-2">
-            <Pin className="size-4 text-primary" />
-            <p className="text-mono-label text-primary">Minhas peladas fixas</p>
-          </div>
+          <h2 className="profile-section-title"><Pin /> Peladas ativas</h2>
           <div className="space-y-2">
             {templates.map((t) => (
-              <div key={t.id} className="rounded-2xl border border-primary/25 bg-card p-4 shadow-sm">
-                <p className="truncate font-bold">{t.name}</p>
-                <p className="mt-0.5 font-mono text-xs uppercase tracking-wider text-primary">
-                  toda {WEEKDAY_LABEL[t.weekday]} · {t.time_of_day.slice(0, 5)}
-                </p>
-                <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground">
-                  <MapPin className="size-3 flex-none" /> {t.location_name}
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    onClick={() => repeatTemplate(t.id)}
-                    disabled={busyTemplate === t.id}
-                    className="flex-1 rounded-xl font-bold uppercase"
-                  >
+              <div key={t.id} className="profile-game">
+                <div className="profile-game-header">
+                  <ProfileSportIcon sport={t.field_type} />
+                  <div className="min-w-0 flex-1">
+                    <p className="profile-game-name">{t.name}</p>
+                    <p className="profile-game-detail profile-game-schedule"><Clock3 /> Toda {WEEKDAY_LABEL[t.weekday]} · {t.time_of_day.slice(0, 5)}</p>
+                    <p className="profile-game-detail"><MapPin /><span className="truncate">{t.location_name}</span></p>
+                  </div>
+                </div>
+                <div className="profile-game-actions">
+                  <Button onClick={() => repeatTemplate(t.id)} disabled={busyTemplate === t.id}>
                     <Repeat /> Criar próxima
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => deactivateTemplate(t.id)}
-                    disabled={busyTemplate === t.id}
-                    className="rounded-xl font-bold uppercase"
-                  >
+                  <Button variant="secondary" onClick={() => deactivateTemplate(t.id)} disabled={busyTemplate === t.id}>
                     Desativar
                   </Button>
                 </div>
@@ -434,7 +417,7 @@ function PerfilPage() {
       )}
 
       <section className="mx-auto mt-6 max-w-lg px-5">
-        <p className="text-mono-label mb-3">Peladas que organizei</p>
+        <h2 className="profile-section-title"><UsersRound /> {myPeladas.length > 0 && myPeladas.every((p) => p.template_id) ? "Peladas fixas" : "Peladas que organizei"}</h2>
         {myPeladas.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card py-8 text-center text-sm text-muted-foreground">
             Você ainda não organizou nenhuma pelada.
@@ -442,31 +425,19 @@ function PerfilPage() {
         ) : (
           <div className="space-y-2">
             {myPeladas.map((p) => (
-              <a
-                key={p.id}
-                href={`/pelada/${p.id}`}
-                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm"
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate font-bold">{p.name}</p>
-                    {p.template_id && (
-                      <span className="flex flex-none items-center gap-1 rounded bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary">
-                        <Pin className="size-2.5" /> Fixa
-                      </span>
-                    )}
+              <a key={p.id} href={`/pelada/${p.id}`} className="profile-game profile-game-row">
+                <ProfileSportIcon sport={p.field_type} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="profile-game-name">{p.name}</p>
+                    {p.template_id && <span className="profile-game-badge">Fixa</span>}
                   </div>
-                  <p className="truncate font-mono text-xs tabular-nums text-muted-foreground">
-                    {new Date(p.starts_at).toLocaleDateString("pt-BR")} · {p.filled_slots}/{p.total_slots} vagas
-                  </p>
+                  <p className="profile-game-detail"><CalendarDays /><span>{new Date(p.starts_at).toLocaleDateString("pt-BR")} · {p.filled_slots}/{p.total_slots} vagas</span></p>
                 </div>
-                <span
-                  className={`rounded px-2 py-1 text-[10px] font-bold uppercase ${
-                    p.status === "open" ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-                  }`}
-                >
-                  {p.status === "open" ? "Aberta" : p.status}
+                <span className="profile-game-status" data-open={p.status === "open"}>
+                  {p.status === "open" ? "Aberta" : p.status === "finished" ? "Encerrada" : p.status === "full" ? "Lotada" : p.status === "cancelled" ? "Cancelada" : p.status}
                 </span>
+                <ChevronRight className="size-4 shrink-0" />
               </a>
             ))}
           </div>
@@ -502,23 +473,3 @@ function PerfilPage() {
   );
 }
 
-function Stat({
-  icon,
-  value,
-  label,
-  tone,
-}: {
-  icon: React.ReactNode;
-  value: string | number;
-  label: string;
-  tone: "primary" | "warning" | "success";
-}) {
-  const toneClass = tone === "primary" ? "text-primary" : tone === "warning" ? "text-warning" : "text-success";
-  return (
-    <div className="rounded-2xl border border-border bg-card px-2 py-4 shadow-sm">
-      <div className={`mx-auto flex size-5 items-center justify-center [&>svg]:size-5 ${toneClass}`}>{icon}</div>
-      <p className="mt-2 font-mono text-xl font-bold tabular-nums">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase text-muted-foreground">{label}</p>
-    </div>
-  );
-}

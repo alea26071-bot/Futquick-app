@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Remodelar perfil pessoal e público conforme as duas referências, preservando ações e navegação.
+- [x] Conferir os perfis com sessão real no celular e no computador (fotos carregadas, edição salva, perfil público e tema escuro sem erros; conta sem peladas para conferir listas preenchidas).
+
 - [x] Adicionar modalidades em Outro e capas correspondentes, mantendo etapas (13 testes e geração real de basquete validados).
 - [ ] Conferir criação autenticada com as novas modalidades — depende de login do usuário no preview.
 

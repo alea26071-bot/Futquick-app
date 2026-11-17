@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft,
   BadgeCheck,
-  CalendarDays,
   ChevronRight,
   CircleUserRound,
   MapPin,
@@ -18,8 +17,9 @@ import {
   UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ProfileStat as Stat, ProfileAbout } from "@/components/ProfilePresentation";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { invitePlayerToPelada } from "@/lib/notifications.functions";
 
@@ -162,10 +162,10 @@ function PlayerProfilePage() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Carregando...</div>;
+    return <div className="min-h-screen bg-background grid place-items-center text-muted-foreground">Carregando...</div>;
   }
   if (!profile) {
-    return <div className="min-h-screen bg-navy grid place-items-center text-white/60">Jogador não encontrado.</div>;
+    return <div className="min-h-screen bg-background grid place-items-center text-muted-foreground">Jogador não encontrado.</div>;
   }
 
   const handle = profile.username || (profile.name || "jogador").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -174,8 +174,8 @@ function PlayerProfilePage() {
   const memberSince = new Date(profile.created_at).getFullYear();
 
   return (
-    <main className="min-h-screen bg-background pb-12 text-foreground">
-      <section className="relative h-[44vh] min-h-80 max-h-[460px] overflow-hidden rounded-b-[2rem] bg-secondary">
+    <main className="profile-page min-h-screen bg-background pb-12 text-foreground">
+      <section className="profile-cover relative h-[44vh] min-h-80 max-h-[460px] overflow-hidden rounded-b-[2rem] bg-secondary">
         {profile.avatar_url ? (
           <img src={profile.avatar_url} alt={`Foto de ${profile.name}`} className="h-full w-full object-cover object-center" />
         ) : (
@@ -183,12 +183,12 @@ function PlayerProfilePage() {
             <CircleUserRound className="size-28 text-muted-foreground/40" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/15 via-transparent to-background" />
+        <div className="profile-cover-fade absolute inset-0" />
         <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
+          <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="profile-cover-action">
             <ArrowLeft className="size-6" strokeWidth={2.5} />
           </Button>
-          <Button aria-label="Mais opções" onClick={() => setOptionsOpen(true)} variant="ghost" size="icon" className="size-11 rounded-full bg-navy/60 text-white ring-1 ring-white/25 shadow-lg backdrop-blur-md hover:bg-navy/80 hover:text-white">
+          <Button aria-label="Mais opções" onClick={() => setOptionsOpen(true)} variant="ghost" size="icon" className="profile-cover-action">
             <MoreHorizontal className="size-6" strokeWidth={2.5} />
           </Button>
         </div>
@@ -202,8 +202,8 @@ function PlayerProfilePage() {
         onShare={shareProfile}
       />
 
-      <section className="relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
-        <div className="mx-auto size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl">
+      <section className="profile-identity relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
+        <div className="profile-avatar mx-auto size-28 overflow-hidden rounded-full border-4 border-background bg-secondary shadow-xl">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={`Perfil de ${profile.name}`} className="h-full w-full object-cover" />
           ) : (
@@ -211,15 +211,15 @@ function PlayerProfilePage() {
           )}
         </div>
 
-        <h1 className="mt-4 text-3xl font-extrabold">{profile.name || "Anônimo"}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">@{handle}</p>
+        <h1 className="profile-name mt-4 text-3xl font-extrabold">{profile.name || "Anônimo"}</h1>
+        <p className="profile-handle mt-1 text-sm text-muted-foreground">@{handle}</p>
         {profile.phone_verified && (
           <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
             <BadgeCheck className="size-5 fill-primary text-primary-foreground" /> Jogador verificado
           </p>
         )}
         {(profile.city || profile.state) && (
-          <p className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+          <p className="profile-location mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
             <MapPin className="size-3.5" /> {[profile.city, profile.state].filter(Boolean).join(", ")}
           </p>
         )}
@@ -242,19 +242,17 @@ function PlayerProfilePage() {
           </div>
         )}
 
-        <div className="mt-7 grid grid-cols-3 gap-3">
+        <div className="profile-stats mt-7 grid grid-cols-3 gap-3">
           <Stat icon={<CircleUserRound />} value={profile.peladas_played} label="Peladas" tone="primary" />
           <Stat icon={<Star />} value={Number(profile.rating_avg ?? 0).toFixed(1)} label="Nível" tone="warning" />
           <Stat icon={<ShieldCheck />} value={`${profile.postura_score}%`} label="Postura" tone="success" />
         </div>
 
-        <article className="mt-6 rounded-2xl border border-border bg-card p-5 text-left shadow-sm">
-          <h2 className="flex items-center gap-2 text-sm font-bold"><CircleUserRound className="size-5 text-primary" /> Sobre {profile.name?.split(" ")[0] || "o jogador"}</h2>
-          <p className="mt-3 text-sm leading-6 text-card-foreground">
-            {profile.bio || (profile.favorite_position ? `${profile.favorite_position} em campo.` : "Este jogador ainda não adicionou uma apresentação.")}
-          </p>
-          <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><CalendarDays className="size-4" /> Membro desde {memberSince}</p>
-        </article>
+        <ProfileAbout
+          title={`Sobre ${profile.name?.split(" ")[0] || "o jogador"}`}
+          bio={profile.bio || (profile.favorite_position ? `${profile.favorite_position} em campo.` : "Sem apresentação.")}
+          memberSince={memberSince}
+        />
       </section>
 
       <Sheet open={inviteOpen} onOpenChange={setInviteOpen}>
@@ -279,13 +277,3 @@ function PlayerProfilePage() {
   );
 }
 
-function Stat({ icon, value, label, tone }: { icon: ReactNode; value: string | number; label: string; tone: "primary" | "warning" | "success" }) {
-  const toneClass = tone === "primary" ? "text-primary" : tone === "warning" ? "text-warning" : "text-success";
-  return (
-    <div className="rounded-2xl border border-border bg-card px-2 py-4 shadow-sm">
-      <div className={`mx-auto flex size-5 items-center justify-center [&>svg]:size-5 ${toneClass}`}>{icon}</div>
-      <p className="mt-2 font-mono text-xl font-bold tabular-nums">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase text-muted-foreground">{label}</p>
-    </div>
-  );
-}

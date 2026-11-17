@@ -302,3 +302,60 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
   .pelada-stat-value { font-size: 22px; }
   .pelada-organizer-name { font-size: 17px; }
 }
+
+/* Shared profile presentation; no changes to navigation or other screens. */
+.profile-page { --profile-shadow: 0 3px 10px color-mix(in oklab, var(--foreground) 8%, transparent); }
+.profile-page .profile-cover { height: 315px; min-height: 0; max-height: none; border-radius: 0 0 32px 32px; }
+.profile-page .profile-cover-fade { background: linear-gradient(to bottom, transparent 48%, var(--background) 99%); }
+.profile-page .profile-cover-action { width: 44px; height: 44px; border-radius: 50%; color: var(--foreground); background: color-mix(in oklab, var(--card) 85%, transparent); backdrop-filter: blur(10px); box-shadow: none; }
+.profile-page .profile-cover-action:hover { background: var(--card); color: var(--foreground); }
+.profile-page .profile-cover-action svg { width: 23px; height: 23px; }
+.profile-page .profile-identity { margin-top: -78px; }
+.profile-page .profile-avatar { width: 112px; height: 112px; padding: 0; box-shadow: 0 12px 22px color-mix(in oklab, var(--foreground) 16%, transparent); }
+.profile-page .profile-name { margin-top: 18px; font-family: var(--font-display); font-size: 30px; font-weight: 800; font-style: normal; line-height: 1.15; letter-spacing: 0; overflow-wrap: anywhere; }
+.profile-page .profile-handle { margin-top: 7px; font-size: 16px; overflow-wrap: anywhere; }
+.profile-page .profile-location { margin-top: 10px; font-size: 13px; flex-wrap: wrap; }
+.profile-page .profile-stats { margin-top: 22px; gap: 13px; }
+.profile-page .profile-stat { min-width: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--card); padding: 10px 4px 9px; box-shadow: var(--profile-shadow); }
+.profile-page .profile-stat-icon { display: flex; justify-content: center; height: 19px; }
+.profile-page .profile-stat-icon svg { width: 19px; height: 19px; }
+.profile-page .profile-stat-value { margin-top: 5px; font-family: var(--font-sans); font-size: 20px; font-weight: 750; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.profile-page .profile-stat-label { margin-top: 6px; font-size: 10px; font-weight: 650; color: var(--muted-foreground); text-transform: uppercase; }
+.profile-page .profile-about { margin-top: 14px; padding: 16px 14px 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); text-align: left; box-shadow: var(--profile-shadow); }
+.profile-page .profile-about-intro { display: flex; align-items: center; gap: 14px; }
+.profile-page .profile-about-icon { display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; color: var(--primary-foreground); background: var(--primary); }
+.profile-page .profile-about-icon svg { width: 31px; height: 31px; stroke-width: 2.5; }
+.profile-page .profile-about h2 { font-family: var(--font-sans); font-size: 16px; font-weight: 750; line-height: 1.3; letter-spacing: 0; }
+.profile-page .profile-bio { margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); overflow-wrap: anywhere; white-space: pre-line; }
+.profile-page .profile-member { display: flex; gap: 12px; align-items: center; margin-top: 13px; padding: 12px 5px 0; border-top: 1px solid var(--border); font-size: 14px; color: var(--muted-foreground); }
+.profile-page .profile-member svg { width: 18px; height: 18px; flex-shrink: 0; }
+.profile-page .profile-public-link { height: auto; margin-top: 12px; padding: 5px 0; font-size: 12px; }
+.profile-page .profile-section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-family: var(--font-sans); font-size: 18px; font-weight: 750; letter-spacing: 0; }
+.profile-page .profile-section-title svg { width: 22px; height: 22px; color: var(--primary); }
+.profile-page .profile-game { display: block; border: 1px solid var(--border); border-radius: 22px; padding: 15px; background: var(--card); box-shadow: var(--profile-shadow); }
+.profile-page .profile-game-header { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.profile-page .profile-sport-icon { display: grid; place-items: center; flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--secondary); color: var(--foreground); }
+.profile-page .profile-sport-icon svg { width: 35px; height: 35px; }
+.profile-page .profile-game-name { font-size: 18px; font-weight: 750; overflow-wrap: anywhere; line-height: 1.3; }
+.profile-page .profile-game-detail { display: flex; align-items: center; gap: 7px; margin-top: 5px; font-size: 12px; color: var(--muted-foreground); }
+.profile-page .profile-game-detail svg { width: 15px; height: 15px; flex-shrink: 0; }
+.profile-page .profile-game-schedule { font-weight: 700; text-transform: uppercase; color: var(--primary); }
+.profile-page .profile-game-actions { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+.profile-page .profile-game-actions button { height: 42px; padding: 0 10px; border-radius: 24px; font-size: 14px; font-weight: 650; }
+.profile-page .profile-game-actions svg { width: 21px; height: 21px; }
+.profile-page .profile-game-row { display: flex; align-items: center; gap: 12px; }
+.profile-page .profile-game-row .profile-sport-icon { width: 42px; height: 42px; }
+.profile-page .profile-game-row .profile-sport-icon svg { width: 31px; height: 31px; }
+.profile-page .profile-game-badge { flex-shrink: 0; border-radius: 20px; padding: 3px 8px; font-size: 10px; font-weight: 700; background: color-mix(in oklab, var(--primary) 12%, var(--card)); color: var(--primary); }
+.profile-page .profile-game-status { flex-shrink: 0; padding: 4px 9px; border-radius: 20px; background: var(--secondary); color: var(--muted-foreground); font-size: 11px; font-weight: 700; }
+.profile-page .profile-game-status[data-open="true"] { background: color-mix(in oklab, var(--success) 15%, var(--card)); color: var(--success); }
+@media (min-width: 768px) {
+  .profile-page .profile-cover { height: 370px; max-width: 760px; margin-inline: auto; }
+  .profile-page .profile-name { font-size: 34px; }
+}
+@media (max-width: 359px) {
+  .profile-page .profile-game-row { gap: 8px; padding: 12px; }
+  .profile-page .profile-game-row .profile-sport-icon { width: 34px; height: 34px; }
+  .profile-page .profile-game-row .profile-game-name { font-size: 15px; }
+  .profile-page .profile-game-detail { font-size: 11px; }
+}
