@@ -373,7 +373,7 @@ function PeladaDetailPage() {
           <Link
             to="/grupo/$peladaId"
             params={{ peladaId: pelada.id }}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-cyan/10 border border-cyan/40 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-cyan/10 border border-cyan/40 text-cyan font-display font-extrabold uppercase active:scale-[0.98] transition-transform"
           >
             <Users className="size-5" /> Grupo da pelada
           </Link>
@@ -466,7 +466,7 @@ function PeladaDetailPage() {
         {!isOrganizer && myRequest && (myRequest.status === "pending" || myRequest.status === "accepted") && (
           <button
             onClick={openChatWithOrganizer}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-navy-soft border border-cyan/30 text-cyan font-display font-extrabold italic uppercase active:scale-[0.98] transition-transform"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-navy-soft border border-cyan/30 text-cyan font-display font-extrabold uppercase active:scale-[0.98] transition-transform"
           >
             <MessageCircle className="size-5" />
             Falar com organizador
@@ -520,7 +520,7 @@ function PeladaDetailPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setManageOpen(true)}
-                className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/80 rounded-2xl font-display font-extrabold italic uppercase text-center flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+                className="flex-1 py-4 bg-navy-soft border border-white/10 text-white/80 rounded-2xl font-display font-extrabold uppercase text-center flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               >
                 <Settings2 className="size-5 text-cyan" /> Gerenciar pelada
               </button>
@@ -536,7 +536,7 @@ function PeladaDetailPage() {
             <button
               onClick={cancelRequest}
               disabled={requesting}
-              className="w-full py-4 bg-navy-soft border border-cyan/30 text-cyan rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
+              className="w-full py-4 bg-navy-soft border border-cyan/30 text-cyan rounded-2xl font-display font-extrabold uppercase flex items-center justify-center gap-2"
             >
               <Check className="size-5" /> Você entrou na pelada — Sair
             </button>
@@ -544,7 +544,7 @@ function PeladaDetailPage() {
             <button
               onClick={cancelRequest}
               disabled={requesting}
-              className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
+              className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold uppercase flex items-center justify-center gap-2"
             >
               Solicitação enviada — Cancelar
             </button>
@@ -553,7 +553,7 @@ function PeladaDetailPage() {
               <button
                 onClick={cancelRequest}
                 disabled={requesting}
-                className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold italic uppercase flex items-center justify-center gap-2"
+                className="w-full py-4 bg-navy-soft border border-warning/40 text-warning rounded-2xl font-display font-extrabold uppercase flex items-center justify-center gap-2"
               >
                 Na lista de espera — Sair
               </button>
@@ -561,17 +561,17 @@ function PeladaDetailPage() {
               <button
                 onClick={requestJoin}
                 disabled={requesting}
-                className="w-full py-5 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase text-lg active:scale-95 transition-transform"
+                className="w-full py-5 bg-cyan text-navy rounded-2xl font-display font-extrabold uppercase text-lg active:scale-95 transition-transform"
               >
                 {requesting ? "..." : "Abriu vaga — Entrar agora"}
               </button>
             )
           ) : myRequest?.status === "rejected" || myRequest?.status === "removed" ? (
-            <div className="w-full py-4 bg-navy-soft border border-destructive/40 text-destructive rounded-2xl font-display font-extrabold italic uppercase text-center flex items-center justify-center gap-2">
+            <div className="w-full py-4 bg-navy-soft border border-destructive/40 text-destructive rounded-2xl font-display font-extrabold uppercase text-center flex items-center justify-center gap-2">
               <X className="size-5" /> Solicitação recusada
             </div>
           ) : isClosed ? (
-            <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold italic uppercase text-center">
+            <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold uppercase text-center">
               Pelada encerrada
             </div>
           ) : isFull ? (
@@ -579,12 +579,12 @@ function PeladaDetailPage() {
               <button
                 onClick={requestJoin}
                 disabled={requesting}
-                className="w-full py-4 bg-navy-soft border border-cyan/40 text-cyan rounded-2xl font-display font-extrabold italic uppercase active:scale-95 transition-transform"
+                className="w-full py-4 bg-navy-soft border border-cyan/40 text-cyan rounded-2xl font-display font-extrabold uppercase active:scale-95 transition-transform"
               >
                 {requesting ? "..." : `Lotada ${pelada.filled_slots}/${pelada.total_slots} — Entrar na lista de espera`}
               </button>
             ) : (
-              <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold italic uppercase text-center">
+              <div className="w-full py-4 bg-navy-soft border border-white/10 text-white/40 rounded-2xl font-display font-extrabold uppercase text-center">
                 Pelada lotada
               </div>
             )
@@ -592,7 +592,7 @@ function PeladaDetailPage() {
             <button
               onClick={requestJoin}
               disabled={requesting}
-              className="w-full py-5 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase text-lg active:scale-95 transition-transform"
+              className="w-full py-5 bg-cyan text-navy rounded-2xl font-display font-extrabold uppercase text-lg active:scale-95 transition-transform"
             >
               {requesting ? "..." : "Quero Participar"}
             </button>

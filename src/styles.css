@@ -276,30 +276,30 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 .create-game .text-mono-label { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }
 
 /* Textos azuis da página da pelada com fonte arredondada */
-.pelada-detail .text-mono-label { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }
-.pelada-detail .text-cyan.font-display, .pelada-detail .pelada-date, .pelada-detail .pelada-posture { font-family: var(--font-rounded); }
+.pelada-detail .text-mono-label { font-family: var(--font-rounded); font-size: 11px; font-weight: 800; letter-spacing: 0.05em; }
+.pelada-detail .text-cyan.font-display, .pelada-detail .pelada-date { font-family: var(--font-rounded); }
 
 .pelada-detail { font-family: var(--font-sans); }
 .pelada-cover { height: 310px; }
 .pelada-cover-fade { background: linear-gradient(to bottom, transparent 38%, var(--background) 96%); }
 .pelada-cover-action { width: 44px; height: 44px; border-radius: 50%; background: color-mix(in oklab, var(--card) 88%, transparent); color: var(--foreground); backdrop-filter: blur(8px); }
 .pelada-cover-action svg { width: 22px; height: 22px; }
-.pelada-date { font-size: 14px; font-weight: 700; letter-spacing: 0; }
-.pelada-title { font-family: var(--font-display); font-size: 44px; line-height: 1.05; font-weight: 800; font-style: italic; letter-spacing: 0; overflow-wrap: anywhere; }
+.pelada-date { font-size: 12px; font-weight: 800; letter-spacing: 0; }
+.pelada-title { font-family: var(--font-display); font-size: 41px; line-height: 1.05; font-weight: 800; letter-spacing: 0; overflow-wrap: anywhere; }
 .pelada-info-label { font-family: var(--font-sans); font-size: 10px; font-weight: 500; line-height: 1.4; letter-spacing: 0; text-transform: uppercase; color: var(--muted-foreground); }
 .pelada-organizer, .pelada-stat, .pelada-detail .pelada-players-summary { box-shadow: var(--pelada-shadow); }
 .pelada-organizer { min-height: 90px; }
-.pelada-organizer-name { font-family: var(--font-display); font-size: 19px; font-weight: 800; font-style: italic; line-height: 1.2; margin-top: 4px; letter-spacing: 0; }
-.pelada-posture { font-family: var(--font-display); font-size: 24px; font-weight: 800; font-style: italic; line-height: 1.2; margin-top: 4px; }
+.pelada-organizer-name { font-family: var(--font-display); font-size: 18px; font-weight: 800; line-height: 1.2; margin-top: 4px; letter-spacing: 0; }
+.pelada-posture { font-family: var(--font-sans); font-size: 21px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
 .pelada-stat { min-width: 0; min-height: 94px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-2xl); background: var(--card); }
 .pelada-stat-icon { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: color-mix(in oklab, var(--primary) 10%, transparent); color: var(--primary); }
 .pelada-stat-icon svg { width: 15px; height: 15px; }
-.pelada-stat-value { font-family: var(--font-display); font-size: 25px; font-weight: 800; font-style: italic; line-height: 1.2; letter-spacing: 0; color: var(--foreground); margin-top: 6px; overflow-wrap: anywhere; }
-.pelada-slots { font-size: 30px; }
+.pelada-stat-value { font-family: var(--font-display); font-size: 21px; font-weight: 800; line-height: 1.2; letter-spacing: 0; color: var(--foreground); margin-top: 6px; overflow-wrap: anywhere; }
+.pelada-slots { font-size: 31px; }
 .pelada-detail .pelada-players-summary { min-height: 76px; }
 .pelada-detail .pelada-players-icon { width: 46px; height: 46px; }
 .pelada-detail .pelada-players-icon svg { width: 25px; height: 25px; }
-.pelada-detail .pelada-players-count { font-family: var(--font-display); font-size: 19px; font-style: italic; font-weight: 800; line-height: 1.2; margin-top: 4px; }
+.pelada-detail .pelada-players-count { font-family: var(--font-display); font-size: 18px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
 .pelada-detail > .fixed { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
 @media (min-width: 768px) {
   .pelada-cover { height: 340px; }
@@ -307,7 +307,7 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 @media (max-width: 359px) {
   .pelada-information { padding-left: 16px; padding-right: 16px; }
   .pelada-stat { padding: 12px; }
-  .pelada-stat-value { font-size: 22px; }
+  .pelada-stat-value { font-size: 19px; }
   .pelada-organizer-name { font-size: 17px; }
 }
 
