@@ -679,14 +679,16 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
           {saving ? "..." : step === TOTAL_STEPS ? "Bora jogar" : "Continuar"}
           {!saving && step < TOTAL_STEPS && <ArrowRight className="size-5" strokeWidth={3} />}
         </button>
-        {step === 1 && !user && (
+        {step === 1 && (
           <>
+            {!user && (
             <button
               onClick={() => { setMode("login"); setLoginError(null); }}
               className="w-full py-3 text-white text-sm font-bold underline underline-offset-4"
             >
               Já tenho conta · entrar com telefone
             </button>
+            )}
             <button
               onClick={handleGoogle}
               disabled={googleLoading}
