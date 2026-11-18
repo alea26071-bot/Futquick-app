@@ -348,7 +348,6 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 .profile-page .profile-bio { margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); overflow-wrap: anywhere; white-space: pre-line; }
 .profile-page .profile-member { display: flex; gap: 12px; align-items: center; margin-top: 13px; padding: 12px 5px 0; border-top: 1px solid var(--border); font-size: 14px; color: var(--muted-foreground); }
 .profile-page .profile-member svg { width: 18px; height: 18px; flex-shrink: 0; }
-.profile-page .profile-public-link { height: auto; margin-top: 12px; padding: 5px 0; font-size: 12px; }
 .profile-page .profile-section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-family: var(--font-sans); font-size: 18px; font-weight: 750; letter-spacing: 0; }
 .profile-page .profile-section-title svg { width: 22px; height: 22px; color: var(--primary); }
 .profile-page .profile-game { display: block; border: 1px solid var(--border); border-radius: 22px; padding: 15px; background: var(--card); box-shadow: var(--profile-shadow); }

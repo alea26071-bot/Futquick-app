@@ -20,7 +20,6 @@ import {
   CalendarDays,
   CircleUserRound,
   Star,
-  ExternalLink,
   Clock3,
   UsersRound,
   ChevronRight,
@@ -361,15 +360,7 @@ function PerfilPage() {
             title="Sobre mim"
             bio={profile?.bio || (profile?.favorite_position ? `${profile.favorite_position} em campo.` : "Sem apresentação.")}
             memberSince={memberSince}
-          >
-            <Button
-              variant="link"
-              onClick={() => navigate({ to: "/jogador/$userId", params: { userId: user.id } })}
-              className="profile-public-link w-full font-semibold"
-            >
-              <ExternalLink /> Ver meu perfil público
-            </Button>
-          </ProfileAbout>
+          />
         )}
       </section>
 
