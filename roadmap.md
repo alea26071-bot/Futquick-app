@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Selecionar e enviar até três fotos de capa juntas, melhorar resolução das fotos do perfil e suavizar os indicadores do carrossel.
+
 - [x] Adicionar carrossel de até três fotos ao perfil, com edição e armazenamento permanente; 24 testes passaram e compilação sem erros.
 - [ ] Conferir envio, swipe e persistência das capas entre contas — depende de sessão do usuário na prévia; tentativa de sessão própria não encontrou conta correspondente.
 

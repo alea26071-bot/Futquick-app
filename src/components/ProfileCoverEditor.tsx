@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useCoverPhotos } from "./ProfileCover";
 import { uploadUserPhotoPath } from "@/lib/storage-helpers";
-import { moveCoverPhoto } from "@/lib/profile-cover";
+import { moveCoverPhoto, validateCoverSelection } from "@/lib/profile-cover";
 import { saveProfileCoverPhotos } from "@/lib/profile-cover.functions";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,6 +18,7 @@ export function ProfileCoverEditor({ userId, paths, open, onOpenChange }: { user
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const replacement = useRef<number | null>(null);
+  const [replacing, setReplacing] = useState(false);
   const persist = async (next: string[]) => {
     await savePhotos({ data: next });
     const removed = paths.filter((path) => !next.includes(path));
@@ -33,19 +34,40 @@ export function ProfileCoverEditor({ userId, paths, open, onOpenChange }: { user
     catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível atualizar as fotos"); }
     finally { setBusy(false); }
   };
-  const pick = (index: number | null) => { replacement.current = index; input.current?.click(); };
-  const upload = async (file: File) => {
+  const pick = (index: number | null) => {
+    replacement.current = index;
+    setReplacing(index !== null);
+    if (input.current) {
+      input.current.multiple = index === null;
+      input.current.click();
+    }
+  };
+  const upload = async (files: File[]) => {
+    if (busy || !files.length) return;
     const index = replacement.current;
-    if (index === null && paths.length >= 3) return;
-    if (!file.type.startsWith("image/")) return toast.error("Escolha uma imagem da sua galeria.");
+    try { validateCoverSelection(files, paths.length, index); }
+    catch (error) { return toast.error(error instanceof Error ? error.message : "Seleção inválida."); }
     setBusy(true);
+    let uploaded: string[] = [];
+    let saved = false;
     try {
-      const path = await uploadUserPhotoPath("avatars", userId, file, `cover-${crypto.randomUUID()}`);
+      const results = await Promise.allSettled(files.map((file) => uploadUserPhotoPath("avatars", userId, file, `cover-${crypto.randomUUID()}`)));
+      uploaded = results.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
+      const failure = results.find((result) => result.status === "rejected");
+      if (failure?.status === "rejected") throw failure.reason;
       const next = [...paths];
-      if (index === null) next.push(path); else next[index] = path;
+      if (index === null) next.push(...uploaded); else {
+        const path = uploaded[0];
+        if (!path) throw new Error("Não foi possível enviar a foto.");
+        next[index] = path;
+      }
       await persist(next);
-      toast.success("Foto adicionada");
-    } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível enviar a foto"); }
+      saved = true;
+      toast.success(files.length > 1 ? "Fotos adicionadas" : "Foto atualizada");
+    } catch (error) {
+      if (!saved && uploaded.length) await supabase.storage.from("avatars").remove(uploaded);
+      toast.error(error instanceof Error ? error.message : "Não foi possível enviar as fotos");
+    }
     finally { setBusy(false); }
   };
   return <Sheet open={open} onOpenChange={(value) => { if (!busy) onOpenChange(value); }}>
@@ -63,8 +85,8 @@ export function ProfileCoverEditor({ userId, paths, open, onOpenChange }: { user
             </div></div>
           </div>)}
         </div>
-        <Button className="mt-5 w-full" variant="outline" disabled={busy || paths.length >= 3} onClick={() => pick(null)}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />} Adicionar foto</Button>
-        <input ref={input} type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); event.currentTarget.value = ""; }} />
+        <Button className="mt-5 w-full" variant="outline" disabled={busy || paths.length >= 3} onClick={() => pick(null)}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />} {busy ? "Enviando fotos…" : "Adicionar fotos"}</Button>
+        <input ref={input} type="file" accept="image/*" multiple={!replacing} disabled={busy} className="hidden" onChange={(event) => { const files = Array.from(event.target.files ?? []); if (files.length) void upload(files); event.currentTarget.value = ""; }} />
       </div>
     </SheetContent>
   </Sheet>;

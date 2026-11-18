@@ -18,3 +18,16 @@ export function moveCoverPhoto(paths: string[], index: number, direction: -1 | 1
   [result[index], result[next]] = [result[next], result[index]];
   return result;
 }
+
+export function validateCoverSelection<T extends { type: string }>(files: T[], existingCount: number, replacementIndex: number | null): T[] {
+  const available = replacementIndex === null ? 3 - existingCount : 1;
+  if (files.length > available) {
+    throw new Error(replacementIndex === null
+      ? `Você pode selecionar até ${available} foto${available === 1 ? "" : "s"} agora (máximo de 3 no perfil).`
+      : "Selecione apenas uma foto para substituir.");
+  }
+  if (files.some((file) => !file.type.startsWith("image/"))) {
+    throw new Error("Escolha apenas imagens da sua galeria.");
+  }
+  return files;
+}
