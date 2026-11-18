@@ -22,7 +22,7 @@ export function useCoverPhotos(paths: string[]) {
 export function ProfileCover({ paths, fallback, name, children }: { paths: string[]; fallback?: string | null; name: string; children: ReactNode }) {
   const { data: urls = [] } = useCoverPhotos(paths);
   const images = paths.length ? urls : fallback ? [fallback] : [];
-  const [viewport, api] = useEmblaCarousel({ loop: false, watchDrag: images.length > 1 });
+  const [viewport, api] = useEmblaCarousel({ loop: images.length > 1, watchDrag: images.length > 1 });
   const [selected, setSelected] = useState(0);
   const onSelect = useCallback(() => setSelected(api?.selectedScrollSnap() ?? 0), [api]);
   useEffect(() => {
