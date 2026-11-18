@@ -1,3 +1,4 @@
+import { reputationValue } from "@/lib/reputation";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState, useEffect } from "react";
@@ -296,11 +297,11 @@ function PerfilPage() {
           <Stat icon={<CircleUserRound />} value={profile?.peladas_played ?? 0} label={labels.plural} tone="primary" />
           <Stat
             icon={<Star />}
-            value={profile?.rating_avg ? Number(profile.rating_avg).toFixed(1) : "—"}
+            value={reputationValue(profile?.stars_average)}
             label="Nível"
             tone="warning"
           />
-          <Stat icon={<ShieldCheck />} value={`${profile?.postura_score ?? 100}%`} label="Postura" tone="success" />
+          <Stat icon={<ShieldCheck />} value={reputationValue(profile?.posture_average,true)} label="Postura" tone="success" />
         </div>
 
         {editing ? (

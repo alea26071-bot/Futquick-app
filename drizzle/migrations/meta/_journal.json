@@ -85,6 +85,13 @@
       "when": 1794977305902,
       "tag": "0011_allow_functional_game_modality",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795037077192,
+      "tag": "0012_independent_player_reputation",
+      "breakpoints": true
     }
   ]
 }

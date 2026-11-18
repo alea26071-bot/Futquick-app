@@ -20,3 +20,5 @@
 - Share the seven-step registration UI between phone signup and authenticated onboarding; OAuth confirms identity without setting a replacement password, and profile completion requires region, radius and avatar before app access.
 - Enforce conversation deadlines with restrictive RLS and a claimed server cleanup; remove media through Storage before transactional conversation deletion so failures remain retryable.
 - Prune only inactive recurrence definitions above the retention target; retain individual games and mark their recurring origin so player history survives foreign-key detachment.
+
+- Persist confirmed attendance separately from reservations, reuse star ratings, and store posture separately; authenticated RPCs enforce eligibility and immutable submissions while triggers alone update profile averages.

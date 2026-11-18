@@ -1,3 +1,4 @@
+import { reputationValue } from "@/lib/reputation";
 import { ProfileOptionsSheet } from "@/components/ProfileOptionsSheet";
 import { useGameTerm } from "@/components/GameTermProvider";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -53,7 +54,7 @@ function PlayerProfilePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, username, avatar_url, cover_photo_paths, bio, city, state, favorite_position, postura_score, rating_avg, peladas_played, phone_verified, created_at")
+        .select("id, name, username, avatar_url, cover_photo_paths, bio, city, state, favorite_position, posture_average, stars_average, peladas_played, phone_verified, created_at")
         .eq("id", userId)
         .maybeSingle();
       if (error) throw error;
@@ -237,8 +238,8 @@ function PlayerProfilePage() {
 
         <div className="profile-stats mt-7 grid grid-cols-3 gap-3">
           <Stat icon={<CircleUserRound />} value={profile.peladas_played} label={plural} tone="primary" />
-          <Stat icon={<Star />} value={Number(profile.rating_avg ?? 0).toFixed(1)} label="Nível" tone="warning" />
-          <Stat icon={<ShieldCheck />} value={`${profile.postura_score}%`} label="Postura" tone="success" />
+          <Stat icon={<Star />} value={reputationValue(profile.stars_average)} label="Nível" tone="warning" />
+          <Stat icon={<ShieldCheck />} value={reputationValue(profile.posture_average,true)} label="Postura" tone="success" />
         </div>
 
         <ProfileAbout

@@ -185,6 +185,49 @@ export type Database = {
         }
         Relationships: []
       }
+      pelada_attendance: {
+        Row: {
+          confirmed_at: string
+          confirmed_by: string
+          pelada_id: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_at?: string
+          confirmed_by: string
+          pelada_id: string
+          user_id: string
+        }
+        Update: {
+          confirmed_at?: string
+          confirmed_by?: string
+          pelada_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_attendance_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_attendance_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_attendance_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pelada_group_messages: {
         Row: {
           attachment_url: string | null
@@ -287,12 +330,62 @@ export type Database = {
           },
         ]
       }
+      pelada_posture_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          organizer_id: string
+          pelada_id: string
+          rated_id: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organizer_id: string
+          pelada_id: string
+          rated_id: string
+          score: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organizer_id?: string
+          pelada_id?: string
+          rated_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pelada_posture_ratings_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_posture_ratings_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_posture_ratings_rated_id_fkey"
+            columns: ["rated_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pelada_ratings: {
         Row: {
           comment: string | null
           created_at: string
           id: string
           pelada_id: string
+          presence_verified: boolean
           rated_id: string
           rater_id: string
           score: number
@@ -302,6 +395,7 @@ export type Database = {
           created_at?: string
           id?: string
           pelada_id: string
+          presence_verified?: boolean
           rated_id: string
           rater_id: string
           score: number
@@ -311,6 +405,7 @@ export type Database = {
           created_at?: string
           id?: string
           pelada_id?: string
+          presence_verified?: boolean
           rated_id?: string
           rater_id?: string
           score?: number
@@ -563,7 +658,9 @@ export type Database = {
           phone: string | null
           phone_verified: boolean
           postura_score: number
+          posture_average: number | null
           rating_avg: number
+          stars_average: number | null
           state: string | null
           suspended_at: string | null
           theme_preference: string
@@ -590,7 +687,9 @@ export type Database = {
           phone?: string | null
           phone_verified?: boolean
           postura_score?: number
+          posture_average?: number | null
           rating_avg?: number
+          stars_average?: number | null
           state?: string | null
           suspended_at?: string | null
           theme_preference?: string
@@ -617,7 +716,9 @@ export type Database = {
           phone?: string | null
           phone_verified?: boolean
           postura_score?: number
+          posture_average?: number | null
           rating_avg?: number
+          stars_average?: number | null
           state?: string | null
           suspended_at?: string | null
           theme_preference?: string
@@ -789,6 +890,11 @@ export type Database = {
         Args: { _pelada_id: string }
         Returns: boolean
       }
+      confirm_game_attendance: {
+        Args: { _pelada_id: string; _user_id: string }
+        Returns: undefined
+      }
+      game_ready_for_ratings: { Args: { _pelada_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -811,6 +917,14 @@ export type Database = {
       leave_pelada: { Args: { _pelada_id: string }; Returns: string }
       max_slots_for: { Args: { _field: string }; Returns: number }
       pelada_group_maintenance: { Args: never; Returns: undefined }
+      pending_game_ratings: {
+        Args: never
+        Returns: {
+          name: string
+          pelada_id: string
+          pending_count: number
+        }[]
+      }
       prune_inactive_templates: { Args: never; Returns: number }
       purge_expired_conversation: {
         Args: { _pelada_id: string }
@@ -820,6 +934,14 @@ export type Database = {
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: string
+      }
+      submit_game_posture: {
+        Args: { _pelada_id: string; _rated_id: string; _score: number }
+        Returns: undefined
+      }
+      submit_game_stars: {
+        Args: { _pelada_id: string; _rated_id: string; _score: number }
+        Returns: undefined
       }
       transfer_pelada: {
         Args: { _new_organizer: string; _pelada_id: string }

@@ -10,6 +10,7 @@ import { NotificationsBell } from "@/components/NotificationsBell";
 import { Logo } from "@/components/Logo";
 import { useGameTerm } from "@/components/GameTermProvider";
 import { Button } from "@/components/ui/button";
+import { PendingRatings } from "@/components/PendingRatings";
 import { modalitiesForFilters } from "@/lib/game-modalities";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
@@ -175,6 +176,7 @@ function DescobrirPage() {
       </header>
 
       <main className="px-5 pt-2 space-y-4">
+        <PendingRatings userId={user.id} />
         <div className="flex justify-between items-end pt-4">
           <span className="discovery-location">
             {profile?.city ? `Perto de ${profile.city}` : plural}

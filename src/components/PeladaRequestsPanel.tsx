@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { respondToJoinRequest, openChatThread } from "@/lib/notifications.functions";
-import { Check, X, MessageCircle, Star, Users } from "lucide-react";
+import { Check, X, MessageCircle, Users } from "lucide-react";
 import { toast } from "sonner";
 
 type Props = {
@@ -24,7 +24,6 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
-  const [rating, setRating] = useState<Record<string, number>>({});
 
   const { data: requests = [] } = useQuery({
     queryKey: ["pelada-requests", peladaId],
@@ -48,21 +47,6 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
       const { data } = await supabase.from("profiles").select("id, name, avatar_url, rating_avg").in("id", ids);
       const map: Record<string, { name: string | null; avatar_url: string | null; rating_avg: number | null }> = {};
       for (const p of data ?? []) map[p.id] = { name: p.name, avatar_url: p.avatar_url, rating_avg: p.rating_avg };
-      return map;
-    },
-  });
-
-  const { data: myRatings = {} } = useQuery({
-    queryKey: ["pelada-player-ratings", peladaId, organizerId],
-    enabled: hasFinished,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("pelada_ratings")
-        .select("rated_id, score")
-        .eq("pelada_id", peladaId)
-        .eq("rater_id", organizerId);
-      const map: Record<string, number> = {};
-      for (const r of data ?? []) map[r.rated_id] = r.score;
       return map;
     },
   });
@@ -91,21 +75,6 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
     } finally {
       setBusy(null);
     }
-  };
-
-  const ratePlayer = async (playerId: string, score: number) => {
-    setBusy(playerId);
-    const { error } = await supabase.from("pelada_ratings").upsert(
-      { pelada_id: peladaId, rater_id: organizerId, rated_id: playerId, score },
-      { onConflict: "pelada_id,rater_id,rated_id" },
-    );
-    setBusy(null);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Nível registrado. Valeu!");
-    qc.invalidateQueries({ queryKey: ["pelada-player-ratings", peladaId, organizerId] });
   };
 
   const pending = requests.filter((r) => r.status === "pending");
@@ -162,8 +131,6 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
 
         {accepted.map((r) => {
           const p = profiles[r.user_id];
-          const given = myRatings[r.user_id];
-          const draft = rating[r.user_id] ?? 0;
           return (
             <div key={r.id} className="p-3 rounded-xl bg-navy border border-white/10 space-y-3">
               <div className="flex items-center gap-3">
@@ -188,30 +155,7 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
                 </button>
               </div>
 
-              {hasFinished && (
-                <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
-                  <p className="text-xs text-white/60">{given ? "Sua nota" : "Avalie o jogador"}</p>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <button
-                        key={n}
-                        disabled={!!given || busy === r.user_id}
-                        onClick={() => {
-                          setRating((prev) => ({ ...prev, [r.user_id]: n }));
-                          void ratePlayer(r.user_id, n);
-                        }}
-                        aria-label={`${n} estrelas`}
-                      >
-                        <Star
-                          className={`size-5 ${
-                            n <= (given ?? draft) ? "fill-cyan text-cyan" : "text-white/20"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+
             </div>
           );
         })}

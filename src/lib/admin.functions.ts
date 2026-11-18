@@ -45,13 +45,13 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
       state?: string | null;
       age?: number | null;
       notify_radius_km?: number | null;
-      postura_score?: number;
     }) => input,
   )
   .handler(async ({ data, context }) => {
     await requireAdminRole(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { id, ...patch } = data;
+    const { id, name, city, state, age, notify_radius_km } = data;
+    const patch = { name, city, state, age, notify_radius_km };
     const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", id);
     if (error) throw new Error("Não foi possível atualizar o usuário");
     return { ok: true };

@@ -1,3 +1,4 @@
+import { reputationValue } from "@/lib/reputation";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -331,7 +332,7 @@ function PeladaDetailPage() {
             </div>
             <div className="text-right border-l border-border pl-4 shrink-0">
               <p className="pelada-info-label">Postura</p>
-              <p className="pelada-posture text-primary">{organizer.postura_score}%</p>
+              <p className="pelada-posture text-primary">{reputationValue(organizer.posture_average,true)}</p>
             </div>
           </Link>
         )}
@@ -388,8 +389,8 @@ function PeladaDetailPage() {
             peladaId={pelada.id}
             organizerId={pelada.organizer_id}
             hasFinished={
-              pelada.status === "finished" ||
-              new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000 < Date.now()
+              pelada.status !== "cancelled" &&
+              new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000 <= Date.now()
             }
           />
         )}
@@ -409,8 +410,8 @@ function PeladaDetailPage() {
           userId={user.id}
           isOrganizer={isOrganizer}
           hasFinished={
-            pelada.status === "finished" ||
-            new Date(pelada.starts_at).getTime() + (pelada.duration_minutes ?? 90) * 60_000 < Date.now()
+            pelada.status !== "cancelled" &&
+            new Date(pelada.starts_at).getTime() + (pelada.duration_minutes ?? 90) * 60_000 <= Date.now()
           }
           wasAccepted={myRequest?.status === "accepted"}
         />

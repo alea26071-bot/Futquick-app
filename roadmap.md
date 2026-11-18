@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Implementar reputação com estrelas entre presentes e postura exclusiva do responsável, médias independentes protegidas, avaliações individuais persistentes e aviso de pendências; presença real será confirmada pelo organizador, sem confundir reserva com comparecimento. Aguardando respostas abertas sobre participação do organizador nas estrelas e quem atribui a postura dele.
+- [ ] Implementar reputação com estrelas entre presentes e postura exclusiva do responsável, médias independentes protegidas, avaliações individuais persistentes e aviso de pendências; presença real confirmada pelo organizador. Organizador presente também dá e recebe estrelas, sem autoavaliação. Não recebe postura no próprio jogo; somente em jogos de outros responsáveis. Todas as dúvidas respondidas; implementação em andamento.
 
 - [x] Arredondar a fonte da localização azul, adaptar ícones por esporte, adicionar filtro Outros e modalidade Funcional; 17 testes passaram, desenhos conferidos em telas pequenas/grandes e banco aceita Funcional.
 - [ ] Conferir filtro Outros e criação de Funcional no fluxo completo — conta autenticada disponível é encaminhada ao cadastro incompleto; não alterado para realizar testes.
