@@ -70,7 +70,7 @@
 
   --navy: oklch(0.18 0.06 260);
   --navy-soft: oklch(0.24 0.06 260);
-  --cyan: oklch(0.75 0.18 220);
+  --cyan: oklch(0.68 0.18 220);
   --cyan-soft: oklch(0.92 0.05 220);
   --sky: oklch(0.97 0.02 240);
   --success: oklch(0.72 0.17 155);
@@ -84,29 +84,29 @@
   --popover: oklch(0.22 0.06 260);
   --popover-foreground: oklch(0.98 0.01 240);
 
-  --primary: oklch(0.75 0.18 220);
+  --primary: oklch(0.68 0.18 220);
   --primary-foreground: oklch(0.15 0.06 260);
   --secondary: oklch(0.28 0.05 260);
   --secondary-foreground: oklch(0.98 0.01 240);
   --muted: oklch(0.26 0.04 260);
   --muted-foreground: oklch(0.72 0.02 240);
-  --accent: oklch(0.75 0.18 220);
+  --accent: oklch(0.68 0.18 220);
   --accent-foreground: oklch(0.15 0.06 260);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0.01 240);
 
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.75 0.18 220);
+  --ring: oklch(0.68 0.18 220);
 
   --sidebar: oklch(0.20 0.06 260);
   --sidebar-foreground: oklch(0.98 0.01 240);
-  --sidebar-primary: oklch(0.75 0.18 220);
+  --sidebar-primary: oklch(0.68 0.18 220);
   --sidebar-primary-foreground: oklch(0.15 0.06 260);
   --sidebar-accent: oklch(0.28 0.05 260);
   --sidebar-accent-foreground: oklch(0.98 0.01 240);
   --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.75 0.18 220);
+  --sidebar-ring: oklch(0.68 0.18 220);
 
   /* Painting tokens used by light-mode overrides below */
   --paint-bg: 15 23 42;         /* navy solid (used only in light overrides) */
@@ -122,7 +122,7 @@ html.light {
 
   --navy: oklch(0.985 0.005 240);      /* app background */
   --navy-soft: oklch(1 0 0);            /* surfaces (cards) */
-  --cyan: oklch(0.62 0.19 240);         /* electric blue, still primary */
+  --cyan: oklch(0.54 0.19 240);         /* electric blue, still primary */
   --cyan-soft: oklch(0.95 0.03 240);
   --sky: oklch(0.98 0.01 240);
   --success: oklch(0.62 0.17 155);
@@ -136,29 +136,29 @@ html.light {
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.06 260);
 
-  --primary: oklch(0.62 0.19 240);
+  --primary: oklch(0.54 0.19 240);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.94 0.01 240);
   --secondary-foreground: oklch(0.18 0.06 260);
   --muted: oklch(0.94 0.01 240);
   --muted-foreground: oklch(0.45 0.03 260);
-  --accent: oklch(0.62 0.19 240);
+  --accent: oklch(0.54 0.19 240);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(1 0 0);
 
   --border: oklch(0.18 0.06 260 / 12%);
   --input: oklch(0.18 0.06 260 / 8%);
-  --ring: oklch(0.62 0.19 240);
+  --ring: oklch(0.54 0.19 240);
 
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.18 0.06 260);
-  --sidebar-primary: oklch(0.62 0.19 240);
+  --sidebar-primary: oklch(0.54 0.19 240);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.94 0.01 240);
   --sidebar-accent-foreground: oklch(0.18 0.06 260);
   --sidebar-border: oklch(0.18 0.06 260 / 10%);
-  --sidebar-ring: oklch(0.62 0.19 240);
+  --sidebar-ring: oklch(0.54 0.19 240);
 
   --paint-bg: 245 247 250;      /* light app bg */
   --paint-surface: 255 255 255; /* cards */
@@ -254,19 +254,19 @@ html.light .bg-white\/10 { background-color: rgb(var(--paint-border) / 0.1) !imp
 html.light .bg-white\/20 { background-color: rgb(var(--paint-border) / 0.2) !important; }
 
 /* Focus outlines / cyan surfaces already themed via --cyan var */
-html.light .bg-cyan\/10 { background-color: rgb(59 130 246 / 0.10) !important; }
-html.light .bg-cyan\/20 { background-color: rgb(59 130 246 / 0.15) !important; }
-html.light .text-cyan { color: rgb(37 99 235) !important; }
-html.light .border-cyan\/20 { border-color: rgb(37 99 235 / 0.3) !important; }
-html.light .border-cyan\/30 { border-color: rgb(37 99 235 / 0.35) !important; }
-html.light .border-cyan\/40 { border-color: rgb(37 99 235 / 0.45) !important; }
-html.light .bg-cyan { background-color: rgb(37 99 235) !important; }
+html.light .bg-cyan\/10 { background-color: rgb(29 78 216 / 0.10) !important; }
+html.light .bg-cyan\/20 { background-color: rgb(29 78 216 / 0.15) !important; }
+html.light .text-cyan { color: rgb(29 78 216) !important; }
+html.light .border-cyan\/20 { border-color: rgb(29 78 216 / 0.3) !important; }
+html.light .border-cyan\/30 { border-color: rgb(29 78 216 / 0.35) !important; }
+html.light .border-cyan\/40 { border-color: rgb(29 78 216 / 0.45) !important; }
+html.light .bg-cyan { background-color: rgb(29 78 216) !important; }
 html.light .text-navy { color: rgb(255 255 255) !important; }
-html.light .fill-cyan { fill: rgb(37 99 235) !important; }
+html.light .fill-cyan { fill: rgb(29 78 216) !important; }
 
 /* From-gradient anchors used in hero images */
-html.light .from-cyan\/40 { --tw-gradient-from: rgb(37 99 235 / 0.35) var(--tw-gradient-from-position); }
-html.light .from-cyan\/30 { --tw-gradient-from: rgb(37 99 235 / 0.25) var(--tw-gradient-from-position); }
+html.light .from-cyan\/40 { --tw-gradient-from: rgb(29 78 216 / 0.35) var(--tw-gradient-from-position); }
+html.light .from-cyan\/30 { --tw-gradient-from: rgb(29 78 216 / 0.25) var(--tw-gradient-from-position); }
 html.light .via-navy-soft { --tw-gradient-via: rgb(var(--paint-surface)) var(--tw-gradient-via-position); }
 html.light .to-navy { --tw-gradient-to: rgb(var(--paint-bg)) var(--tw-gradient-to-position); }
 html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(--tw-gradient-from-position); }
