@@ -78,6 +78,13 @@
       "when": 1794975963234,
       "tag": "0010_recurrence_renewal_retention_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794977305902,
+      "tag": "0011_allow_functional_game_modality",
+      "breakpoints": true
     }
   ]
 }

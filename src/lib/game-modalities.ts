@@ -12,6 +12,7 @@ export const OTHER_MODALITIES = [
   { id: "tenis", label: "Tênis" },
   { id: "corrida", label: "Corrida" },
   { id: "pedal", label: "Pedal" },
+  { id: "funcional", label: "Funcional" },
 ] as const;
 
 export const GAME_MODALITIES = [...FOOTBALL_MODALITIES, ...OTHER_MODALITIES];
@@ -28,6 +29,7 @@ export const SPORT_LABELS: Record<string, string> = {
   tenis: "Tênis",
   corrida: "Corrida",
   pedal: "Pedal",
+  funcional: "Funcional",
 };
 
 export function sportLabelFor(fieldType: string): string {
@@ -36,6 +38,13 @@ export function sportLabelFor(fieldType: string): string {
 
 export function isGameModality(value: string): boolean {
   return GAME_MODALITIES.some((modality) => modality.id === value);
+}
+
+/** Selected sport categories combine; date, price and distance stay independent. */
+export function modalitiesForFilters(filters: ReadonlySet<string>): string[] {
+  return GAME_MODALITIES.filter((modality) => filters.has(modality.id) ||
+    (filters.has("outros") && OTHER_MODALITIES.some((other) => other.id === modality.id)))
+    .map((modality) => modality.id);
 }
 
 export type GameImageInput = { peladaName: string; fieldType: string; city?: string | null };
@@ -51,6 +60,7 @@ const SCENES: Record<string, string> = {
   tenis: "a tennis court with a low tennis net, stringed tennis rackets and tennis balls",
   corrida: "a running track with marked lanes and runners jogging in sportswear, no balls or nets",
   pedal: "a cycling route with cyclists riding bicycles wearing helmets, no balls or nets",
+  funcional: "an outdoor functional fitness training area with athletes using kettlebells, exercise mats and battle ropes, no balls or nets",
 };
 
 export function buildGameImagePrompt({ peladaName, fieldType, city }: GameImageInput): string {

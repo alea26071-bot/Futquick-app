@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Arredondar a fonte da localização azul, adaptar ícones por esporte, adicionar filtro Outros e modalidade Funcional; 17 testes passaram, desenhos conferidos em telas pequenas/grandes e banco aceita Funcional.
+- [ ] Conferir filtro Outros e criação de Funcional no fluxo completo — conta autenticada disponível é encaminhada ao cadastro incompleto; não alterado para realizar testes.
+
 - [x] Ajustar proporções do perfil e cards ativos, com títulos regionais e rolagem natural; quatro tamanhos de tela sem transbordamento.
 - [x] Preservar recorrências ativas e limpar apenas históricas elegíveis acima de dez, sem apagar ocorrências ou estatísticas; testes transacionais desfeitos validaram doze ativas, renovação e preservação de jogos.
 - [x] Limitar conversas de 24h antes a 24h após o jogo e automatizar limpeza segura de mensagens, vínculos e mídias; canceladas mantêm o prazo original. Rotina horária configurada, callback local autorizado testado.

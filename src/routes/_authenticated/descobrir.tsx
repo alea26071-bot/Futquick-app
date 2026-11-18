@@ -9,6 +9,8 @@ import { Zap } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { Logo } from "@/components/Logo";
 import { useGameTerm } from "@/components/GameTermProvider";
+import { Button } from "@/components/ui/button";
+import { modalitiesForFilters } from "@/lib/game-modalities";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
   ssr: false,
@@ -30,6 +32,7 @@ const FILTERS = [
   { id: "society", label: "Society" },
   { id: "campo", label: "Campo" },
   { id: "futsal", label: "Futsal" },
+  { id: "outros", label: "Outros" },
 ] as const;
 
 function DescobrirPage() {
@@ -72,9 +75,8 @@ function DescobrirPage() {
         q = q.lte("starts_at", end.toISOString());
       }
       if (activeFilters.has("gratis")) q = q.eq("price_cents", 0);
-      for (const t of ["society", "campo", "futsal"]) {
-        if (activeFilters.has(t)) q = q.eq("field_type", t);
-      }
+      const modalities = modalitiesForFilters(activeFilters);
+      if (modalities.length) q = q.in("field_type", modalities);
 
       const { data, error } = await q;
       if (error) throw error;
@@ -155,15 +157,18 @@ function DescobrirPage() {
           {FILTERS.map((f) => {
             const active = activeFilters.has(f.id);
             return (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                aria-pressed={active}
                 key={f.id}
                 onClick={() => toggleFilter(f.id)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-                  active ? "bg-cyan text-navy" : "bg-navy-soft text-white/60 border border-white/10"
+                className={`h-auto whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+                  active ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "bg-card text-muted-foreground border border-border"
                 }`}
               >
                 {f.label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -171,7 +176,7 @@ function DescobrirPage() {
 
       <main className="px-5 pt-2 space-y-4">
         <div className="flex justify-between items-end pt-4">
-          <span className="text-mono-label">
+          <span className="discovery-location">
             {profile?.city ? `Perto de ${profile.city}` : plural}
           </span>
           <Link to="/mapa" className="text-xs font-bold text-cyan uppercase tracking-wider">

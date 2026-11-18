@@ -12,6 +12,7 @@
 - Scope pelada detail presentation styles under `.pelada-detail` and use existing font and theme tokens so other screens remain unchanged.
 - Store regional game terminology on the authenticated profile; share creation labels through the authenticated layout provider and validate preference writes in an authenticated server function.
 - Share supported sport IDs, labels and cover prompt subjects through the browser-safe modality catalog; persist the chosen sport in field_type so creation, recurring games and existing displays use the same identity.
+- Resolve discovery sport filters from the modality catalog and combine selected categories with one field_type IN query so Other sports never conflict with football selections.
 - Share profile statistics and biography presentation between personal and public profiles, with styles scoped to `.profile-page` so other screens keep their existing appearance.
 - Share the Embla profile cover between personal and visitor profiles; persist ordered private-storage paths and refresh signed URLs so covers survive sessions without expiring links in profile data. Validate owner paths and the three-photo limit on the server and database.
 - Upload cover selections as an ordered batch with one profile save; use separate cover/avatar compression settings so full-width photos retain detail without changing chat or game uploads.

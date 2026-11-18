@@ -14,6 +14,7 @@
   --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-rounded: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -304,6 +305,8 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 }
 
 /* Shared profile presentation; no changes to navigation or other screens. */
+.active-games-feed .discovery-location { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; line-height: 1.4; letter-spacing: 0; text-transform: uppercase; color: var(--cyan); overflow-wrap: anywhere; }
+:root { --sport-icon-surface: oklch(0.99 0 0); }
 .pelada-feed-card { background: var(--card); container-type: inline-size; }
 .pelada-feed-photo { display: grid; grid-template-rows: auto 1fr; gap: 28px; padding: 12px 16px; min-height: clamp(180px, 53cqw, 320px); color: var(--feed-photo-foreground); }
 .pelada-feed-overlay { background: var(--feed-photo-overlay); }
@@ -350,7 +353,7 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 .profile-page .profile-section-title svg { width: 22px; height: 22px; color: var(--primary); }
 .profile-page .profile-game { display: block; border: 1px solid var(--border); border-radius: 22px; padding: 15px; background: var(--card); box-shadow: var(--profile-shadow); }
 .profile-page .profile-game-header { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.profile-page .profile-sport-icon { display: grid; place-items: center; flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--secondary); color: var(--foreground); }
+.profile-page .profile-sport-icon { display: grid; place-items: center; flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--sport-icon-surface); color: var(--primary); }
 .profile-page .profile-sport-icon svg { width: 35px; height: 35px; }
 .profile-page .profile-game-name { font-size: 18px; font-weight: 750; overflow-wrap: anywhere; line-height: 1.3; }
 .profile-page .profile-game-detail { display: flex; align-items: center; gap: 7px; margin-top: 5px; font-size: 12px; color: var(--muted-foreground); }

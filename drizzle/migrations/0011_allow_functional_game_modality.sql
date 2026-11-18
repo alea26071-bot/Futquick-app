@@ -1,0 +1,2 @@
+ALTER TABLE public.peladas DROP CONSTRAINT peladas_field_type_check;
+ALTER TABLE public.peladas ADD CONSTRAINT peladas_field_type_check CHECK (field_type IN ('futsal', 'society', 'campo', 'basquete', 'volei', 'futvolei', 'beach_tenis', 'tenis', 'corrida', 'pedal', 'funcional'));
