@@ -256,7 +256,7 @@ function AdminPage() {
                         </p>
                         <p className="text-[11px] text-white/40 mt-1">
                           {u.age ? `${u.age} anos · ` : ""}raio {u.notify_radius_km ?? "—"} km · postura{" "}
-                          {u.postura_score}%
+                          {u.posture_average == null ? "—" : `${Math.round(u.posture_average)}%`}
                         </p>
                         {u.latitude != null && u.longitude != null && (
                           <p className="text-[11px] text-cyan/70 font-mono mt-0.5">

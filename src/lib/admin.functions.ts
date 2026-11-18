@@ -11,7 +11,7 @@ export const adminOverview = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("profiles")
         .select(
-          "id, name, phone, age, city, state, avatar_url, notify_radius_km, latitude, longitude, peladas_played, rating_avg, postura_score, onboarding_complete, created_at",
+          "id, name, phone, age, city, state, avatar_url, notify_radius_km, latitude, longitude, peladas_played, stars_average, posture_average, onboarding_complete, created_at",
         )
         .order("created_at", { ascending: false })
         .limit(500),

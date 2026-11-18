@@ -92,6 +92,13 @@
       "when": 1795037077192,
       "tag": "0012_independent_player_reputation",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795037461214,
+      "tag": "0013_restrict_reputation_direct_writes",
+      "breakpoints": true
     }
   ]
 }

@@ -44,9 +44,9 @@ export function PeladaRequestsPanel({ peladaId, organizerId, hasFinished }: Prop
     queryKey: ["profiles-map", ids.slice().sort().join(",")],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id, name, avatar_url, rating_avg").in("id", ids);
-      const map: Record<string, { name: string | null; avatar_url: string | null; rating_avg: number | null }> = {};
-      for (const p of data ?? []) map[p.id] = { name: p.name, avatar_url: p.avatar_url, rating_avg: p.rating_avg };
+      const { data } = await supabase.from("profiles").select("id, name, avatar_url").in("id", ids);
+      const map: Record<string, { name: string | null; avatar_url: string | null }> = {};
+      for (const p of data ?? []) map[p.id] = { name: p.name, avatar_url: p.avatar_url };
       return map;
     },
   });

@@ -1,6 +1,7 @@
 # Roadmap
 
-- [ ] Implementar reputação com estrelas entre presentes e postura exclusiva do responsável, médias independentes protegidas, avaliações individuais persistentes e aviso de pendências; presença real confirmada pelo organizador. Organizador presente também dá e recebe estrelas, sem autoavaliação. Não recebe postura no próprio jogo; somente em jogos de outros responsáveis. Todas as dúvidas respondidas; implementação em andamento.
+- [x] Implementar reputação com presença confirmada pelo organizador, estrelas entre presentes e postura independente exclusiva do responsável (sem postura no próprio jogo); médias protegidas, histórico preservado e aviso persistente de pendências. Oito testes automatizados passaram; verificações transacionais de permissões, duplicidades, médias e limpeza passaram. Fluxo real de confirmação, estrelas, postura, releitura e desaparecimento do aviso conferido em celular e computador; jogo temporário removido.
+- [ ] Validar lembrete horário de avaliações no aplicativo publicado — novo agendamento autenticado configurado e antigo desativado; depende de publicar a versão atual.
 
 - [x] Arredondar a fonte da localização azul, adaptar ícones por esporte, adicionar filtro Outros e modalidade Funcional; 17 testes passaram, desenhos conferidos em telas pequenas/grandes e banco aceita Funcional.
 - [ ] Conferir filtro Outros e criação de Funcional no fluxo completo — conta autenticada disponível é encaminhada ao cadastro incompleto; não alterado para realizar testes.

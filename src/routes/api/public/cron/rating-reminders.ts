@@ -1,50 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { authenticateCronRequest } from '@/integrations/supabase/cron-auth';
 
 async function run() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { notifyUser } = await import("@/lib/notifications.server");
 
-  // Peladas that ended in the last 48h and never got a rating reminder.
-  const since = new Date(Date.now() - 48 * 3600_000).toISOString();
+  // Attendance may be confirmed later; never infer it from reservations.
   const { data: peladas, error } = await supabaseAdmin
     .from("peladas")
     .select("id, name, organizer_id, starts_at, duration_minutes, status, rating_reminder_sent_at")
-    .is("rating_reminder_sent_at", null)
-    .gte("starts_at", since);
-  if (error) return { notified: 0, error: error.message };
+    .neq("status", "cancelled")
+    .lte("starts_at", new Date().toISOString());
+  if (error) return { notified: 0, error: "Não foi possível consultar os jogos" };
 
   let notified = 0;
   for (const p of peladas ?? []) {
     const endedAt = new Date(p.starts_at).getTime() + p.duration_minutes * 60_000;
-    const finished = p.status === "finished" || endedAt < Date.now();
+    const finished = endedAt <= Date.now();
     if (!finished) continue;
 
     const { data: players } = await supabaseAdmin
-      .from("pelada_requests")
+      .from("pelada_attendance")
       .select("user_id")
-      .eq("pelada_id", p.id)
-      .eq("status", "accepted");
+      .eq("pelada_id", p.id);
 
-    const url = `/pelada/${p.id}`;
+    const { data: ratings } = await supabaseAdmin.from("pelada_ratings")
+      .select("rater_id,rated_id").eq("pelada_id", p.id).eq("presence_verified", true);
 
-    await notifyUser({
+    const url = `/pelada/${p.id}#avaliacoes`;
+
+    if (!p.rating_reminder_sent_at) await notifyUser({
       userId: p.organizer_id,
       type: "rating_reminder",
-      title: "Avalie os jogadores",
-      body: `Como foi a galera na ${p.name}? Deixe as notas agora.`,
+      title: "Confirme a presença e avalie a postura",
+      body: `${p.name} terminou. Registre quem jogou e a postura dos presentes.`,
       url,
       data: { peladaId: p.id },
-      dedupeKey: `rating:${p.id}:${p.organizer_id}`,
+      dedupeKey: `posture:${p.id}:${p.organizer_id}`,
     });
     notified++;
 
     for (const pl of players ?? []) {
-      if (pl.user_id === p.organizer_id) continue;
+      const pending = (players ?? []).some(other => other.user_id !== pl.user_id &&
+        !(ratings ?? []).some(r => r.rater_id === pl.user_id && r.rated_id === other.user_id));
+      if (!pending) continue;
       await notifyUser({
         userId: pl.user_id,
         type: "rating_reminder",
-        title: "Como foi a pelada?",
-        body: `Avalie a organização da ${p.name} — leva 5 segundos.`,
+        title: "Avaliações pendentes",
+        body: `Avalie os jogadores presentes em ${p.name}.`,
         url,
         data: { peladaId: p.id },
         dedupeKey: `rating:${p.id}:${pl.user_id}`,
@@ -65,11 +69,8 @@ export const Route = createFileRoute("/api/public/cron/rating-reminders")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const key = request.headers.get("apikey");
-        const expected = process.env["SUPABASE_ANON_KEY"] ?? process.env["SUPABASE_PUBLISHABLE_KEY"];
-        if (!expected || key !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const denied = await authenticateCronRequest(request);
+        if (denied) return denied;
         return Response.json(await run());
       },
     },
