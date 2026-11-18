@@ -275,6 +275,10 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 /* Criação de jogo: rótulos com fonte arredondada, sem afetar as demais telas */
 .create-game .text-mono-label { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }
 
+/* Textos azuis da página da pelada com fonte arredondada */
+.pelada-detail .text-mono-label { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }
+.pelada-detail .text-cyan.font-display, .pelada-detail .pelada-date, .pelada-detail .pelada-posture { font-family: var(--font-rounded); }
+
 .pelada-detail { font-family: var(--font-sans); }
 .pelada-cover { height: 310px; }
 .pelada-cover-fade { background: linear-gradient(to bottom, transparent 38%, var(--background) 96%); }
