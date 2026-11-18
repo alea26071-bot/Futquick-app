@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Implementar reputação com estrelas entre presentes e postura exclusiva do responsável, médias independentes protegidas, avaliações individuais persistentes e aviso de pendências; análise concluída, aguardando definição de confirmação de presença e participação do organizador.
+
 - [x] Arredondar a fonte da localização azul, adaptar ícones por esporte, adicionar filtro Outros e modalidade Funcional; 17 testes passaram, desenhos conferidos em telas pequenas/grandes e banco aceita Funcional.
 - [ ] Conferir filtro Outros e criação de Funcional no fluxo completo — conta autenticada disponível é encaminhada ao cadastro incompleto; não alterado para realizar testes.
 
