@@ -16,6 +16,7 @@ import { PeladaRequestsPanel } from "@/components/PeladaRequestsPanel";
 import { joinPelada, leavePelada } from "@/lib/pelada-group.functions";
 import { OrganizerManageSheet } from "@/components/OrganizerManageSheet";
 import { ReportSheet } from "@/components/ReportSheet";
+import { conversationWindow } from "@/lib/conversation-window";
 
 export const Route = createFileRoute("/_authenticated/pelada/$peladaId")({
   ssr: false,
@@ -368,7 +369,7 @@ function PeladaDetailPage() {
 
         <PeladaPlayersSection peladaId={pelada.id} userId={user.id} totalSlots={pelada.total_slots} />
 
-        {isOrganizer || myRequest?.status === "accepted" ? (
+        {(isOrganizer || myRequest?.status === "accepted") && conversationWindow(pelada).open ? (
           <Link
             to="/grupo/$peladaId"
             params={{ peladaId: pelada.id }}
@@ -378,7 +379,7 @@ function PeladaDetailPage() {
           </Link>
         ) : (
           <p className="text-center text-xs text-white/40 flex items-center justify-center gap-1">
-            <Lock className="size-3" /> O grupo é liberado quando sua entrada for confirmada.
+            <Lock className="size-3" /> A conversa fica disponível aos confirmados de 24h antes até 24h após o jogo.
           </p>
         )}
 

@@ -6,9 +6,9 @@ import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { saveGameTerm } from "@/lib/game-term.functions";
-import { REGIONAL_GAME_TERMS, gameTermSchema } from "@/lib/game-term";
+import { REGIONAL_GAME_TERMS, gameTermSchema, gameListLabels } from "@/lib/game-term";
 
-const GameTermContext = createContext({ createLabel: "Criar jogo" });
+const GameTermContext = createContext({ createLabel: "Criar jogo", ...gameListLabels(null) });
 export const useGameTerm = () => useContext(GameTermContext);
 
 export function GameTermProvider({ initialTerm, userId, children }: { initialTerm: string | null; userId: string; children: ReactNode }) {
@@ -32,7 +32,7 @@ export function GameTermProvider({ initialTerm, userId, children }: { initialTer
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar");
     } finally { setBusy(false); }
   };
-  return <GameTermContext.Provider value={{ createLabel: `Criar ${term?.toLocaleLowerCase("pt-BR") || "jogo"}` }}>
+  return <GameTermContext.Provider value={{ createLabel: `Criar ${term?.toLocaleLowerCase("pt-BR") || "jogo"}`, ...gameListLabels(term) }}>
     {children}
     <Dialog open={open} onOpenChange={(value) => { if (!value && !busy) void persist("Jogo"); }}>
       <DialogContent className="w-[calc(100%-32px)] max-w-sm rounded-2xl border-border bg-card text-card-foreground">

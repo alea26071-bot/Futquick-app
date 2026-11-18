@@ -255,8 +255,8 @@ export const addParticipant = createServerFn({ method: "POST" })
         userId: data.userId,
         type: "added_to_pelada",
         title: "Você foi adicionado a uma pelada ⚽",
-        body: `${who} te adicionou na ${p?.name ?? "pelada"}. O chat do grupo já está liberado.`,
-        url: `/grupo/${data.peladaId}`,
+        body: `${who} te adicionou na ${p?.name ?? "pelada"}. A conversa abre 24h antes do jogo.`,
+        url: `/pelada/${data.peladaId}`,
         data: { peladaId: data.peladaId },
         dedupeKey: `added:${data.peladaId}:${data.userId}`,
       });

@@ -6,6 +6,8 @@ import { ArrowLeft, Send, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { notifyChatMessage } from "@/lib/notifications.functions";
+import { conversationWindow } from "@/lib/conversation-window";
+import { Button } from "@/components/ui/button";
 import {
   LiveLocationBanner,
   LocationMessageCard,
@@ -40,14 +42,16 @@ function ChatThreadPage() {
   const notify = useServerFn(notifyChatMessage);
   const live = useLiveLocationShare(threadId, user.id);
 
-  const { data: thread } = useQuery({
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+  const { data: thread, isLoading: loadingThread } = useQuery({
     queryKey: ["chat-thread", threadId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("chat_threads")
-        .select("id, pelada_id, organizer_id, player_id, peladas(name)")
+        .select("id, pelada_id, organizer_id, player_id, peladas(name, starts_at, duration_minutes, chat_purged_at)")
         .eq("id", threadId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -63,7 +67,8 @@ function ChatThreadPage() {
     queryKey: ["profile", otherId],
     enabled: !!otherId,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id, name, avatar_url").eq("id", otherId!).maybeSingle();
+      if (!otherId) return null;
+      const { data } = await supabase.from("profiles").select("id, name, avatar_url").eq("id", otherId).maybeSingle();
       return data;
     },
   });
@@ -198,6 +203,7 @@ function ChatThreadPage() {
     void qc.invalidateQueries({ queryKey: ["live-locations", threadId] });
   };
 
+  if (!loadingThread && (!thread?.peladas || !conversationWindow(thread.peladas, now).open)) return <div className="min-h-screen bg-background grid place-items-center text-center text-foreground"><div><h2 className="text-xl font-bold">Conversa indisponível</h2><p className="mt-3 text-muted-foreground">Esta conversa está fora do período de funcionamento.</p><Button variant="link" onClick={() => navigate({ to: '/chat' })}>Voltar às conversas</Button></div></div>;
   return (
     <div className="h-screen bg-navy flex flex-col">
       <header className="pt-12 px-4 pb-3 flex items-center gap-3 border-b border-white/10 bg-navy-soft">

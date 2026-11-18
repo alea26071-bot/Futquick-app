@@ -4,6 +4,7 @@ import { FIELD_TYPE_LABEL, LEVEL_LABEL, formatPrice } from "@/lib/pelada-utils";
 import { useState, type MouseEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export interface PeladaCardData {
   id: string;
@@ -67,60 +68,51 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
     <Link
       to="/pelada/$peladaId"
       params={{ peladaId: pelada.id }}
-      className="block animate-slide-up rounded-3xl overflow-hidden border border-white/5 shadow-2xl shadow-black/40 active:scale-[0.98] transition-transform"
-      style={{ backgroundColor: "#1e293b" }}
+      className="pelada-feed-card block animate-slide-up rounded-3xl overflow-hidden border border-border shadow-pelada active:scale-[0.98] transition-transform"
     >
       {/* Image + overlay */}
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="pelada-feed-photo relative overflow-hidden">
         {pelada.photo_url ? (
           <img src={pelada.photo_url} alt={pelada.name} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan/40 via-navy-soft to-navy grid place-items-center">
-            <span className="font-display font-extrabold italic text-6xl tracking-tighter" style={{ color: "rgba(255,255,255,0.1)" }}>
+          <div className="absolute inset-0 bg-secondary grid place-items-center">
+            <span className="font-display font-extrabold italic text-4xl text-muted-foreground">
               {FIELD_TYPE_LABEL[pelada.field_type]?.toUpperCase()}
             </span>
           </div>
         )}
         {/* dark gradient overlays for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20" />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent" />
+        <div className="pelada-feed-overlay absolute inset-0" />
 
         {/* Top tags */}
-        <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full backdrop-blur-sm text-[11px] font-bold uppercase tracking-wide drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
+        <div className="relative z-10 flex flex-wrap content-start gap-2">
+          <span className="pelada-feed-tag px-3 py-1 rounded-full text-[11px] font-bold uppercase">
             {FIELD_TYPE_LABEL[pelada.field_type]}
           </span>
-          <span className="px-3 py-1 rounded-full backdrop-blur-sm text-[11px] font-bold uppercase tracking-wide drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
+          <span className="pelada-feed-tag px-3 py-1 rounded-full text-[11px] font-bold uppercase">
             {LEVEL_LABEL[pelada.level]}
           </span>
           <span
-            className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide drop-shadow-md"
-            style={
-              pelada.price_cents === 0
-                ? { backgroundColor: "#10b981", color: "#fff" }
-                : { backgroundColor: "#22d3ee", color: "#0b1220" }
-            }
+            className="px-3 py-1 rounded-full text-[11px] font-bold uppercase bg-primary text-primary-foreground"
           >
             {formatPrice(pelada.price_cents)}
           </span>
           {pelada.distance_km != null && (
-            <span className="ml-auto px-3 py-1 rounded-full backdrop-blur-sm text-[11px] font-bold flex items-center gap-1 drop-shadow-md" style={{ backgroundColor: "rgba(55,65,81,0.9)", color: "#fff" }}>
+            <span className="pelada-feed-tag ml-auto px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1">
               <MapPin className="size-3" /> {pelada.distance_km.toFixed(1)} km
             </span>
           )}
         </div>
 
         {/* Title + location bottom-left */}
-        <div className="absolute bottom-3 left-4 right-4">
+        <div className="relative z-10 self-end">
           <h3
-            className="font-display text-2xl font-extrabold italic uppercase leading-tight line-clamp-2"
-            style={{ color: "#ffffff", textShadow: "0 2px 10px rgba(0,0,0,1), 0 0 2px rgba(0,0,0,0.9)" }}
+            className="font-display text-2xl font-extrabold italic uppercase leading-tight break-words"
           >
             {pelada.name}
           </h3>
           <div
             className="flex items-center gap-1.5 mt-1 text-xs font-semibold"
-            style={{ color: "#ffffff", textShadow: "0 1px 6px rgba(0,0,0,1)" }}
           >
             <MapPin className="size-3.5 flex-none" />
             <span className="truncate">{pelada.location_name}</span>
@@ -129,36 +121,38 @@ export function PeladaCard({ pelada, featured: _featured }: { pelada: PeladaCard
       </div>
 
       {/* Bottom bar */}
-      <div className="flex items-center gap-3 px-4 py-3" style={{ backgroundColor: "#1e293b" }}>
-        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
-          <Calendar className="size-4" style={{ color: "#ffffff" }} />
+      <div className="pelada-feed-footer grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-2 text-card-foreground">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+        <div className="flex items-center gap-1.5 text-sm font-bold">
+          <Calendar className="size-4 shrink-0" />
           {formatDayMonth(pelada.starts_at)}
         </div>
-        <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#ffffff" }}>
-          <Clock className="size-4" style={{ color: "#ffffff" }} />
+        <div className="flex items-center gap-1.5 text-sm font-bold">
+          <Clock className="size-4 shrink-0" />
           {formatHM(pelada.starts_at)}
         </div>
         <div className="flex items-center gap-1.5 text-sm font-bold">
-          <Users className="size-4" style={{ color: "#ffffff" }} />
-          <span style={{ color: isFull ? "rgba(255,255,255,0.5)" : "#22d3ee" }}>
+          <Users className="size-4 shrink-0" />
+          <span className={isFull ? 'text-muted-foreground' : 'text-primary'}>
             {isFull ? "LOTADA" : `${remaining} ${remaining === 1 ? "vaga" : "vagas"}`}
           </span>
         </div>
-        <div className="ml-auto flex items-center gap-1">
-          <button
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <Button variant="ghost" size="icon"
             onClick={toggleLike}
             aria-label="Curtir"
-            className="size-9 grid place-items-center rounded-full hover:bg-white/5"
+            className="size-9 rounded-full"
           >
-            <Heart className="size-5" style={{ color: liked ? "#22d3ee" : "rgba(255,255,255,0.7)", fill: liked ? "#22d3ee" : "transparent" }} />
-          </button>
-          <button
+            <Heart className={liked ? 'size-5 fill-primary text-primary' : 'size-5 text-muted-foreground'} />
+          </Button>
+          <Button variant="ghost" size="icon"
             onClick={share}
             aria-label="Compartilhar"
-            className="size-9 grid place-items-center rounded-full hover:bg-white/5"
+            className="size-9 rounded-full"
           >
-            <Share2 className="size-5" style={{ color: "rgba(255,255,255,0.7)" }} />
-          </button>
+            <Share2 className="size-5 text-muted-foreground" />
+          </Button>
         </div>
       </div>
     </Link>

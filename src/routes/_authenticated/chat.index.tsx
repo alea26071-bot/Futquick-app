@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { MessageCircle, ChevronRight } from "lucide-react";
+import { conversationWindow } from "@/lib/conversation-window";
 
 export const Route = createFileRoute("/_authenticated/chat/")({
   ssr: false,
@@ -21,13 +22,30 @@ export const Route = createFileRoute("/_authenticated/chat/")({
 function ChatListPage() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+
+  const { data: groups = [] } = useQuery({
+    queryKey: ['my-conversation-groups', user.id],
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const [owned, joined] = await Promise.all([
+        supabase.from('peladas').select('*').eq('organizer_id', user.id).is('chat_purged_at', null),
+        supabase.from('pelada_requests').select('peladas(*)').eq('user_id', user.id).eq('status', 'accepted'),
+      ]);
+      if (owned.error || joined.error) throw new Error('Não foi possível carregar os grupos');
+      const all = [...(owned.data ?? []), ...(joined.data ?? []).flatMap(r => r.peladas ? [r.peladas] : [])];
+      return Array.from(new Map(all.map(g => [g.id, g])).values());
+    },
+  });
+  const availableGroups = groups.filter(g => conversationWindow(g, now).open);
 
   const { data: threads = [], isLoading } = useQuery({
     queryKey: ["chat-threads", user.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("chat_threads")
-        .select("id, pelada_id, organizer_id, player_id, last_message, last_message_at, peladas(name, photo_url)")
+        .select("id, pelada_id, organizer_id, player_id, last_message, last_message_at, peladas(name, photo_url, starts_at, duration_minutes, chat_purged_at)")
         .or(`organizer_id.eq.${user.id},player_id.eq.${user.id}`)
         .order("last_message_at", { ascending: false });
       if (error) throw error;
@@ -35,6 +53,7 @@ function ChatListPage() {
     },
   });
 
+  const availableThreads = threads.filter(t => t.peladas && conversationWindow(t.peladas, now).open);
   // Collect the "other user" ids to hydrate names/avatars
   const otherIds = Array.from(
     new Set(threads.map((t) => (t.organizer_id === user.id ? t.player_id : t.organizer_id))),
@@ -76,7 +95,7 @@ function ChatListPage() {
               <div key={i} className="h-20 rounded-2xl bg-navy-soft/50 animate-pulse" />
             ))}
           </div>
-        ) : threads.length === 0 ? (
+        ) : availableThreads.length === 0 && availableGroups.length === 0 ? (
           <div className="mt-12 text-center px-6 py-12 bg-navy-soft/40 rounded-3xl border border-white/5">
             <div className="size-16 rounded-full bg-cyan/10 grid place-items-center mx-auto mb-4">
               <MessageCircle className="size-7 text-cyan" strokeWidth={2.5} />
@@ -90,7 +109,8 @@ function ChatListPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {threads.map((t) => {
+            {availableGroups.map(g => <Link key={g.id} to="/grupo/$peladaId" params={{ peladaId: g.id }} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-card p-3 text-card-foreground"><div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary">{g.photo_url ? <img src={g.photo_url} alt="" className="size-full object-cover" /> : <MessageCircle className="size-6 text-primary" />}</div><div className="min-w-0"><p className="truncate font-bold">{g.name}</p><p className="text-xs text-muted-foreground">Grupo · {g.filled_slots} participantes</p></div><ChevronRight className="size-5 shrink-0 text-muted-foreground" /></Link>)}
+            {availableThreads.map((t) => {
               const otherId = t.organizer_id === user.id ? t.player_id : t.organizer_id;
               const other = profiles[otherId];
               const pelada = t.peladas as any;

@@ -192,10 +192,6 @@ export function OrganizerManageSheet({ pelada, open, onOpenChange }: { pelada: P
               <span className="text-sm text-white font-bold">Lista de espera quando lotar</span>
               <input type="checkbox" checked={form.waitlistEnabled} onChange={(e) => setForm({ ...form, waitlistEnabled: e.target.checked })} className="size-5 accent-[var(--color-cyan)]" />
             </label>
-            <label className="flex items-center justify-between p-4 rounded-2xl bg-navy-soft border border-white/10">
-              <span className="text-sm text-white font-bold">Manter o grupo ativo após a pelada (até eu encerrar)</span>
-              <input type="checkbox" checked={form.groupPermanent} onChange={(e) => setForm({ ...form, groupPermanent: e.target.checked })} className="size-5 accent-[var(--color-cyan)]" />
-            </label>
             <button onClick={() => submit(false)} disabled={busy} className="w-full py-4 rounded-2xl bg-cyan text-navy font-display font-extrabold italic uppercase disabled:opacity-50">
               Salvar alterações
             </button>

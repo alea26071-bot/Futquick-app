@@ -17,3 +17,5 @@
 - Upload cover selections as an ordered batch with one profile save; use separate cover/avatar compression settings so full-width photos retain detail without changing chat or game uploads.
 - Authorize every administrative server handler through authenticated `has_role` checks before privileged access; never grant roles using client credentials or profile fields, preventing self-promotion.
 - Share the seven-step registration UI between phone signup and authenticated onboarding; OAuth confirms identity without setting a replacement password, and profile completion requires region, radius and avatar before app access.
+- Enforce conversation deadlines with restrictive RLS and a claimed server cleanup; remove media through Storage before transactional conversation deletion so failures remain retryable.
+- Prune only inactive recurrence definitions above the retention target; retain individual games and mark their recurring origin so player history survives foreign-key detachment.

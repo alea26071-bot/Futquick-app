@@ -1,9 +1,10 @@
 # Roadmap
 
-- [ ] Ajustar proporções do perfil e cards ativos, com títulos regionais e rolagem natural.
-- [ ] Preservar recorrências ativas e limpar apenas históricas elegíveis acima de dez, sem apagar ocorrências ou estatísticas.
-- [ ] Limitar conversas de 24h antes a 24h após o jogo e automatizar limpeza segura de mensagens, vínculos e mídias.
-- [ ] Validar regras, acesso direto, telas em tamanhos distintos e agendamento.
+- [x] Ajustar proporções do perfil e cards ativos, com títulos regionais e rolagem natural; quatro tamanhos de tela sem transbordamento.
+- [x] Preservar recorrências ativas e limpar apenas históricas elegíveis acima de dez, sem apagar ocorrências ou estatísticas; testes transacionais desfeitos validaram doze ativas, renovação e preservação de jogos.
+- [x] Limitar conversas de 24h antes a 24h após o jogo e automatizar limpeza segura de mensagens, vínculos e mídias; canceladas mantêm o prazo original. Rotina horária configurada, callback local autorizado testado.
+- [x] Validar envio real e releitura em conversa de membros, bloqueio por link antigo e chamadas diretas, 45 testes e compilação sem erros.
+- [ ] Validar callback da limpeza no aplicativo publicado — depende de publicar a versão atual; rotina agendada e callback local já testados.
 
 - [x] Unificar o cadastro após Google com as sete etapas originais; seis testes passaram e sessão real percorreu estado/cidade, raio e foto obrigatória, sem alterar dados da conta. Salvamento final não executado para não preencher o perfil do usuário com dados de teste.
 

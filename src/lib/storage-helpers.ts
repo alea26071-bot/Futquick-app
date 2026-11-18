@@ -35,7 +35,7 @@ export async function uploadUserPhoto(
   keyHint?: string,
 ): Promise<string> {
   const path = await uploadUserPhotoPath(bucket, userId, file, keyHint);
-  const { data, error: signErr } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
+  const { data, error: signErr } = await supabase.storage.from(bucket).createSignedUrl(path, bucket === 'chat' ? 300 : SIGNED_URL_TTL);
   if (signErr) throw signErr;
   return data.signedUrl;
 }

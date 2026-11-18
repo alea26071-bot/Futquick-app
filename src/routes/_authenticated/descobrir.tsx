@@ -33,7 +33,7 @@ const FILTERS = [
 ] as const;
 
 function DescobrirPage() {
-  const { createLabel } = useGameTerm();
+  const { createLabel, plural } = useGameTerm();
   const { user } = Route.useRouteContext();
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(["hoje"]));
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -117,7 +117,7 @@ function DescobrirPage() {
   };
 
   return (
-    <div className="min-h-screen bg-navy pb-28">
+    <div className="active-games-feed min-h-screen bg-navy pb-28">
       <header className="pt-12 px-5 pb-4 sticky top-0 bg-navy/95 backdrop-blur-md z-30">
         <div className="flex items-center justify-between mb-6">
           <NotificationsBell userId={user.id} />
@@ -172,7 +172,7 @@ function DescobrirPage() {
       <main className="px-5 pt-2 space-y-4">
         <div className="flex justify-between items-end pt-4">
           <span className="text-mono-label">
-            {profile?.city ? `Perto de ${profile.city}` : "Peladas próximas"}
+            {profile?.city ? `Perto de ${profile.city}` : plural}
           </span>
           <Link to="/mapa" className="text-xs font-bold text-cyan uppercase tracking-wider">
             Ver mapa →

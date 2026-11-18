@@ -304,8 +304,15 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 }
 
 /* Shared profile presentation; no changes to navigation or other screens. */
+.pelada-feed-card { background: var(--card); container-type: inline-size; }
+.pelada-feed-photo { display: grid; grid-template-rows: auto 1fr; gap: 28px; padding: 12px 16px; min-height: clamp(180px, 53cqw, 320px); color: var(--feed-photo-foreground); }
+.pelada-feed-overlay { background: var(--feed-photo-overlay); }
+.pelada-feed-tag { background: var(--feed-tag-background); color: var(--feed-photo-foreground); }
+:root { --feed-photo-foreground: oklch(0.99 0 0); --feed-tag-background: oklch(0.28 0.03 260 / 90%); --feed-photo-overlay: linear-gradient(to top, oklch(0.1 0 0 / 95%), oklch(0.1 0 0 / 25%) 65%, oklch(0.1 0 0 / 15%)); }
+@media (max-height: 650px) { .pelada-feed-photo { min-height: 168px; } .active-games-feed > header { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: 4px; } .active-games-feed > header > div:first-child { margin-bottom: 12px; } }
+@container (max-width: 350px) { .pelada-feed-photo { min-height: 200px; } }
 .profile-page { --profile-shadow: 0 3px 10px color-mix(in oklab, var(--foreground) 8%, transparent); }
-.profile-page .profile-cover { height: 315px; min-height: 0; max-height: none; border-radius: 0 0 32px 32px; }
+.profile-page .profile-cover { height: clamp(180px, 30svh, 285px); min-height: 0; max-height: none; border-radius: 0 0 32px 32px; }
 .profile-page .profile-carousel-viewport { height: 100%; overflow: hidden; touch-action: pan-y pinch-zoom; }
 .profile-page .profile-carousel-track { display: flex; height: 100%; }
 .profile-page .profile-carousel-slide { flex: 0 0 100%; min-width: 0; height: 100%; overflow: hidden; }
@@ -321,15 +328,15 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 .profile-page .profile-cover-action svg { width: 23px; height: 23px; }
 .profile-page .profile-identity { margin-top: -78px; }
 .profile-page .profile-avatar { width: 112px; height: 112px; padding: 0; box-shadow: 0 12px 22px color-mix(in oklab, var(--foreground) 16%, transparent); }
-.profile-page .profile-name { margin-top: 18px; font-family: var(--font-display); font-size: 30px; font-weight: 800; font-style: normal; line-height: 1.15; letter-spacing: 0; overflow-wrap: anywhere; }
+.profile-page .profile-name { margin-top: 12px; font-family: var(--font-display); font-size: 30px; font-weight: 800; font-style: normal; line-height: 1.15; letter-spacing: 0; overflow-wrap: anywhere; }
 .profile-page .profile-handle { margin-top: 7px; font-size: 16px; overflow-wrap: anywhere; }
 .profile-page .profile-location { margin-top: 10px; font-size: 13px; flex-wrap: wrap; }
-.profile-page .profile-stats { margin-top: 22px; gap: 13px; }
+.profile-page .profile-stats { margin-top: 16px; gap: 10px; }
 .profile-page .profile-stat { min-width: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--card); padding: 10px 4px 9px; box-shadow: var(--profile-shadow); }
 .profile-page .profile-stat-icon { display: flex; justify-content: center; height: 19px; }
 .profile-page .profile-stat-icon svg { width: 19px; height: 19px; }
 .profile-page .profile-stat-value { margin-top: 5px; font-family: var(--font-sans); font-size: 20px; font-weight: 750; line-height: 1.2; font-variant-numeric: tabular-nums; }
-.profile-page .profile-stat-label { margin-top: 6px; font-size: 10px; font-weight: 650; color: var(--muted-foreground); text-transform: uppercase; }
+.profile-page .profile-stat-label { margin-top: 6px; font-size: 11px; line-height: 1.35; overflow-wrap: anywhere; font-weight: 650; color: var(--muted-foreground); text-transform: uppercase; }
 .profile-page .profile-about { margin-top: 14px; padding: 16px 14px 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); text-align: left; box-shadow: var(--profile-shadow); }
 .profile-page .profile-about-intro { display: flex; align-items: center; gap: 14px; }
 .profile-page .profile-about-icon { display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; color: var(--primary-foreground); background: var(--primary); }
@@ -352,14 +359,16 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 .profile-page .profile-game-actions { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
 .profile-page .profile-game-actions button { height: 42px; padding: 0 10px; border-radius: 24px; font-size: 14px; font-weight: 650; }
 .profile-page .profile-game-actions svg { width: 21px; height: 21px; }
-.profile-page .profile-game-row { display: flex; align-items: center; gap: 12px; }
+.profile-page .profile-game-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.profile-page .profile-game-row .profile-game-status { grid-column: 2; justify-self: start; }
+.profile-page .profile-game-row > svg { grid-column: 3; grid-row: 1 / span 2; }
 .profile-page .profile-game-row .profile-sport-icon { width: 42px; height: 42px; }
 .profile-page .profile-game-row .profile-sport-icon svg { width: 31px; height: 31px; }
 .profile-page .profile-game-badge { flex-shrink: 0; border-radius: 20px; padding: 3px 8px; font-size: 10px; font-weight: 700; background: color-mix(in oklab, var(--primary) 12%, var(--card)); color: var(--primary); }
 .profile-page .profile-game-status { flex-shrink: 0; padding: 4px 9px; border-radius: 20px; background: var(--secondary); color: var(--muted-foreground); font-size: 11px; font-weight: 700; }
 .profile-page .profile-game-status[data-open="true"] { background: color-mix(in oklab, var(--success) 15%, var(--card)); color: var(--success); }
 @media (min-width: 768px) {
-  .profile-page .profile-cover { height: 370px; max-width: 760px; margin-inline: auto; }
+  .profile-page .profile-cover { height: clamp(220px, 30svh, 330px); max-width: 760px; margin-inline: auto; }
   .profile-page .profile-name { font-size: 34px; }
 }
 @media (max-width: 359px) {

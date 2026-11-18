@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/jogador/$userId")({
 });
 
 function PlayerProfilePage() {
-  const { createLabel } = useGameTerm();
+  const { createLabel, plural } = useGameTerm();
   const { userId } = Route.useParams();
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
@@ -236,7 +236,7 @@ function PlayerProfilePage() {
         )}
 
         <div className="profile-stats mt-7 grid grid-cols-3 gap-3">
-          <Stat icon={<CircleUserRound />} value={profile.peladas_played} label="Peladas" tone="primary" />
+          <Stat icon={<CircleUserRound />} value={profile.peladas_played} label={plural} tone="primary" />
           <Stat icon={<Star />} value={Number(profile.rating_avg ?? 0).toFixed(1)} label="Nível" tone="warning" />
           <Stat icon={<ShieldCheck />} value={`${profile.postura_score}%`} label="Postura" tone="success" />
         </div>

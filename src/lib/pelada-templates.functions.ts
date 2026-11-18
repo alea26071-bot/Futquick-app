@@ -94,7 +94,11 @@ export const createNextFromTemplate = createServerFn({ method: "POST" })
       .eq("template_id", tpl.id)
       .eq("starts_at", next.iso)
       .maybeSingle();
-    if (existing) return { peladaId: existing.id as string, created: false };
+    if (existing) {
+      const { error: renewError } = await supabase.from('pelada_templates').update({ active: true }).eq('id', tpl.id);
+      if (renewError) throw new Error(renewError.message);
+      return { peladaId: existing.id as string, created: false };
+    }
 
     const { data: created, error: insertError } = await supabase
       .from("peladas")
@@ -125,7 +129,7 @@ export const createNextFromTemplate = createServerFn({ method: "POST" })
 
     await supabase
       .from("pelada_templates")
-      .update({ last_generated_for: next.date })
+      .update({ last_generated_for: next.date, active: true })
       .eq("id", tpl.id);
 
     return { peladaId: created.id as string, created: true };

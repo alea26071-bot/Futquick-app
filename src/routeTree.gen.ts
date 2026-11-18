@@ -24,6 +24,7 @@ import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedGrupoPeladaIdRouteImport } from './routes/_authenticated/grupo.$peladaId'
 import { Route as AuthenticatedJogadorUserIdRouteImport } from './routes/_authenticated/jogador.$userId'
 import { Route as AuthenticatedPeladaPeladaIdRouteImport } from './routes/_authenticated/pelada.$peladaId'
+import { Route as ApiPublicCronConversationMaintenanceRouteImport } from './routes/api/public/cron/conversation-maintenance'
 import { Route as ApiPublicCronNearbyReminderRouteImport } from './routes/api/public/cron/nearby-reminder'
 import { Route as ApiPublicCronRatingRemindersRouteImport } from './routes/api/public/cron/rating-reminders'
 import { Route as ApiPublicCronRecurringPeladasRouteImport } from './routes/api/public/cron/recurring-peladas'
@@ -107,6 +108,12 @@ const AuthenticatedPeladaPeladaIdRoute =
     path: '/pelada/$peladaId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCronConversationMaintenanceRoute =
+  ApiPublicCronConversationMaintenanceRouteImport.update({
+    id: '/api/public/cron/conversation-maintenance',
+    path: '/api/public/cron/conversation-maintenance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronNearbyReminderRoute =
   ApiPublicCronNearbyReminderRouteImport.update({
     id: '/api/public/cron/nearby-reminder',
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/conversation-maintenance': typeof ApiPublicCronConversationMaintenanceRoute
   '/api/public/cron/nearby-reminder': typeof ApiPublicCronNearbyReminderRoute
   '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
@@ -160,6 +168,7 @@ export interface FileRoutesByTo {
   '/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/chat': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/conversation-maintenance': typeof ApiPublicCronConversationMaintenanceRoute
   '/api/public/cron/nearby-reminder': typeof ApiPublicCronNearbyReminderRoute
   '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
@@ -181,6 +190,7 @@ export interface FileRoutesById {
   '/_authenticated/jogador/$userId': typeof AuthenticatedJogadorUserIdRoute
   '/_authenticated/pelada/$peladaId': typeof AuthenticatedPeladaPeladaIdRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
+  '/api/public/cron/conversation-maintenance': typeof ApiPublicCronConversationMaintenanceRoute
   '/api/public/cron/nearby-reminder': typeof ApiPublicCronNearbyReminderRoute
   '/api/public/cron/rating-reminders': typeof ApiPublicCronRatingRemindersRoute
   '/api/public/cron/recurring-peladas': typeof ApiPublicCronRecurringPeladasRoute
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat/'
+    | '/api/public/cron/conversation-maintenance'
     | '/api/public/cron/nearby-reminder'
     | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/jogador/$userId'
     | '/pelada/$peladaId'
     | '/chat'
+    | '/api/public/cron/conversation-maintenance'
     | '/api/public/cron/nearby-reminder'
     | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
@@ -241,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/jogador/$userId'
     | '/_authenticated/pelada/$peladaId'
     | '/_authenticated/chat/'
+    | '/api/public/cron/conversation-maintenance'
     | '/api/public/cron/nearby-reminder'
     | '/api/public/cron/rating-reminders'
     | '/api/public/cron/recurring-peladas'
@@ -251,6 +264,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiPublicCronConversationMaintenanceRoute: typeof ApiPublicCronConversationMaintenanceRoute
   ApiPublicCronNearbyReminderRoute: typeof ApiPublicCronNearbyReminderRoute
   ApiPublicCronRatingRemindersRoute: typeof ApiPublicCronRatingRemindersRoute
   ApiPublicCronRecurringPeladasRoute: typeof ApiPublicCronRecurringPeladasRoute
@@ -363,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeladaPeladaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cron/conversation-maintenance': {
+      id: '/api/public/cron/conversation-maintenance'
+      path: '/api/public/cron/conversation-maintenance'
+      fullPath: '/api/public/cron/conversation-maintenance'
+      preLoaderRoute: typeof ApiPublicCronConversationMaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/nearby-reminder': {
       id: '/api/public/cron/nearby-reminder'
       path: '/api/public/cron/nearby-reminder'
@@ -423,6 +444,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiPublicCronConversationMaintenanceRoute:
+    ApiPublicCronConversationMaintenanceRoute,
   ApiPublicCronNearbyReminderRoute: ApiPublicCronNearbyReminderRoute,
   ApiPublicCronRatingRemindersRoute: ApiPublicCronRatingRemindersRoute,
   ApiPublicCronRecurringPeladasRoute: ApiPublicCronRecurringPeladasRoute,

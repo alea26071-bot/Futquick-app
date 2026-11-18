@@ -12,6 +12,8 @@ import { PeladaPlayersSection } from "@/components/PeladaPlayersSheet";
 import { GoogleMap } from "@/components/GoogleMap";
 import { formatMatchDate } from "@/lib/pelada-utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { conversationWindow } from "@/lib/conversation-window";
+import { getGroupMedia } from "@/lib/chat-media.functions";
 
 export const Route = createFileRoute("/_authenticated/grupo/$peladaId")({
   ssr: false,
@@ -50,6 +52,8 @@ function GroupChatPage() {
   const [report, setReport] = useState<ReportTarget | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
 
   const { data: pelada } = useQuery({
     queryKey: ["pelada", peladaId],
@@ -70,7 +74,7 @@ function GroupChatPage() {
 
   const { data: messages = [] } = useQuery({
     queryKey: ["group-messages", peladaId],
-    enabled: !!isMember,
+    enabled: !!isMember && !!pelada && conversationWindow(pelada, now).open,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pelada_group_messages")
@@ -84,6 +88,12 @@ function GroupChatPage() {
   });
 
   const senderIds = Array.from(new Set(messages.map((m) => m.sender_id)));
+  const { data: media = {} } = useQuery({
+    queryKey: ['group-media', peladaId, messages.filter(m => m.kind === 'image').map(m => m.id).join(',')],
+    enabled: !!isMember && !!pelada && conversationWindow(pelada, now).open && messages.some(m => m.kind === 'image'),
+    refetchInterval: 45000,
+    queryFn: () => getGroupMedia({ data: { peladaId } }),
+  });
   const { data: senders = {} } = useQuery({
     queryKey: ["group-senders", peladaId, senderIds.sort().join(",")],
     enabled: senderIds.length > 0,
@@ -102,7 +112,7 @@ function GroupChatPage() {
   });
 
   useEffect(() => {
-    if (!isMember) return;
+    if (!isMember || !pelada || !conversationWindow(pelada, now).open) return;
     const ch = supabase
       .channel(`group-${peladaId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "pelada_group_messages", filter: `pelada_id=eq.${peladaId}` }, () =>
@@ -112,7 +122,7 @@ function GroupChatPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [isMember, peladaId, qc]);
+  }, [isMember, peladaId, qc, pelada, !!pelada && conversationWindow(pelada, now).open]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
@@ -201,8 +211,9 @@ function GroupChatPage() {
     );
   }
 
-  const endsAt = new Date(pelada.starts_at).getTime() + pelada.duration_minutes * 60000;
-  const groupOpen = pelada.status !== "finished" && (pelada.group_mode === "permanent" || endsAt > Date.now());
+  const chatWindow = conversationWindow(pelada, now);
+  const groupOpen = chatWindow.open;
+  if (!groupOpen) return <div className="min-h-screen bg-background grid place-items-center px-6 text-center text-foreground"><div><Lock className="mx-auto mb-4 size-8 text-primary" /><h2 className="text-xl font-bold">{now < chatWindow.opensAt && !pelada.chat_purged_at ? 'Conversa ainda indisponível' : 'Conversa encerrada'}</h2><p className="mt-3 text-sm text-muted-foreground">{now < chatWindow.opensAt && !pelada.chat_purged_at ? 'O grupo abre 24 horas antes do jogo.' : 'O prazo desta conversa terminou.'}</p><Link to="/pelada/$peladaId" params={{ peladaId }} className="mt-6 inline-block text-primary">Ver jogo</Link></div></div>;
 
   return (
     <div className="h-[100dvh] bg-navy flex flex-col">
@@ -241,7 +252,7 @@ function GroupChatPage() {
                 {m.deleted_at ? (
                   <p className="text-sm italic opacity-60">Mensagem removida</p>
                 ) : m.kind === "image" && m.attachment_url ? (
-                  <img src={m.attachment_url} alt="Foto" className="rounded-xl max-h-64" />
+                  media[m.id] ? <img src={media[m.id]} alt="Foto" className="rounded-xl max-h-64" /> : <p className="text-sm">Foto indisponível</p>
                 ) : (
                   <p className="text-sm whitespace-pre-wrap break-words pr-5">{m.body}</p>
                 )}
@@ -278,7 +289,7 @@ function GroupChatPage() {
 
       {!groupOpen ? (
         <div className="p-4 border-t border-white/10 bg-navy pb-6 text-center text-sm text-white/50">
-          Grupo encerrado — a pelada já terminou. Mensagens ficam guardadas por {pelada.template_id ? "7 dias" : "24h"}.
+          Conversa encerrada.
         </div>
       ) : (
       <div className="p-3 border-t border-white/10 flex items-center gap-2 bg-navy pb-6">

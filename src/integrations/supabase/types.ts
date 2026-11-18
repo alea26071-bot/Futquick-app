@@ -442,6 +442,8 @@ export type Database = {
         Row: {
           address: string
           auto_approve: boolean
+          chat_cleanup_started_at: string | null
+          chat_purged_at: string | null
           city: string | null
           created_at: string
           description: string | null
@@ -466,10 +468,13 @@ export type Database = {
           total_slots: number
           updated_at: string
           waitlist_enabled: boolean
+          was_recurring: boolean
         }
         Insert: {
           address: string
           auto_approve?: boolean
+          chat_cleanup_started_at?: string | null
+          chat_purged_at?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -494,10 +499,13 @@ export type Database = {
           total_slots: number
           updated_at?: string
           waitlist_enabled?: boolean
+          was_recurring?: boolean
         }
         Update: {
           address?: string
           auto_approve?: boolean
+          chat_cleanup_started_at?: string | null
+          chat_purged_at?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -522,6 +530,7 @@ export type Database = {
           total_slots?: number
           updated_at?: string
           waitlist_enabled?: boolean
+          was_recurring?: boolean
         }
         Relationships: [
           {
@@ -775,6 +784,11 @@ export type Database = {
         Args: { _pelada_id: string; _user_id: string }
         Returns: string
       }
+      can_read_chat_object: { Args: { _path: string }; Returns: boolean }
+      claim_expired_conversation: {
+        Args: { _pelada_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -792,10 +806,16 @@ export type Database = {
         Args: { _pelada_id: string; _user_id: string }
         Returns: boolean
       }
+      is_thread_open: { Args: { _thread_id: string }; Returns: boolean }
       join_pelada: { Args: { _pelada_id: string }; Returns: string }
       leave_pelada: { Args: { _pelada_id: string }; Returns: string }
       max_slots_for: { Args: { _field: string }; Returns: number }
       pelada_group_maintenance: { Args: never; Returns: undefined }
+      prune_inactive_templates: { Args: never; Returns: number }
+      purge_expired_conversation: {
+        Args: { _pelada_id: string }
+        Returns: boolean
+      }
       recompute_player_stats: { Args: { _user_id: string }; Returns: undefined }
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }

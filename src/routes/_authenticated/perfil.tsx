@@ -40,6 +40,7 @@ import { Button } from "@/components/ui/button";
 import { ProfileStat as Stat, ProfileAbout, ProfileSportIcon } from "@/components/ProfilePresentation";
 import { ProfileCover } from "@/components/ProfileCover";
 import { ProfileCoverEditor } from "@/components/ProfileCoverEditor";
+import { useGameTerm } from "@/components/GameTermProvider";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
@@ -59,6 +60,7 @@ export const Route = createFileRoute("/_authenticated/perfil")({
 const POSITIONS = ["Goleiro", "Zagueiro", "Lateral", "Volante", "Meia", "Atacante"];
 
 function PerfilPage() {
+  const labels = useGameTerm();
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -292,7 +294,7 @@ function PerfilPage() {
         )}
 
         <div className="profile-stats mt-6 grid grid-cols-3 gap-3">
-          <Stat icon={<CircleUserRound />} value={profile?.peladas_played ?? 0} label="Peladas" tone="primary" />
+          <Stat icon={<CircleUserRound />} value={profile?.peladas_played ?? 0} label={labels.plural} tone="primary" />
           <Stat
             icon={<Star />}
             value={profile?.rating_avg ? Number(profile.rating_avg).toFixed(1) : "—"}
@@ -373,7 +375,7 @@ function PerfilPage() {
 
       {templates.length > 0 && (
         <section className="mx-auto mt-6 max-w-lg px-5">
-          <h2 className="profile-section-title"><Pin /> Peladas ativas</h2>
+          <h2 className="profile-section-title"><Pin /> {labels.active}</h2>
           <div className="space-y-2">
             {templates.map((t) => (
               <div key={t.id} className="profile-game">
@@ -400,7 +402,7 @@ function PerfilPage() {
       )}
 
       <section className="mx-auto mt-6 max-w-lg px-5">
-        <h2 className="profile-section-title"><UsersRound /> {myPeladas.length > 0 && myPeladas.every((p) => p.template_id) ? "Peladas fixas" : "Peladas que organizei"}</h2>
+        <h2 className="profile-section-title"><UsersRound /> {labels.fixed}</h2>
         {myPeladas.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card py-8 text-center text-sm text-muted-foreground">
             Você ainda não organizou nenhuma pelada.
@@ -413,7 +415,7 @@ function PerfilPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="profile-game-name">{p.name}</p>
-                    {p.template_id && <span className="profile-game-badge">Fixa</span>}
+                    {(p.template_id || p.was_recurring) && <span className="profile-game-badge">Fixa</span>}
                   </div>
                   <p className="profile-game-detail"><CalendarDays /><span>{new Date(p.starts_at).toLocaleDateString("pt-BR")} · {p.filled_slots}/{p.total_slots} vagas</span></p>
                 </div>
