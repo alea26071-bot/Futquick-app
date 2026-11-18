@@ -16,3 +16,4 @@
 - Share the Embla profile cover between personal and visitor profiles; persist ordered private-storage paths and refresh signed URLs so covers survive sessions without expiring links in profile data. Validate owner paths and the three-photo limit on the server and database.
 - Upload cover selections as an ordered batch with one profile save; use separate cover/avatar compression settings so full-width photos retain detail without changing chat or game uploads.
 - Authorize every administrative server handler through authenticated `has_role` checks before privileged access; never grant roles using client credentials or profile fields, preventing self-promotion.
+- Share the seven-step registration UI between phone signup and authenticated onboarding; OAuth confirms identity without setting a replacement password, and profile completion requires region, radius and avatar before app access.

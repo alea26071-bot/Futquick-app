@@ -2,20 +2,22 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatMessagePopup } from "@/components/ChatMessagePopup";
 import { GameTermProvider } from "@/components/GameTermProvider";
+import { isOnboardingComplete } from "@/lib/onboarding";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
-    // Foto de perfil é obrigatória para usar o app.
-    const { data: profile } = await supabase
+    // Fotos vindas do Google não substituem a conclusão do cadastro.
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("avatar_url, game_term")
+      .select("name, age, city, state, notify_radius_km, onboarding_complete, avatar_url, game_term")
       .eq("id", data.user.id)
       .maybeSingle();
-    if (!profile?.avatar_url) throw redirect({ to: "/onboarding" });
-    return { user: data.user, gameTerm: profile.game_term };
+    if (profileError) throw profileError;
+    if (!isOnboardingComplete(profile)) throw redirect({ to: "/onboarding" });
+    return { user: data.user, gameTerm: profile?.game_term ?? null };
   },
   component: AuthenticatedLayout,
 });

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Unificar o cadastro após Google com as sete etapas originais; seis testes passaram e sessão real percorreu estado/cidade, raio e foto obrigatória, sem alterar dados da conta. Salvamento final não executado para não preencher o perfil do usuário com dados de teste.
+
 - [x] Selecionar e enviar até três fotos de capa juntas, melhorar resolução das fotos do perfil e suavizar os indicadores do carrossel.
 
 - [x] Adicionar carrossel de até três fotos ao perfil, com edição e armazenamento permanente; 24 testes passaram e compilação sem erros.
