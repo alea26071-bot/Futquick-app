@@ -10,6 +10,14 @@ import { ChevronRight, MapPin, ArrowLeft, Search, Plus, X, LocateFixed } from "l
 
 export const Route = createFileRoute("/_authenticated/mapa")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Mapa de jogos | Futquick" },
+    { name: "description", content: "Veja os jogos próximos no mapa do Futquick." },
+    { property: "og:title", content: "Mapa de jogos | Futquick" },
+    { property: "og:description", content: "Veja os jogos próximos no mapa do Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: MapaPage,
 });
 

@@ -16,7 +16,9 @@ async function fileToJpegBlob(file: File, maxDim = 1200, quality = 0.85): Promis
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d");
+  URL.revokeObjectURL(img.src);
+  if (!ctx) throw new Error("Não foi possível preparar a imagem.");
   ctx.drawImage(img, 0, 0, w, h);
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Canvas encode failed"))), "image/jpeg", quality);
@@ -24,6 +26,18 @@ async function fileToJpegBlob(file: File, maxDim = 1200, quality = 0.85): Promis
 }
 
 export async function uploadUserPhoto(
+  bucket: "avatars" | "peladas" | "chat",
+  userId: string,
+  file: File,
+  keyHint?: string,
+): Promise<string> {
+  const path = await uploadUserPhotoPath(bucket, userId, file, keyHint);
+  const { data, error: signErr } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
+  if (signErr) throw signErr;
+  return data.signedUrl;
+}
+
+export async function uploadUserPhotoPath(
   bucket: "avatars" | "peladas" | "chat",
   userId: string,
   file: File,
@@ -58,7 +72,5 @@ export async function uploadUserPhoto(
     throw new Error(verdict.reason || "Esta imagem não segue as diretrizes do Futquick.");
   }
 
-  const { data, error: signErr } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
-  if (signErr) throw signErr;
-  return data.signedUrl;
+  return path;
 }

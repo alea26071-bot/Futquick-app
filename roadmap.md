@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Adicionar carrossel de até três fotos ao perfil, com edição e armazenamento permanente; 24 testes passaram e compilação sem erros.
+- [ ] Conferir envio, swipe e persistência das capas entre contas — depende de sessão do usuário na prévia; tentativa de sessão própria não encontrou conta correspondente.
+
 - [x] Remover credenciais administrativas expostas e conferir autorização no servidor e RLS sem alterar contas ou outras funcionalidades (administrador existente acessa; cinco funções negadas a usuário comum e sem sessão).
 - [x] Confirmar conta atual sem papel admin e preservar as permissões existentes, conforme escolha do usuário; concessão futura exige operação privilegiada no banco.
 

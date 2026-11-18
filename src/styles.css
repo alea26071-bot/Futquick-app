@@ -306,6 +306,14 @@ html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(-
 /* Shared profile presentation; no changes to navigation or other screens. */
 .profile-page { --profile-shadow: 0 3px 10px color-mix(in oklab, var(--foreground) 8%, transparent); }
 .profile-page .profile-cover { height: 315px; min-height: 0; max-height: none; border-radius: 0 0 32px 32px; }
+.profile-page .profile-carousel-viewport { height: 100%; overflow: hidden; touch-action: pan-y pinch-zoom; }
+.profile-page .profile-carousel-track { display: flex; height: 100%; }
+.profile-page .profile-carousel-slide { flex: 0 0 100%; min-width: 0; height: 100%; overflow: hidden; }
+.profile-page .profile-cover-dots { position: absolute; bottom: 88px; inset-inline: 0; display: flex; justify-content: center; gap: 0; pointer-events: none; }
+.profile-page .profile-cover-dot { width: 28px; height: 28px; padding: 0; border-radius: 50%; pointer-events: auto; }
+.profile-page .profile-cover-dot span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted-foreground); box-shadow: 0 0 0 2px color-mix(in oklab, var(--background) 45%, transparent); transition: background 180ms, transform 180ms; }
+.profile-page .profile-cover-dot[aria-pressed="true"] span { background: var(--primary); transform: scale(1.2); }
+@media (prefers-reduced-motion: reduce) { .profile-page .profile-cover-dot span { transition: none; } }
 .profile-page .profile-cover-fade { background: linear-gradient(to bottom, transparent 48%, var(--background) 99%); }
 .profile-page .profile-cover-action { width: 44px; height: 44px; border-radius: 50%; color: var(--foreground); background: color-mix(in oklab, var(--card) 85%, transparent); backdrop-filter: blur(10px); box-shadow: none; }
 .profile-page .profile-cover-action:hover { background: var(--card); color: var(--foreground); }

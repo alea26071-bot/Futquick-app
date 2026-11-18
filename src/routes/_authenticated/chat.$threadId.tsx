@@ -16,6 +16,14 @@ import {
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Conversa com jogador | Futquick" },
+    { name: "description", content: "Converse sobre sua pelada no Futquick." },
+    { property: "og:title", content: "Conversa com jogador | Futquick" },
+    { property: "og:description", content: "Converse sobre sua pelada no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ChatThreadPage,
 });
 

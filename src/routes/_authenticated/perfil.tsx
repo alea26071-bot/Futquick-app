@@ -9,6 +9,7 @@ import {
   Edit3,
   Check,
   Camera,
+  ImagePlus,
   Sun,
   Moon,
   Pin,
@@ -30,6 +31,8 @@ import { WEEKDAY_LABEL } from "@/lib/pelada-utils";
 import { createNextFromTemplate, setTemplateActive } from "@/lib/pelada-templates.functions";
 import { Button } from "@/components/ui/button";
 import { ProfileStat as Stat, ProfileAbout, ProfileSportIcon } from "@/components/ProfilePresentation";
+import { ProfileCover } from "@/components/ProfileCover";
+import { ProfileCoverEditor } from "@/components/ProfileCoverEditor";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
@@ -54,6 +57,7 @@ function PerfilPage() {
   const qc = useQueryClient();
   const { theme, toggle } = useTheme();
   const [editing, setEditing] = useState(false);
+  const [coverEditorOpen, setCoverEditorOpen] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -194,17 +198,7 @@ function PerfilPage() {
 
   return (
     <main className="profile-page min-h-screen bg-background pb-28 text-foreground">
-      {/* Capa sincronizada com a foto de perfil */}
-      <section className="profile-cover relative h-[40vh] min-h-72 max-h-[420px] overflow-hidden rounded-b-[2rem] bg-secondary">
-        {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="" className="h-full w-full object-cover object-center" />
-        ) : (
-          <div className="grid h-full w-full place-items-center bg-secondary">
-            <CircleUserRound className="size-28 text-muted-foreground/40" />
-          </div>
-        )}
-        <div className="profile-cover-fade absolute inset-0" />
-
+      <ProfileCover paths={profile?.cover_photo_paths ?? []} fallback={profile?.avatar_url} name={profile?.name || "jogador"}>
         <div className="absolute inset-x-0 top-0 flex items-center justify-end gap-2 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <Button variant="ghost" size="icon"
             onClick={toggle}
@@ -228,7 +222,9 @@ function PerfilPage() {
             <LogOut className="size-5" />
           </Button>
         </div>
-      </section>
+        <Button variant="ghost" size="icon" className="profile-cover-action absolute left-5 top-[max(1.25rem,env(safe-area-inset-top))]" aria-label="Editar fotos de capa" title="Editar fotos de capa" onClick={() => setCoverEditorOpen(true)}><ImagePlus /></Button>
+      </ProfileCover>
+      <ProfileCoverEditor userId={user.id} paths={profile?.cover_photo_paths ?? []} open={coverEditorOpen} onOpenChange={setCoverEditorOpen} />
 
       <section className="profile-identity relative z-10 mx-auto -mt-20 max-w-lg px-5 text-center">
         <Button variant="ghost"

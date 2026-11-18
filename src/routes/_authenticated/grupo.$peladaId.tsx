@@ -15,7 +15,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 
 export const Route = createFileRoute("/_authenticated/grupo/$peladaId")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Grupo da pelada — Futquick" }] }),
+  head: () => ({ meta: [
+    { title: "Grupo da pelada — Futquick" },
+    { name: "description", content: "Converse com os participantes da sua pelada no Futquick." },
+    { property: "og:title", content: "Grupo da pelada — Futquick" },
+    { property: "og:description", content: "Converse com os participantes da sua pelada no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: GroupChatPage,
 });
 

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ProfileStat as Stat, ProfileAbout } from "@/components/ProfilePresentation";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { invitePlayerToPelada } from "@/lib/notifications.functions";
+import { ProfileCover } from "@/components/ProfileCover";
 
 export const Route = createFileRoute("/_authenticated/jogador/$userId")({
   ssr: false,
@@ -52,7 +53,7 @@ function PlayerProfilePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, username, avatar_url, bio, city, state, favorite_position, postura_score, rating_avg, peladas_played, phone_verified, created_at")
+        .select("id, name, username, avatar_url, cover_photo_paths, bio, city, state, favorite_position, postura_score, rating_avg, peladas_played, phone_verified, created_at")
         .eq("id", userId)
         .maybeSingle();
       if (error) throw error;
@@ -175,15 +176,7 @@ function PlayerProfilePage() {
 
   return (
     <main className="profile-page min-h-screen bg-background pb-12 text-foreground">
-      <section className="profile-cover relative h-[44vh] min-h-80 max-h-[460px] overflow-hidden rounded-b-[2rem] bg-secondary">
-        {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={`Foto de ${profile.name}`} className="h-full w-full object-cover object-center" />
-        ) : (
-          <div className="grid h-full w-full place-items-center bg-secondary">
-            <CircleUserRound className="size-28 text-muted-foreground/40" />
-          </div>
-        )}
-        <div className="profile-cover-fade absolute inset-0" />
+      <ProfileCover paths={profile.cover_photo_paths} fallback={profile.avatar_url} name={profile.name}>
         <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="profile-cover-action">
             <ArrowLeft className="size-6" strokeWidth={2.5} />
@@ -192,7 +185,7 @@ function PlayerProfilePage() {
             <MoreHorizontal className="size-6" strokeWidth={2.5} />
           </Button>
         </div>
-      </section>
+      </ProfileCover>
       <ProfileOptionsSheet
         open={optionsOpen}
         onOpenChange={setOptionsOpen}

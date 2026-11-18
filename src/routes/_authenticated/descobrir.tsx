@@ -12,6 +12,14 @@ import { useGameTerm } from "@/components/GameTermProvider";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Descobrir jogos | Futquick" },
+    { name: "description", content: "Encontre jogos e vagas perto de você no Futquick." },
+    { property: "og:title", content: "Descobrir jogos | Futquick" },
+    { property: "og:description", content: "Encontre jogos e vagas perto de você no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: DescobrirPage,
 });
 

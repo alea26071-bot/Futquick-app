@@ -50,6 +50,13 @@
       "when": 1792115884300,
       "tag": "0006_additional_game_modalities",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794972205351,
+      "tag": "0007_profile_cover_photos",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,14 @@ import { MessageCircle, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/chat/")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Conversas | Futquick" },
+    { name: "description", content: "Suas conversas com jogadores e organizadores no Futquick." },
+    { property: "og:title", content: "Conversas | Futquick" },
+    { property: "og:description", content: "Suas conversas com jogadores e organizadores no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ChatListPage,
 });
 

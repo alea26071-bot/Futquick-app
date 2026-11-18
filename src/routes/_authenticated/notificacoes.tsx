@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/notificacoes")({
       { name: "description", content: "Solicitações, confirmações e mensagens das suas peladas no Futquick." },
       { property: "og:title", content: "Notificações · Futquick" },
       { property: "og:description", content: "Acompanhe solicitações e confirmações das suas peladas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NotificationsPage,

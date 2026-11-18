@@ -8,6 +8,14 @@ import { ArrowLeft, ArrowRight, Camera, User as UserIcon, Calendar, MapPin, Star
 
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Complete seu cadastro | Futquick" },
+    { name: "description", content: "Complete seu perfil de jogador no Futquick." },
+    { property: "og:title", content: "Complete seu cadastro | Futquick" },
+    { property: "og:description", content: "Complete seu perfil de jogador no Futquick." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
