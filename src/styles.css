@@ -272,6 +272,9 @@ html.light .to-navy { --tw-gradient-to: rgb(var(--paint-bg)) var(--tw-gradient-t
 html.light .from-navy-soft { --tw-gradient-from: rgb(var(--paint-surface)) var(--tw-gradient-from-position); }
 
 /* Detail-page reference styling stays local to the pelada information view. */
+/* Criação de jogo: rótulos com fonte arredondada, sem afetar as demais telas */
+.create-game .text-mono-label { font-family: var(--font-rounded); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }
+
 .pelada-detail { font-family: var(--font-sans); }
 .pelada-cover { height: 310px; }
 .pelada-cover-fade { background: linear-gradient(to bottom, transparent 38%, var(--background) 96%); }

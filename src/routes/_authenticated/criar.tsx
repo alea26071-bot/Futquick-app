@@ -178,7 +178,7 @@ function CriarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-navy flex flex-col">
+    <div className="create-game min-h-screen bg-navy flex flex-col">
       <header className="pt-12 px-6 pb-6 flex items-center justify-between">
         <Link to="/descobrir" className="text-white font-bold text-xl">
           <X className="size-6" />
