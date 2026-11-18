@@ -24,7 +24,14 @@ import {
   Clock3,
   UsersRound,
   ChevronRight,
+  MoreVertical,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { useTheme } from "@/lib/theme";
 import { WEEKDAY_LABEL } from "@/lib/pelada-utils";
@@ -200,27 +207,27 @@ function PerfilPage() {
     <main className="profile-page min-h-screen bg-background pb-28 text-foreground">
       <ProfileCover paths={profile?.cover_photo_paths ?? []} fallback={profile?.avatar_url} name={profile?.name || "jogador"}>
         <div className="absolute inset-x-0 top-0 flex items-center justify-end gap-2 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <Button variant="ghost" size="icon"
-            onClick={toggle}
-            aria-label="Alternar tema"
-            className="profile-cover-action"
-          >
-            {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </Button>
-          <Button variant="ghost" size="icon"
-            onClick={() => (editing ? save() : setEditing(true))}
-            aria-label={editing ? "Salvar perfil" : "Editar perfil"}
-            className="profile-cover-action"
-          >
-            {editing ? <Check className="size-5" /> : <Edit3 className="size-5" />}
-          </Button>
-          <Button variant="ghost" size="icon"
-            onClick={signOut}
-            aria-label="Sair da conta"
-            className="profile-cover-action"
-          >
-            <LogOut className="size-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Opções do perfil" className="profile-cover-action">
+                <MoreVertical className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 rounded-2xl">
+              <DropdownMenuItem onClick={toggle} className="gap-2">
+                {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+                {theme === "dark" ? "Modo claro" : "Modo escuro"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => (editing ? save() : setEditing(true))} className="gap-2">
+                {editing ? <Check className="size-4" /> : <Edit3 className="size-4" />}
+                {editing ? "Salvar perfil" : "Editar perfil"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive focus:text-destructive">
+                <LogOut className="size-4" />
+                Sair da conta
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <Button variant="ghost" size="icon" className="profile-cover-action absolute left-5 top-[max(1.25rem,env(safe-area-inset-top))]" aria-label="Editar fotos de capa" title="Editar fotos de capa" onClick={() => setCoverEditorOpen(true)}><ImagePlus /></Button>
       </ProfileCover>
