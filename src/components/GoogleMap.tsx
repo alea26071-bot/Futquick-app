@@ -93,7 +93,7 @@ export function GoogleMap({
         icon: {
           path: window.google.maps.SymbolPath.CIRCLE,
           scale: 10,
-          fillColor: "#22d3ee",
+          fillColor: "#1d4ed8",
           fillOpacity: 1,
           strokeColor: "#0a1224",
           strokeWeight: 3,
