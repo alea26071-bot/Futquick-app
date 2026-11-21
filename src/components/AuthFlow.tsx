@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { consumeReturnPath } from "@/lib/oauth-return-path";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,10 +95,16 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
 
+  const goAfterAuth = () => {
+    const back = consumeReturnPath();
+    if (back) window.location.assign(back);
+    else navigate({ to: "/descobrir" });
+  };
+
   useEffect(() => {
     if (user) return;
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/descobrir" });
+      if (data.user) goAfterAuth();
     });
   }, [navigate, user]);
 
@@ -233,7 +240,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
         .eq("id", userData.user.id);
       if (error) throw error;
       toast.success("Bora jogar!");
-      navigate({ to: "/descobrir" });
+      goAfterAuth();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar perfil");
     } finally {
@@ -282,7 +289,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      navigate({ to: "/descobrir" });
+      goAfterAuth();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro no login com Google");
       setGoogleLoading(false);
@@ -315,7 +322,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
         }
         return;
       }
-      navigate({ to: "/descobrir" });
+      goAfterAuth();
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : "Erro ao entrar");
     } finally {

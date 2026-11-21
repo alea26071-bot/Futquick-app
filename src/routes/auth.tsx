@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthFlow } from "@/components/AuthFlow";
+import { rememberReturnPath } from "@/lib/oauth-return-path";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -11,5 +12,10 @@ export const Route = createFileRoute("/auth")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
-  component: AuthFlow,
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s["next"] === "string" ? { next: s["next"] } : {},
+  beforeLoad: ({ search }) => {
+    if (search.next) rememberReturnPath(search.next);
+  },
+  component: () => <AuthFlow />,
 });
