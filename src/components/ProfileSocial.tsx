@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
-import { CircleUserRound, Search } from "lucide-react";
+import { ChevronRight, CircleUserRound, Search, UserRoundPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,9 +40,14 @@ export function ProfileSocial({ profileId, viewerId }: { profileId: string; view
   };
   const label = summary.data && profileId !== viewerId ? mutualLabel(summary.data.mutual.names, summary.data.mutual.total) : null;
   return <>
-    <div className="mt-3 flex justify-center gap-8" aria-label="Relacionamentos do perfil">
-      {(["followers", "following"] as const).map((item) => <Button key={item} variant="ghost" onClick={() => open(item)} aria-label={item === "followers" ? "Seguidores" : "Seguindo"} className="h-auto min-h-12 flex-col gap-0.5 px-4 py-1.5">
-        <strong className="text-lg leading-tight tabular-nums">{summary.data?.[item] ?? "—"}</strong><span className="text-xs text-muted-foreground">{item === "followers" ? "Seguidores" : "Seguindo"}</span>
+    <div className="profile-social mt-3" aria-label="Relacionamentos do perfil">
+      {([
+        { key: "followers", label: "Seguidores", icon: <Users /> },
+        { key: "following", label: "Seguindo", icon: <UserRoundPlus /> },
+      ] as const).map((item) => <Button key={item.key} variant="ghost" onClick={() => open(item.key)} aria-label={item.label} className="profile-social-item h-auto min-w-0 px-3 py-2.5">
+        <span className="profile-social-icon" aria-hidden="true">{item.icon}</span>
+        <span className="profile-social-text"><strong className="profile-social-count">{summary.data?.[item.key] ?? "—"}</strong><span className="profile-social-label">{item.label}</span></span>
+        <ChevronRight className="profile-social-arrow" aria-hidden="true" />
       </Button>)}
     </div>
     {summary.isError && <Button variant="ghost" className="text-xs text-muted-foreground" onClick={() => summary.refetch()}>Tentar novamente</Button>}
