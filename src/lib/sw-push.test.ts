@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -16,7 +16,7 @@ function loadSw() {
       },
     },
   };
-  const src = readFileSync(resolve(__dirname, "../../public/sw.js"), "utf8");
+  const src = readFileSync(resolve(import.meta.dir, "../../public/sw.js"), "utf8");
   new Function("self", src)(self);
   return { listeners, shown };
 }
