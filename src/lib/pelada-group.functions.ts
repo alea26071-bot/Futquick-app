@@ -222,15 +222,13 @@ export const notifyGroupMessage = createServerFn({ method: "POST" })
     const ids = new Set<string>((members ?? []).map((m) => m.user_id));
     if (pelada) ids.add(pelada.organizer_id);
     ids.delete(context.userId);
-    const who = await nameOf(context.supabase, context.userId);
-    const preview = msg.kind === "image" ? "📷 Foto" : msg.kind === "location" ? "📍 Localização" : msg.body;
+    const { COPY } = await import("@/lib/notification-copy");
     const { notifyUser } = await import("@/lib/notifications.server");
     for (const uid of ids) {
       await notifyUser({
         userId: uid,
         type: "group_message",
-        title: `💬 ${who} · ${pelada?.name ?? "Grupo"}`,
-        body: preview,
+        ...COPY.newMessage(),
         url: `/grupo/${msg.pelada_id}`,
         data: { peladaId: msg.pelada_id },
       });

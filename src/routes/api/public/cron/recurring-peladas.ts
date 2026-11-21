@@ -24,7 +24,7 @@ async function run() {
       .maybeSingle();
     if (existing) continue;
 
-    const { error: insertError } = await supabaseAdmin.from("peladas").insert({
+    const { data: inserted, error: insertError } = await supabaseAdmin.from("peladas").insert({
       organizer_id: tpl.organizer_id,
       template_id: tpl.id,
       name: tpl.name,
@@ -44,9 +44,11 @@ async function run() {
       photo_url: tpl.photo_url,
       auto_approve: tpl.auto_approve,
       status: "open",
-    });
-    if (!insertError) {
+    }).select("id").single();
+    if (!insertError && inserted) {
       created++;
+      const { notifyNearbyPeladaCreated } = await import("@/lib/nearby-notify.server");
+      await notifyNearbyPeladaCreated(inserted.id).catch((e) => console.error("[nearby] recurring", e));
       await supabaseAdmin
         .from("pelada_templates")
         .update({ last_generated_for: next.date })

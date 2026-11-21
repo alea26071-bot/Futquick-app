@@ -130,7 +130,7 @@ export const notifyChatMessage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: message } = await context.supabase
       .from("chat_messages")
-      .select("id, thread_id, sender_id, body, kind, chat_threads(id, organizer_id, player_id, peladas(name))")
+      .select("id, thread_id, sender_id, body, kind, chat_threads(id, organizer_id, player_id, pelada_id)")
       .eq("id", data.messageId)
       .maybeSingle();
     if (!message || message.sender_id !== context.userId) throw new Error("Mensagem não encontrada");
@@ -138,28 +138,19 @@ export const notifyChatMessage = createServerFn({ method: "POST" })
       id: string;
       organizer_id: string;
       player_id: string;
-      peladas: { name: string } | null;
+      pelada_id: string;
     } | null;
     if (!thread) throw new Error("Conversa não encontrada");
 
     const recipient = thread.organizer_id === context.userId ? thread.player_id : thread.organizer_id;
-    const { data: profile } = await context.supabase
-      .from("profiles")
-      .select("name")
-      .eq("id", context.userId)
-      .maybeSingle();
-
-    const preview =
-      message.kind === "image" ? "📷 Foto" : message.kind === "location" ? "📍 Localização" : message.body;
-
+    const { COPY } = await import("@/lib/notification-copy");
     const { notifyUser } = await import("@/lib/notifications.server");
     await notifyUser({
       userId: recipient,
       type: "chat_message",
-      title: `${profile?.name?.trim() || "Nova mensagem"}${thread.peladas?.name ? ` · ${thread.peladas.name}` : ""}`,
-      body: preview ?? "Nova mensagem",
+      ...COPY.newMessage(),
       url: `/chat/${thread.id}`,
-      data: { threadId: thread.id },
+      data: { threadId: thread.id, peladaId: thread.pelada_id },
     });
     return { ok: true };
   });
@@ -245,4 +236,22 @@ export const openChatThread = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
     return { threadId: created.id };
+  });
+
+/** Organizer-only: alerts nearby players once a new open game is created. */
+export const notifyNearbyPelada = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { peladaId: string }) => {
+    if (!/^[0-9a-f-]{36}$/i.test(input?.peladaId ?? "")) throw new Error("Jogo inválido");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: pelada } = await context.supabase
+      .from("peladas")
+      .select("id, organizer_id")
+      .eq("id", data.peladaId)
+      .maybeSingle();
+    if (!pelada || pelada.organizer_id !== context.userId) throw new Error("Apenas o organizador pode avisar");
+    const { notifyNearbyPeladaCreated } = await import("@/lib/nearby-notify.server");
+    return { sent: await notifyNearbyPeladaCreated(pelada.id) };
   });

@@ -6,6 +6,7 @@ import { LocationPicker, type LocationResult } from "@/components/LocationPicker
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import { generatePeladaImage } from "@/lib/pelada-image.functions";
 import { pinPelada } from "@/lib/pelada-templates.functions";
+import { notifyNearbyPelada } from "@/lib/notifications.functions";
 import { WEEKDAY_LABEL, brWeekday, maxSlotsFor } from "@/lib/pelada-utils";
 import { X, MapPin, Minus, Plus, Camera, Sparkles, Trash2, Pin } from "lucide-react";
 import { useGameTerm } from "@/components/GameTermProvider";
@@ -147,6 +148,7 @@ function CriarPage() {
         .select("id")
         .single();
       if (error) throw error;
+      void notifyNearbyPelada({ data: { peladaId: data.id } }).catch((e) => console.warn("nearby notify failed", e));
       if (recurring) {
         try {
           await pinPelada({ data: { peladaId: data.id } });

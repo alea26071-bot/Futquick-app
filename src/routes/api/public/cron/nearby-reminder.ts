@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 
 async function run() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { notifyUser } = await import("@/lib/notifications.server");
-  const { COPY, distanceKm, effectiveRadiusKm } = await import("@/lib/notification-copy");
+  const { COPY, distanceKm, effectiveRadiusKm, saoPauloDayStart } = await import("@/lib/notification-copy");
 
   const { data: peladas } = await supabaseAdmin
     .from("peladas")
@@ -18,23 +19,28 @@ async function run() {
     .is("suspended_at", null)
     .limit(5000);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const since = new Date(Date.now() - 20 * 3600_000).toISOString();
+  const { day: today, startIso: since } = saoPauloDayStart();
   let notified = 0;
   for (const u of users ?? []) {
     if (u.latitude == null || u.longitude == null) continue;
     const r = effectiveRadiusKm(u.notify_radius_km);
-    const count = (peladas ?? []).filter(
+    const near = (peladas ?? []).filter(
       (p) => p.organizer_id !== u.id && distanceKm(u.latitude!, u.longitude!, p.latitude, p.longitude) <= r,
-    ).length;
-    if (!count) continue;
+    );
+    if (!near.length) continue;
+    // Um aviso por dia: pula quem já recebeu qualquer notificação hoje (horário de Brasília).
     const { count: recent } = await supabaseAdmin
       .from("notifications")
       .select("id", { count: "exact", head: true })
       .eq("user_id", u.id)
-      .in("type", ["nearby_pelada", "nearby_reminder"])
       .gte("created_at", since);
     if (recent) continue;
+    let count = 0;
+    for (const p of near) {
+      const { data: blocked } = await supabaseAdmin.rpc("is_blocked", { _a: u.id, _b: p.organizer_id });
+      if (!blocked) count++;
+    }
+    if (!count) continue;
     await notifyUser({
       userId: u.id,
       type: "nearby_reminder",
@@ -51,9 +57,8 @@ export const Route = createFileRoute("/api/public/cron/nearby-reminder")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const key = request.headers.get("apikey");
-        const expected = process.env["SUPABASE_ANON_KEY"] ?? process.env["SUPABASE_PUBLISHABLE_KEY"];
-        if (!expected || key !== expected) return new Response("Unauthorized", { status: 401 });
+        const authFailure = await authenticateCronRequest(request);
+        if (authFailure) return authFailure;
         return Response.json(await run());
       },
     },

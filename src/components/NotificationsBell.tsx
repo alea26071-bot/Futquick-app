@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Bell } from "lucide-react";
-import { syncPushIfGranted } from "@/lib/push-client";
+import { toast } from "sonner";
+import { enablePush, pushPermission, syncPushIfGranted } from "@/lib/push-client";
+import { PUSH_PROMPT } from "@/lib/notification-copy";
+
+const PROMPT_KEY = "futquick-push-prompted";
 
 export function NotificationsBell({ userId, className = "" }: { userId: string; className?: string }) {
   const qc = useQueryClient();
@@ -22,6 +26,17 @@ export function NotificationsBell({ userId, className = "" }: { userId: string; 
 
   useEffect(() => {
     void syncPushIfGranted();
+    // Convite único por aparelho, depois que o cadastro já foi concluído.
+    if (pushPermission() !== "default" || localStorage.getItem(PROMPT_KEY)) return;
+    const t = window.setTimeout(() => {
+      localStorage.setItem(PROMPT_KEY, "1");
+      toast(PUSH_PROMPT.title, {
+        description: PUSH_PROMPT.body,
+        duration: 15000,
+        action: { label: PUSH_PROMPT.action, onClick: () => void enablePush() },
+      });
+    }, 4000);
+    return () => window.clearTimeout(t);
   }, []);
 
   useEffect(() => {
