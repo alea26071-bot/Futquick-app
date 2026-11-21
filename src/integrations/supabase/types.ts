@@ -652,6 +652,7 @@ export type Database = {
           location_updated_at: string | null
           longitude: number | null
           name: string
+          notify_follow_activity: boolean
           notify_radius_km: number | null
           onboarding_complete: boolean
           peladas_played: number
@@ -681,6 +682,7 @@ export type Database = {
           location_updated_at?: string | null
           longitude?: number | null
           name?: string
+          notify_follow_activity?: boolean
           notify_radius_km?: number | null
           onboarding_complete?: boolean
           peladas_played?: number
@@ -710,6 +712,7 @@ export type Database = {
           location_updated_at?: string | null
           longitude?: number | null
           name?: string
+          notify_follow_activity?: boolean
           notify_radius_km?: number | null
           onboarding_complete?: boolean
           peladas_played?: number
@@ -819,6 +822,54 @@ export type Database = {
           },
         ]
       }
+      social_push_queue: {
+        Row: {
+          accepted_devices: string[]
+          attempts: number
+          claimed_at: string | null
+          created_at: string
+          notification_id: string
+          participant_id: string
+          pelada_id: string
+          state: string
+        }
+        Insert: {
+          accepted_devices?: string[]
+          attempts?: number
+          claimed_at?: string | null
+          created_at?: string
+          notification_id: string
+          participant_id: string
+          pelada_id: string
+          state?: string
+        }
+        Update: {
+          accepted_devices?: string[]
+          attempts?: number
+          claimed_at?: string | null
+          created_at?: string
+          notification_id?: string
+          participant_id?: string
+          pelada_id?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_push_queue_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: true
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_push_queue_pelada_id_fkey"
+            columns: ["pelada_id"]
+            isOneToOne: false
+            referencedRelation: "peladas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_blocks: {
         Row: {
           blocked_id: string
@@ -890,6 +941,25 @@ export type Database = {
         Args: { _pelada_id: string }
         Returns: boolean
       }
+      claim_social_push: {
+        Args: { _pelada_id?: string }
+        Returns: {
+          accepted_devices: string[]
+          attempts: number
+          claimed_at: string | null
+          created_at: string
+          notification_id: string
+          participant_id: string
+          pelada_id: string
+          state: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "social_push_queue"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       confirm_game_attendance: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: undefined
@@ -934,6 +1004,15 @@ export type Database = {
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: string
+      }
+      social_profile_list: {
+        Args: {
+          _mode: string
+          _offset?: number
+          _profile_id: string
+          _search?: string
+        }
+        Returns: Json
       }
       submit_game_posture: {
         Args: { _pelada_id: string; _rated_id: string; _score: number }

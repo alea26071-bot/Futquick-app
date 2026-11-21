@@ -161,6 +161,8 @@ export function PeladaPlayersSection({
       if (error) return toast.error(error.message);
     }
     qc.invalidateQueries({ queryKey: ["following", userId] });
+    qc.invalidateQueries({ queryKey: ["social"] });
+    qc.invalidateQueries({ queryKey: ["is-following"] });
   };
 
   const navigate = useNavigate();

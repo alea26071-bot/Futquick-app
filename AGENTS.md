@@ -22,3 +22,4 @@
 - Prune only inactive recurrence definitions above the retention target; retain individual games and mark their recurring origin so player history survives foreign-key detachment.
 
 - Persist confirmed attendance separately from reservations, reuse star ratings, and store posture separately; authenticated RPCs enforce eligibility and immutable submissions while triggers alone update profile averages.
+- Reuse user_follows for social lists through authenticated safe-column RPCs; accepted-participation triggers create deduplicated nearby follower notifications and a service-only push queue, dispatched by participation handlers and retried by the existing hourly reminder job.

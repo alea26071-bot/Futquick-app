@@ -1,0 +1,1 @@
+ALTER TABLE public.social_push_queue ADD COLUMN IF NOT EXISTS accepted_devices text[] NOT NULL DEFAULT '{}';

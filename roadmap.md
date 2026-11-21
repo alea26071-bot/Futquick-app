@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Integrar contagens/listas de seguidores, conhecidos em comum e preferência de atividade; relacionamentos/notificações reutilizados, RLS e testes transacionais aprovados, seguir/deixar de seguir e preferência após recarregar conferidos com conta temporária; 13 testes passaram e compilação sem erros.
+- [ ] Validar push social em dispositivo no app publicado — depende de publicação e permissão do navegador.
+
 - [x] Implementar reputação com presença confirmada pelo organizador, estrelas entre presentes e postura independente exclusiva do responsável (sem postura no próprio jogo); médias protegidas, histórico preservado e aviso persistente de pendências. Oito testes automatizados passaram; verificações transacionais de permissões, duplicidades, médias e limpeza passaram. Fluxo real de confirmação, estrelas, postura, releitura e desaparecimento do aviso conferido em celular e computador; jogo temporário removido.
 - [ ] Validar lembrete horário de avaliações no aplicativo publicado — novo agendamento autenticado configurado e antigo desativado; depende de publicar a versão atual.
 

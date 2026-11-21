@@ -1,0 +1,62 @@
+-- Isolated transaction: no test users, follows, games or notifications persist.
+BEGIN;
+DO $$
+DECLARE a uuid; b uuid; c uuid; game uuid; optedout uuid; n integer; page jsonb; denied boolean;
+BEGIN
+ SELECT id INTO a FROM profiles WHERE suspended_at IS NULL ORDER BY id LIMIT 1;
+ SELECT id INTO b FROM profiles WHERE id<>a AND suspended_at IS NULL ORDER BY id LIMIT 1;
+ SELECT id INTO c FROM profiles WHERE id NOT IN(a,b) AND suspended_at IS NULL ORDER BY id LIMIT 1;
+ SELECT id INTO optedout FROM profiles WHERE id NOT IN(a,b,c) AND suspended_at IS NULL ORDER BY id LIMIT 1;
+ IF optedout IS NULL THEN RAISE EXCEPTION 'Need four existing profiles for transactional tests'; END IF;
+ -- Existing accounts only, with all changes rolled back before any push dispatch.
+ DELETE FROM user_blocks WHERE blocker_id IN(a,b,c,optedout) AND blocked_id IN(a,b,c,optedout);
+ DELETE FROM user_follows WHERE follower_id IN(a,b,c,optedout) AND following_id IN(a,b,c,optedout);
+ UPDATE profiles SET latitude=0,longitude=0,notify_radius_km=5,notify_follow_activity=true WHERE id IN(a,b,c,optedout);
+ INSERT INTO user_follows(follower_id,following_id) VALUES(a,b),(a,c),(c,b),(optedout,b);
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);
+ page := social_profile_list(b,'mutual');
+ IF (page->>'total')::integer <> 1 OR page->'items'->0->>'id' <> c::text THEN RAISE EXCEPTION 'Mutual followers must be followed by visitor and follow target'; END IF;
+ IF page->'items'->0 ? 'phone' OR page->'items'->0 ? 'email' THEN RAISE EXCEPTION 'Private fields exposed'; END IF;
+ page := social_profile_list(a,'following');
+ IF (page->>'total')::integer < 2 THEN RAISE EXCEPTION 'Following direction incorrect'; END IF;
+ denied:=false; BEGIN INSERT INTO user_follows(follower_id,following_id) VALUES(a,a); EXCEPTION WHEN check_violation THEN denied:=true; END;
+ IF NOT denied THEN RAISE EXCEPTION 'Self follow accepted'; END IF;
+ denied:=false; BEGIN INSERT INTO user_follows(follower_id,following_id) VALUES(a,b); EXCEPTION WHEN unique_violation THEN denied:=true; END;
+ IF NOT denied THEN RAISE EXCEPTION 'Duplicate follow accepted'; END IF;
+ EXECUTE 'SET LOCAL ROLE authenticated';
+ denied:=false; BEGIN INSERT INTO user_follows(follower_id,following_id) VALUES(b,c); EXCEPTION WHEN insufficient_privilege THEN denied:=true; END;
+ IF NOT denied THEN RAISE EXCEPTION 'Can create someone else follow'; END IF;
+ DELETE FROM user_follows WHERE follower_id=c AND following_id=b;
+ EXECUTE 'RESET ROLE';
+ IF NOT EXISTS(SELECT 1 FROM user_follows WHERE follower_id=c AND following_id=b) THEN RAISE EXCEPTION 'Can remove someone else follow'; END IF;
+ UPDATE profiles SET notify_follow_activity=false WHERE id=optedout;
+ UPDATE profiles SET notify_radius_km=1,longitude=0.018 WHERE id=c;
+ PERFORM set_config('request.jwt.claim.sub','',true);
+ INSERT INTO peladas(organizer_id,name,location_name,address,latitude,longitude,starts_at,total_slots,field_type,level,auto_approve)
+ VALUES(c,'transactional-social-check','test','test',0,0,now()+interval '2 days',10,'campo','iniciante',false) RETURNING id INTO game;
+ PERFORM set_config('request.jwt.claim.sub',b::text,true);
+ denied:=false; BEGIN INSERT INTO pelada_requests(pelada_id,user_id,status) VALUES(game,b,'accepted'); EXCEPTION WHEN OTHERS THEN denied:=true; END;
+ IF NOT denied THEN RAISE EXCEPTION 'Forged acceptance allowed'; END IF;
+ PERFORM set_config('request.jwt.claim.sub',c::text,true);
+ INSERT INTO pelada_requests(pelada_id,user_id,status) VALUES(game,b,'pending');
+ IF EXISTS(SELECT 1 FROM notifications WHERE type='follow_activity' AND data->>'peladaId'=game::text) THEN RAISE EXCEPTION 'Pending entry notifies'; END IF;
+ UPDATE pelada_requests SET status='accepted' WHERE pelada_id=game AND user_id=b;
+ SELECT count(*) INTO n FROM notifications WHERE type='follow_activity' AND data->>'peladaId'=game::text;
+ IF n<>1 THEN RAISE EXCEPTION 'Expected only one nearby opted-in follower, got %',n; END IF;
+ IF NOT EXISTS(SELECT 1 FROM notifications WHERE user_id=a AND type='follow_activity' AND data->>'peladaId'=game::text AND url='/pelada/'||game) THEN RAISE EXCEPTION 'Follower or game destination incorrect'; END IF;
+ IF EXISTS(SELECT 1 FROM notifications WHERE user_id IN(b,c,optedout) AND type='follow_activity' AND data->>'peladaId'=game::text) THEN RAISE EXCEPTION 'Notified non-follower, outside radius or opted-out'; END IF;
+ IF NOT EXISTS(SELECT 1 FROM social_push_queue WHERE pelada_id=game AND participant_id=b AND state='pending') THEN RAISE EXCEPTION 'Push was not queued'; END IF;
+ UPDATE pelada_requests SET status='accepted' WHERE pelada_id=game AND user_id=b;
+ SELECT count(*) INTO n FROM notifications WHERE type='follow_activity' AND data->>'peladaId'=game::text;
+ IF n<>1 THEN RAISE EXCEPTION 'Duplicate notification'; END IF;
+ denied:=false; BEGIN UPDATE pelada_requests SET user_id=a WHERE pelada_id=game AND user_id=b; EXCEPTION WHEN OTHERS THEN denied:=true; END;
+ IF NOT denied THEN RAISE EXCEPTION 'Participation identity can be forged'; END IF;
+ IF has_table_privilege('authenticated','public.social_push_queue','SELECT') OR has_function_privilege('authenticated','public.claim_social_push(uuid)','EXECUTE') THEN RAISE EXCEPTION 'Private push queue exposed'; END IF;
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);
+ EXECUTE 'SET LOCAL ROLE authenticated';
+ DELETE FROM user_follows WHERE follower_id=a AND following_id=b;
+ EXECUTE 'RESET ROLE';
+ IF EXISTS(SELECT 1 FROM user_follows WHERE follower_id=a AND following_id=b) THEN RAISE EXCEPTION 'Own unfollow did not persist'; END IF;
+ RAISE NOTICE 'Social: mutuals, safe fields, directions, self/duplicate follow, own-only writes, accepted-only activity, radius, preferences, non-followers, dedupe, push queue and unfollow passed';
+END $$;
+ROLLBACK;

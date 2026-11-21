@@ -41,6 +41,7 @@ import { ProfileStat as Stat, ProfileAbout, ProfileSportIcon } from "@/component
 import { ProfileCover } from "@/components/ProfileCover";
 import { ProfileCoverEditor } from "@/components/ProfileCoverEditor";
 import { useGameTerm } from "@/components/GameTermProvider";
+import { ProfileSocial } from "@/components/ProfileSocial";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   ssr: false,
@@ -303,6 +304,8 @@ function PerfilPage() {
           />
           <Stat icon={<ShieldCheck />} value={reputationValue(profile?.posture_average,true)} label="Postura" tone="success" />
         </div>
+
+        <ProfileSocial profileId={user.id} viewerId={user.id} />
 
         {editing ? (
           <div className="mt-6 space-y-3 rounded-2xl border border-border bg-card p-5 text-left shadow-sm">

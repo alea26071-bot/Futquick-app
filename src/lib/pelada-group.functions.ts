@@ -29,6 +29,10 @@ export const joinPelada = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: status, error } = await context.supabase.rpc("join_pelada", { _pelada_id: data.peladaId });
     if (error) throw new Error(error.message);
+    if (status === "accepted") {
+      const { attemptSocialPush } = await import("@/lib/social-push.server");
+      await attemptSocialPush(data.peladaId);
+    }
     const { data: p } = await context.supabase
       .from("peladas")
       .select("id, name, organizer_id, filled_slots, total_slots")
@@ -246,6 +250,8 @@ export const addParticipant = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     if (status === "accepted") {
+      const { attemptSocialPush } = await import("@/lib/social-push.server");
+      await attemptSocialPush(data.peladaId);
       const { data: p } = await context.supabase.from("peladas").select("id, name").eq("id", data.peladaId).single();
       const who = await nameOf(context.supabase, context.userId);
       const { notifyUser } = await import("@/lib/notifications.server");

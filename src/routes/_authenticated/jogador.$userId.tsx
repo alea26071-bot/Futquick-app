@@ -24,6 +24,7 @@ import { ProfileStat as Stat, ProfileAbout } from "@/components/ProfilePresentat
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { invitePlayerToPelada } from "@/lib/notifications.functions";
 import { ProfileCover } from "@/components/ProfileCover";
+import { ProfileSocial } from "@/components/ProfileSocial";
 
 export const Route = createFileRoute("/_authenticated/jogador/$userId")({
   ssr: false,
@@ -124,6 +125,7 @@ function PlayerProfilePage() {
     }
     qc.invalidateQueries({ queryKey: ["is-following", user.id, userId] });
     qc.invalidateQueries({ queryKey: ["following", user.id] });
+    qc.invalidateQueries({ queryKey: ["social"] });
   };
 
   const openMessage = () => {
@@ -241,6 +243,8 @@ function PlayerProfilePage() {
           <Stat icon={<Star />} value={reputationValue(profile.stars_average)} label="Nível" tone="warning" />
           <Stat icon={<ShieldCheck />} value={reputationValue(profile.posture_average,true)} label="Postura" tone="success" />
         </div>
+
+        <ProfileSocial profileId={userId} viewerId={user.id} />
 
         <ProfileAbout
           title={`Sobre ${profile.name?.split(" ")[0] || "o jogador"}`}

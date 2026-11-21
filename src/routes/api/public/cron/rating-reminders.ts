@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { authenticateCronRequest } from '@/integrations/supabase/cron-auth';
 
 async function run() {
+  const { attemptSocialPush } = await import("@/lib/social-push.server");
+  await attemptSocialPush();
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { notifyUser } = await import("@/lib/notifications.server");
 

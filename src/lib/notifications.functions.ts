@@ -99,6 +99,11 @@ export const respondToJoinRequest = createServerFn({ method: "POST" })
       .eq("id", request.id);
     if (error) throw new Error(error.message);
 
+    if (data.status === "accepted") {
+      const { attemptSocialPush } = await import("@/lib/social-push.server");
+      await attemptSocialPush(pelada.id);
+    }
+
     const when = new Date(pelada.starts_at).toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",

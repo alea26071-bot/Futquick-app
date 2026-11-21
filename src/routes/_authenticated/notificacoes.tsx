@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ArrowLeft, Bell, BellOff, BellRing, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { enablePush, disablePush, pushPermission, type PushState } from "@/lib/push-client";
+import { FollowActivityPreference } from "@/components/FollowActivityPreference";
 
 export const Route = createFileRoute("/_authenticated/notificacoes")({
   ssr: false,
@@ -133,6 +134,8 @@ function NotificationsPage() {
             </p>
           </div>
         </button>
+
+        <FollowActivityPreference userId={user.id} />
 
         {isLoading ? (
           <div className="space-y-2">
