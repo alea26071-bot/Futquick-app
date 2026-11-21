@@ -35,7 +35,9 @@ function keyToBase64(buffer: ArrayBuffer | null): string {
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!pushSupported()) return null;
   try {
-    return await navigator.serviceWorker.register("/sw.js");
+    const reg = await navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" });
+    void reg.update().catch(() => undefined);
+    return reg;
   } catch {
     return null;
   }
