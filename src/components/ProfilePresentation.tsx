@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CalendarDays, CircleUserRound, Bike, Footprints, Volleyball, Dumbbell } from "lucide-react";
+import { CircleUserRound, Bike, Footprints, Volleyball, Dumbbell } from "lucide-react";
 
 export function ProfileStat({ icon, value, label, tone }: { icon: ReactNode; value: string | number; label: string; tone: "primary" | "warning" | "success" }) {
   const toneClass = tone === "primary" ? "text-primary" : tone === "warning" ? "text-warning" : "text-success";
@@ -12,7 +12,7 @@ export function ProfileStat({ icon, value, label, tone }: { icon: ReactNode; val
   );
 }
 
-export function ProfileAbout({ title, bio, memberSince, children }: { title: string; bio: string; memberSince: number | null; children?: ReactNode }) {
+export function ProfileAbout({ title, bio, children }: { title: string; bio: string; children?: ReactNode }) {
   return (
     <article className="profile-about">
       <div className="profile-about-intro">
@@ -22,7 +22,6 @@ export function ProfileAbout({ title, bio, memberSince, children }: { title: str
           <p className="profile-bio">{bio}</p>
         </div>
       </div>
-      {memberSince && <p className="profile-member"><CalendarDays aria-hidden="true" /> Membro desde {memberSince}</p>}
       {children}
     </article>
   );

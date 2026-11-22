@@ -175,8 +175,6 @@ function PlayerProfilePage() {
   const handle = profile.username || (profile.name || "jogador").toLowerCase().replace(/[^a-z0-9]/g, "");
 
   const isMe = user.id === userId;
-  const memberSince = new Date(profile.created_at).getFullYear();
-
   return (
     <main className="profile-page min-h-screen bg-background pb-12 text-foreground">
       <ProfileCover paths={profile.cover_photo_paths} fallback={profile.avatar_url} name={profile.name}>
@@ -249,7 +247,6 @@ function PlayerProfilePage() {
         <ProfileAbout
           title={`Sobre ${profile.name?.split(" ")[0] || "o jogador"}`}
           bio={profile.bio || (profile.favorite_position ? `${profile.favorite_position} em campo.` : "Sem apresentação.")}
-          memberSince={memberSince}
         />
       </section>
 
