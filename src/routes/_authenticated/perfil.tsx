@@ -1,4 +1,5 @@
 import { reputationValue } from "@/lib/reputation";
+import { isNativeApp } from "@/lib/native/platform";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState, useEffect } from "react";
@@ -196,6 +197,11 @@ function PerfilPage() {
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
+    // App nativo: este aparelho para de receber avisos da conta que saiu.
+    if (isNativeApp()) {
+      const { disableNativePush } = await import("@/lib/native/push");
+      await disableNativePush().catch(() => undefined);
+    }
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };

@@ -1,3 +1,4 @@
+import { isNativeApp } from "@/lib/native/platform";
 import { getPushConfig, savePushSubscription, removePushSubscription } from "@/lib/notifications.functions";
 
 export type PushState = "unsupported" | "denied" | "granted" | "default" | "error";
@@ -11,7 +12,10 @@ export function pushSupported(): boolean {
   );
 }
 
+let nativePermission: PushState = "default";
+
 export function pushPermission(): PushState {
+  if (isNativeApp()) return nativePermission;
   if (!pushSupported()) return "unsupported";
   return Notification.permission as PushState;
 }
@@ -45,6 +49,12 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 
 /** Asks for permission (if needed), subscribes and persists the subscription. */
 export async function enablePush(): Promise<PushState> {
+  // Inside the Android/iOS app the device registers with FCM instead of the service worker.
+  if (isNativeApp()) {
+    const { enableNativePush } = await import("@/lib/native/push");
+    nativePermission = await enableNativePush();
+    return nativePermission;
+  }
   if (!pushSupported()) return "unsupported";
   try {
     const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
@@ -81,6 +91,12 @@ export async function enablePush(): Promise<PushState> {
 }
 
 export async function disablePush(): Promise<void> {
+  if (isNativeApp()) {
+    const { disableNativePush } = await import("@/lib/native/push");
+    await disableNativePush().catch(() => undefined);
+    nativePermission = "default";
+    return;
+  }
   if (!pushSupported()) return;
   const registration = await navigator.serviceWorker.getRegistration();
   const subscription = await registration?.pushManager.getSubscription();
@@ -91,6 +107,12 @@ export async function disablePush(): Promise<void> {
 
 /** Silent refresh: keeps the stored subscription in sync when permission is already granted. */
 export async function syncPushIfGranted(): Promise<void> {
+  if (isNativeApp()) {
+    const { syncNativePushIfGranted, cachedNativePermission } = await import("@/lib/native/push");
+    await syncNativePushIfGranted();
+    nativePermission = cachedNativePermission();
+    return;
+  }
   if (!pushSupported() || Notification.permission !== "granted") {
     if (pushSupported()) await registerServiceWorker();
     return;

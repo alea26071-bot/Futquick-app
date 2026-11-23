@@ -730,6 +730,50 @@ export type Database = {
         }
         Relationships: []
       }
+      push_devices: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          device_id: string | null
+          id: string
+          last_seen_at: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          last_seen_at?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          last_seen_at?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -1001,6 +1045,15 @@ export type Database = {
         Returns: boolean
       }
       recompute_player_stats: { Args: { _user_id: string }; Returns: undefined }
+      register_push_device: {
+        Args: {
+          _app_version: string
+          _device_id: string
+          _platform: string
+          _token: string
+        }
+        Returns: undefined
+      }
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: string

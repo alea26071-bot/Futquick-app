@@ -134,6 +134,13 @@
       "when": 1795301427550,
       "tag": "0018_protect_social_participation_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795438525574,
+      "tag": "0019_push_devices",
+      "breakpoints": true
     }
   ]
 }

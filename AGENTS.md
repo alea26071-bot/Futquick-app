@@ -23,3 +23,6 @@
 
 - Persist confirmed attendance separately from reservations, reuse star ratings, and store posture separately; authenticated RPCs enforce eligibility and immutable submissions while triggers alone update profile averages.
 - Reuse user_follows for social lists through authenticated safe-column RPCs; accepted-participation triggers create deduplicated nearby follower notifications and a service-only push queue, dispatched by participation handlers and retried by the existing hourly reminder job.
+- Native Android/iOS apps are a Capacitor shell loading the published SSR site (server.url); native features run only behind `isNativeApp()` so the browser experience and Web Push stay unchanged.
+- Native push tokens live in `push_devices` and are sent through the Firebase Cloud Messaging connector from the same notification helpers as Web Push, so each device receives one channel.
+- AdMob stays disabled unless the public enable flag is set and uses only Google test units until real IDs are configured.

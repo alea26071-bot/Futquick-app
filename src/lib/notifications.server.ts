@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPush } from "@/lib/web-push.server";
+import { sendToNativeDevices } from "@/lib/native-devices.server";
 
 export type NotifyInput = {
   userId: string;
@@ -65,5 +66,13 @@ export async function notifyUser(input: NotifyInput): Promise<{ delivered: numbe
       await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
     }
   }
+  // Native app devices (Android/iOS). The app's WebView never holds a web subscription, so no device gets both.
+  const native = await sendToNativeDevices(input.userId, {
+    title: input.title,
+    body: input.body,
+    url: input.url,
+    tag: input.dedupeKey ?? input.type,
+  });
+  delivered += native.delivered;
   return { delivered };
 }

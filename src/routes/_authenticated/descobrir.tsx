@@ -11,6 +11,7 @@ import { Logo } from "@/components/Logo";
 import { useGameTerm } from "@/components/GameTermProvider";
 import { Button } from "@/components/ui/button";
 import { PendingRatings } from "@/components/PendingRatings";
+import { NativeAdBanner } from "@/components/NativeAdBanner";
 import { modalitiesForFilters } from "@/lib/game-modalities";
 
 export const Route = createFileRoute("/_authenticated/descobrir")({
@@ -220,6 +221,7 @@ function DescobrirPage() {
         )}
       </main>
 
+      <NativeAdBanner />
       <BottomNav />
     </div>
   );

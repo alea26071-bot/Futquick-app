@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Futquick</string>
+    <string name="title_activity_main">Futquick</string>
+    <string name="package_name">com.futquick.app</string>
+    <string name="custom_url_scheme">com.futquick.app</string>
+    <!-- Google official AdMob TEST App ID. Never ship to production with this value. -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="notification_channel_name">Avisos do Futquick</string>
+</resources>

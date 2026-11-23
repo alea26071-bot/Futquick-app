@@ -1,5 +1,12 @@
 # Roadmap
 
+- [x] Capacitor com.futquick.app (Android/iOS gerados), push nativo FCM com push_devices, AdMob de teste desligado, documentação nativa; 64 testes e typecheck OK.
+- [ ] Conectar Firebase Cloud Messaging e colocar google-services.json — depende do Firebase do usuário.
+- [ ] Gerar AAB e testar push/anúncios em aparelho — depende de Android Studio e keystore.
+- [ ] iOS: APNs, GoogleService-Info.plist e build — depende de Apple Developer e Mac/Xcode.
+- [ ] Login Google nativo no app (Google bloqueia login em WebView).
+- [ ] Termos, Privacidade, exclusão de conta — depende dos dados legais do responsável.
+
 - [x] Integrar contagens/listas de seguidores, conhecidos em comum e preferência de atividade; relacionamentos/notificações reutilizados, RLS e testes transacionais aprovados, seguir/deixar de seguir e preferência após recarregar conferidos com conta temporária; 13 testes passaram e compilação sem erros.
 - [ ] Validar push social em dispositivo no app publicado — depende de publicação e permissão do navegador.
 

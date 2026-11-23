@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatMessagePopup } from "@/components/ChatMessagePopup";
+import { NativeAppBridge } from "@/components/NativeAppBridge";
 import { GameTermProvider } from "@/components/GameTermProvider";
 import { isOnboardingComplete } from "@/lib/onboarding";
 
@@ -27,6 +28,7 @@ function AuthenticatedLayout() {
   return (
     <GameTermProvider key={user.id} userId={user.id} initialTerm={gameTerm}>
       <ChatMessagePopup userId={user.id} />
+      <NativeAppBridge />
       <Outlet />
     </GameTermProvider>
   );
