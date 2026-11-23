@@ -8,7 +8,7 @@ const complete = {
   avatar_url: "avatars/user/photo.jpg",
 };
 
-test("cadastro tem sete etapas", () => assert.equal(ONBOARDING_STEPS, 7));
+test("cadastro tem oito etapas", () => assert.equal(ONBOARDING_STEPS, 8));
 test("foto é obrigatória mesmo quando a conta está marcada como completa", () => {
   assert.equal(isOnboardingComplete({ ...complete, avatar_url: null }), false);
 });

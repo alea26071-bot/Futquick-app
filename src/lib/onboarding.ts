@@ -1,4 +1,4 @@
-export const ONBOARDING_STEPS = 7;
+export const ONBOARDING_STEPS = 8;
 
 export const NOTIFICATION_RADIUS_OPTIONS = [
   { label: "2 km", hint: "Só o que está no seu bairro", value: 2 },

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
+import { LegalConsentStep } from "@/components/LegalConsentStep";
+import { TERMS_VERSION, PRIVACY_VERSION, isLegalDraft, isLegalTestEnvironment, canFinishWithLegal } from "@/lib/legal";
 import { StateCityPicker } from "@/components/StateCityPicker";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
 import {
@@ -85,6 +87,13 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
     radius: profile?.notify_radius_km ?? 5,
   });
   const [radiusTouched, setRadiusTouched] = useState(false);
+  const [legalAccepted, setLegalAccepted] = useState(false);
+  const [termsViewed, setTermsViewed] = useState(false);
+  const [privacyViewed, setPrivacyViewed] = useState(false);
+  const [legalTestEnv, setLegalTestEnv] = useState(false);
+  const finishingRef = useRef(false);
+  const legalDraft = isLegalDraft();
+  useEffect(() => { setLegalTestEnv(isLegalTestEnvironment(window.location.hostname, import.meta.env.DEV)); }, []);
 
   // Login-mode state
   const [loginPhone, setLoginPhone] = useState("");
@@ -117,7 +126,8 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
     step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
     step === 5 ? !!form.state && form.city.trim().length >= 2 :
     step === 6 ? radiusTouched || form.radius !== null :
-    !!avatarUrl && !uploadingAvatar;
+    step === 7 ? !!avatarUrl && !uploadingAvatar :
+    canFinishWithLegal({ accepted: legalAccepted, termsViewed, privacyViewed, draft: legalDraft, testEnv: legalTestEnv });
 
 
   // Create the account (auth + profile.phone) at end of step 3.
@@ -213,10 +223,30 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
       toast.error("Complete seu cadastro e adicione a foto de perfil para continuar.");
       return;
     }
+    if (!canFinishWithLegal({ accepted: legalAccepted, termsViewed, privacyViewed, draft: legalDraft, testEnv: legalTestEnv })) {
+      toast.error("Leia os documentos e marque o aceite para concluir.");
+      return;
+    }
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     setSaving(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Sessão não iniciada");
+
+      // Aceite gravado antes de concluir o cadastro; duplicatas são ignoradas.
+      const { error: legalError } = await supabase
+        .from("legal_acceptances")
+        .upsert(
+          { user_id: userData.user.id, terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION },
+          { onConflict: "user_id,terms_version,privacy_version", ignoreDuplicates: true },
+        );
+      if (legalError) throw new Error("Não foi possível registrar seu aceite. Tente novamente.");
+      const { data: acceptance } = await supabase
+        .from("legal_acceptances").select("id")
+        .eq("user_id", userData.user.id).eq("terms_version", TERMS_VERSION).eq("privacy_version", PRIVACY_VERSION)
+        .maybeSingle();
+      if (!acceptance) throw new Error("Não foi possível confirmar seu aceite. Tente novamente.");
 
       const { error } = await supabase
         .from("profiles")
@@ -244,6 +274,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar perfil");
     } finally {
+      finishingRef.current = false;
       setSaving(false);
     }
   };
@@ -675,6 +706,18 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
             </div>
           </Step>
         )}
+
+        {step === 8 && (
+          <LegalConsentStep
+            accepted={legalAccepted}
+            onAcceptedChange={setLegalAccepted}
+            termsViewed={termsViewed}
+            privacyViewed={privacyViewed}
+            onViewed={(d) => (d === "terms" ? setTermsViewed(true) : setPrivacyViewed(true))}
+            draft={legalDraft}
+            testEnv={legalTestEnv}
+          />
+        )}
       </main>
 
       <footer className="p-6 space-y-3">
@@ -683,7 +726,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
           onClick={next}
           className="w-full py-4 bg-cyan text-navy rounded-2xl font-display font-extrabold italic uppercase disabled:opacity-30 active:scale-95 transition-transform flex items-center justify-center gap-2"
         >
-          {saving ? "..." : step === TOTAL_STEPS ? "Bora jogar" : "Continuar"}
+          {saving ? "..." : step === TOTAL_STEPS ? "Concordar e concluir cadastro" : "Continuar"}
           {!saving && step < TOTAL_STEPS && <ArrowRight className="size-5" strokeWidth={3} />}
         </button>
         {step === 1 && (
@@ -705,9 +748,11 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
             </button>
           </>
         )}
-        <p className="text-center text-[10px] text-white/30">
-          Ao continuar você concorda com nossos termos.
-        </p>
+        {step < TOTAL_STEPS && (
+          <p className="text-center text-[10px] text-white/30">
+            Na última etapa você poderá ler os Termos de Uso e a Política de Privacidade antes de concluir.
+          </p>
+        )}
       </footer>
     </div>
   );
