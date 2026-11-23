@@ -10,3 +10,11 @@ Enquanto `LEGAL_PENDING` tiver algum `false`, o app publicado bloqueia "Concorda
 5. Revisão jurídica. Ao mudar texto relevante, aumentar `TERMS_VERSION`/`PRIVACY_VERSION`.
 
 Registro: tabela `legal_acceptances` (versões + `accepted_at` do servidor, único por usuário/versões, sem IP). Um trigger impede marcar o cadastro como concluído sem aceite.
+
+## Itens a auditar (revisão 2)
+- Logs técnicos dos provedores (IP, aparelho) e suas políticas.
+- Compartilhamentos e lista de fornecedores/países.
+- Medidas de segurança efetivas (controle de acesso, privacidade das fotos) — descrever só após auditoria.
+- Localização em tempo real nas conversas privadas: funcionamento e retenção.
+- Analytics, anúncios (hoje desativados) e retenção de cada tipo de dado.
+- Ao mudar TERMS_VERSION/PRIVACY_VERSION, criar migration atualizando `require_legal_acceptance` com o novo par.

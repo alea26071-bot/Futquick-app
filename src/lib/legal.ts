@@ -89,8 +89,8 @@ export const PRIVACY_DOC: LegalDoc = {
       "Cadastro: nome, telefone (ou conta Google com nome e e-mail), idade, estado, cidade, raio de interesse e foto de perfil. O PIN é usado para login e não é exibido a ninguém.",
       "Perfil e social: bio, fotos de capa, termo regional preferido (Pelada, Baba, Rachão...), quem você segue e quem te segue.",
       "Jogos: jogos criados, solicitações, participações, presença confirmada, curtidas, avaliações de nível (estrelas) e de postura.",
-      "Conversas: mensagens, fotos e localização que você decide enviar no chat do jogo ou em conversas privadas, além de localização ao vivo quando você a ativa.",
-      "Segurança: denúncias, bloqueios e registro do seu aceite destes documentos (versões e data/hora do servidor). Não registramos seu IP nem identificação do aparelho nesse aceite." ] },
+      "Conversas: mensagens, fotos e localização que você decide enviar no chat do jogo ou em conversas privadas. O app tem uma função de compartilhar localização em tempo real nas conversas privadas, ativada por você; o funcionamento detalhado e o prazo de guarda estão A CONFIRMAR.",
+      "Segurança: denúncias, bloqueios e registro do seu aceite destes documentos (versões e data/hora do servidor). O registro de aceite do app não inclui IP nem identificação do aparelho; logs técnicos podem ser gerados pelos provedores de infraestrutura conforme suas próprias políticas (A CONFIRMAR após auditoria)." ] },
     { title: "3. Localização", body: [
       "Com sua permissão, usamos a localização do aparelho para mostrar e avisar sobre jogos próximos. Você pode continuar sem ela.",
       "Localização em segundo plano: A CONFIRMAR. Hoje a localização é usada quando o app está aberto ou quando você compartilha no chat." ] },
@@ -102,14 +102,15 @@ export const PRIVACY_DOC: LegalDoc = {
     { title: "6. Notificações", body: [
       "Com sua permissão, enviamos avisos de jogos próximos, mensagens, lembretes e atividade de quem você segue, pelo navegador ou pelo app. Você pode desativar nas configurações do aparelho e algumas no próprio perfil." ] },
     { title: "7. Compartilhamento e fornecedores", body: [
-      "Usamos fornecedores para hospedagem, banco de dados, armazenamento de fotos, login com Google, mapas, envio de notificações e, no app, anúncios. A lista completa de fornecedores e os países onde os dados são processados está A CONFIRMAR.",
-      "Podemos compartilhar dados quando exigido por lei ou ordem de autoridade competente. Não vendemos seus dados." ] },
+      "O funcionamento do app depende de fornecedores (por exemplo, hospedagem, banco de dados, armazenamento de arquivos, login com Google, mapas e envio de notificações). O levantamento completo de compartilhamentos, fornecedores e países onde os dados são processados está em andamento e será publicado nesta política (A CONFIRMAR).",
+      "Anúncios no app: A CONFIRMAR. Hoje não estão ativados.",
+      "Podemos compartilhar dados quando exigido por lei ou ordem de autoridade competente." ] },
     { title: "8. Armazenamento local e cookies", body: [
-      "O app guarda no seu aparelho informações técnicas necessárias, como a sessão de login e preferências (ex.: tema). Ferramentas de estatística de uso: A CONFIRMAR." ] },
+      "O app guarda no seu aparelho informações técnicas necessárias, como a sessão de login e preferências (ex.: tema). Uso de ferramentas de estatística de acesso (analytics) e seus detalhes: A CONFIRMAR." ] },
     { title: "9. Retenção", body: [
-      "Conversas dos jogos são apagadas automaticamente após o prazo da conversa. Histórico de jogos e avaliações é mantido enquanto a conta existir. Prazos de retenção após exclusão da conta: A CONFIRMAR." ] },
+      "Prazos de retenção de cada tipo de dado (conversas, fotos, localização, histórico de jogos e avaliações), inclusive após a exclusão da conta: A CONFIRMAR." ] },
     { title: "10. Segurança", body: [
-      "Adotamos medidas técnicas e administrativas razoáveis, como controle de acesso por usuário e fotos privadas com links temporários. Nenhum sistema é totalmente imune a incidentes; se ocorrer um incidente relevante, comunicaremos conforme a LGPD." ] },
+      "Buscamos adotar medidas técnicas e administrativas razoáveis para proteger seus dados. A descrição das medidas de segurança será publicada após auditoria técnica (A CONFIRMAR). Nenhum sistema é totalmente imune a incidentes; se ocorrer um incidente relevante, comunicaremos conforme a LGPD." ] },
     { title: "11. Crianças e adolescentes", body: [
       "PENDENTE: a política para menores de 18 anos, incluindo consentimento específico e verificável de responsável legal para crianças e salvaguardas de melhor interesse, ainda será definida. Esta versão não resolve esse ponto." ] },
     { title: "12. Seus direitos (LGPD)", body: [
