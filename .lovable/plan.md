@@ -1,48 +1,67 @@
-# Auditoria de prontidão para lançamento — Futquick
+# Plano técnico — Push nativo Android e iOS com Capacitor (mantendo Web Push)
 
-Nada foi alterado. Verificado nesta etapa: estrutura de pastas, dependências, rotas, rotinas agendadas, segredos referenciados no código, migrations e 60 testes automatizados (60 passaram, sem tocar em dados).
+Nada foi alterado. Inspecionado: dependências, `public/sw.js`, `src/lib/push-client.ts`, `web-push.server.ts`, `notifications.server.ts`, `social-push.server.ts`, tabela `push_subscriptions`, `GoogleMap.tsx`, `LocationPicker.tsx`, `mapa.tsx`, `descobrir.tsx`. 60 testes existentes passaram.
 
-## 1. Empacotamento Android — estado real
-- NÃO existe Capacitor, pasta `android/`, Gradle, AndroidManifest, keystore, AAB/APK nem script de build mobile.
-- NÃO existe manifesto PWA (`manifest.webmanifest`) nem ícones de app; só `favicon.ico` e `public/sw.js`. Ou seja, nem TWA (app Play Store baseado no site) está pronto.
-- Faltam: escolher caminho (TWA via Bubblewrap/PWABuilder = mais rápido; Capacitor = necessário para AdMob/FCM nativos), manifesto + ícones 512px, `assetlinks.json` em `/.well-known/` (TWA), keystore de assinatura, build AAB em máquina com Android Studio/JDK (não roda na Lovable), conta Google Play Console (US$25), ficha da loja, classificação etária, formulário de Segurança de Dados e política de privacidade pública.
+## Estado real
+- Não há Capacitor, `android/`, `ios/`, Firebase, APNs nem plugin de push nativo.
+- Web Push: `push_subscriptions` (user_id, endpoint único, p256dh, auth); envio VAPID no servidor; inscrições 404/410 já são apagadas; clique abre `data.url` (padrão `/descobrir`).
+- Mapa: Google Maps JS carregado por script com chave de navegador do conector Google Maps; localização via `navigator.geolocation` (só em primeiro plano).
+- Ponto crítico: o app é renderizado no servidor (TanStack Start) e usa funções de servidor. O Capacitor não empacota isso como arquivos estáticos. Caminho recomendado: app nativo abre o site publicado (`server.url` = domínio publicado), com o plugin nativo habilitado para esse domínio. Consequência: precisa de internet (já precisa hoje) e updates de tela chegam sem nova versão na loja.
 
-## 2. Web Push hoje e FCM nativo
-Existe: `public/sw.js`, tabela `push_subscriptions`, chaves VAPID, envio no servidor, fila social, rotinas `nearby-reminder`, `rating-reminders`, `conversation-maintenance`, `recurring-peladas`.
-Não testado: entrega real em celular entre duas contas.
-Falta para FCM: projeto Firebase + `google-services.json`, conexão Firebase Cloud Messaging (conta de serviço), plugin `@capacitor/push-notifications`, coluna de plataforma/token nativo em `push_subscriptions`, envio pelo FCM HTTP v1 no servidor.
-Sem duplicar: dentro do app nativo, não registrar Web Push (detectar plataforma) e enviar a cada dispositivo um único canal; deduplicação por dispositivo e por tag de notificação.
+## Arquitetura de entrega sem duplicidade
+```text
+Evento (jogo próximo, mensagem, lembrete, social)
+  -> notifications.server.ts monta título/texto/url (textos já centralizados)
+  -> para cada dispositivo do usuário:
+       plataforma web     -> Web Push (VAPID)  [atual]
+       plataforma android -> FCM HTTP v1
+       plataforma ios     -> FCM HTTP v1 -> APNs
+```
+Regras: dentro do app nativo NÃO registrar Web Push nem service worker (detectar `Capacitor.isNativePlatform()`); ao registrar token nativo, apagar inscrição web do mesmo aparelho se existir; uma tag/`collapse_key` por destino; deduplicação por (evento, dispositivo).
 
-## 3. AdMob
-- Nada existe (sem SDK/plugin). Web/TWA não suporta AdMob nativo; exige Capacitor + `@capacitor-community/admob`.
-- Código: inicialização, banner/intersticial em pontos definidos, IDs de teste do Google em desenvolvimento, consentimento UMP (obrigatório para UE/LGPD recomendável), `app-ads.txt` no domínio.
-- Conta externa (responsável): criar app no AdMob, App ID (vai no AndroidManifest), Ad Unit IDs, mensagem de consentimento GDPR/US, dados de pagamento, declaração "contém anúncios" no Play Console.
+## Banco (migração futura)
+- Nova tabela `push_devices`: user_id, platform (android|ios), token FCM único, app_version, device_id local, last_seen_at, created_at. RLS: dono lê/insere/apaga o próprio; envio via servidor.
+- Alternativa: estender `push_subscriptions` com `platform` e `fcm_token` (endpoint/p256dh opcionais). Tabela separada é mais limpa.
 
-## 4. Dependências do Lovable Cloud e migração
-Dependem do Cloud: login telefone/PIN e Google, banco (tabelas, RLS, ~39 funções SQL, triggers), 3 buckets de arquivos, rotinas `pg_cron` chamando as rotas `/api/public/cron/*`, server functions com chave de serviço, VAPID e `LOVABLE_API_KEY` (geração de capas por IA), servidor MCP/OAuth.
-Observação: há 13 arquivos em `supabase/migrations` e 19 em `drizzle/migrations`; uma recriação precisa consolidar as duas fontes.
-Recomendação: NÃO migrar antes de amanhã. Sem dados reais, migrar depois é barato e o risco agora é quebrar login, push e rotinas na véspera. Se for migrar, fazer antes de ter usuários reais (janela ideal: logo após o teste interno).
-Limitações: senhas/PIN de usuários não são exportáveis de forma simples (sem dados reais, recriar contas resolve); IA de capas usa chave Lovable; MCP OAuth depende da Lovable.
-Testes obrigatórios pós-migração: cadastro/login PIN e Google, RLS com duas contas, upload e leitura de fotos, criar/entrar/sair de jogo, chat, cada cron, push, admin.
+## Código que a Lovable implementa
+- Dependências: `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`, `@capacitor/push-notifications` (ou `@capacitor-firebase/messaging` para token FCM também no iOS — recomendado), `@capacitor/app` (deep links), `@capacitor/local-notifications` (exibir em primeiro plano, opcional).
+- `capacitor.config.ts` (appId, appName, `server.url`, `allowNavigation`).
+- `src/lib/native-push.ts`: pedir permissão no mesmo momento do aviso atual pós-cadastro; obter token; salvar via função de servidor autenticada; ouvir renovação de token; remover no logout.
+- `push-client.ts`: pular Web Push quando nativo.
+- Servidor: `fcm.server.ts` enviando via conector Firebase Cloud Messaging; integrar em `notifications.server.ts` e `social-push.server.ts`; apagar tokens com `UNREGISTERED`/`INVALID_ARGUMENT`; respeitar silenciamento, raio de 5 km e exclusões já existentes.
+- Estados do app:
+  - primeiro plano: evento `pushNotificationReceived` -> toast/aviso no app (sem notificação de sistema duplicada) e atualizar sino.
+  - segundo plano/fechado: sistema mostra a notificação (payload `notification` + `data.url`).
+  - toque: `pushNotificationActionPerformed` -> navegar para `data.url` (`/pelada/:id`, `/chat/:id`, `/notificacoes`, `/descobrir`).
+- Deep links: App Links Android (`/.well-known/assetlinks.json`) e Universal Links iOS (`apple-app-site-association`) servidos pelo site.
+- Limpeza: token removido no logout, na exclusão de conta, em erro do FCM e se `last_seen_at` > 60 dias (rotina horária existente).
+- Testes automatizados: escolha de canal por plataforma, deduplicação, remoção de token inválido, montagem de URL de destino.
 
-## 5. Tour guiado (primeira entrada)
-- Onde: componente novo montado no layout autenticado (`src/routes/_authenticated/route.tsx`), após o guard de onboarding, sem tocar no cadastro de sete etapas.
-- Alvos: navegação inferior (Descobrir, Mapa, Criar jogo, Chat, Perfil).
-- Persistência: campo no perfil (ex.: `tour_completed_at`) + `localStorage` como cache; botões Pular/Concluir e "Rever tour" no menu de três pontos do perfil.
+## O que exige ação externa (você)
+- Firebase Console: criar projeto, app Android (pacote, SHA-256) -> `google-services.json`; app iOS -> `GoogleService-Info.plist`; conta de serviço para o conector FCM.
+- Apple Developer (US$99/ano): App ID com Push Notifications e Associated Domains, chave APNs `.p8` (Key ID, Team ID) enviada ao Firebase, perfis de assinatura.
+- Mac com Xcode: `npx cap add ios`, ativar capabilities Push + Background Modes (remote notifications), build e envio ao TestFlight. Não roda na Lovable.
+- Android Studio/JDK: `npx cap add android`, canal de notificação padrão, ícone monocromático, keystore, gerar AAB, Play Console (US$25).
+- Na Lovable: conectar Firebase Cloud Messaging (segredo no servidor) — só após sua autorização.
+- Fluxo de build: exportar código para GitHub -> clonar -> `npm install` -> `npx cap sync` -> abrir no Android Studio/Xcode.
 
-## 6. Legal e dados
-Hoje existe apenas o texto "Ao continuar você concorda com nossos termos" no cadastro, sem link nem página. Exclusão de conta só existe para admin (`admin.functions.ts`).
-Criar: rotas públicas `/termos`, `/privacidade`, `/excluir-dados` (exigida pelo Google Play, acessível sem login), checkbox de aceite com data/versão salva no perfil, "Excluir minha conta" no menu do perfil via função autenticada (apaga fotos, mensagens, inscrições de push e usuário), consentimento de anúncios (UMP) e de localização.
-Campos que o responsável precisa fornecer: razão social ou nome do titular, CNPJ/CPF, endereço, e-mail de contato e do encarregado (DPO), cidade/foro, idade mínima, prazos de retenção desejados, data de vigência.
+## Permissões
+- Android 13+: `POST_NOTIFICATIONS` em tempo de execução; localização `ACCESS_FINE/COARSE_LOCATION`.
+- iOS: pedido de notificações em tempo de execução; `NSLocationWhenInUseUsageDescription` no Info.plist.
+- Sem localização em segundo plano (não necessária: proximidade usa a cidade/coordenadas salvas no perfil).
 
-## 7. Não verificado
-Push real em celular, rotinas no app publicado, login Google no publicado, upload de capas autenticado, build Android (inexistente), conta AdMob/Play Console, configurações de auth hospedadas.
+## Google Maps no Capacitor/WebView
+- Funciona: o mapa é JS carregado em página web. Com `server.url` no domínio publicado, a origem continua `https://futquick-app.lovable.app`, então restrição de chave por referenciador (HTTP referrer) continua válida.
+- Se no futuro empacotar arquivos locais, a origem vira `https://localhost` (Android) e `capacitor://localhost` (iOS): seria preciso liberar esses referenciadores ou usar chave separada — menos seguro.
+- Verificar no Google Cloud: referenciadores permitidos incluem o domínio publicado; Places e Geocoding ativos.
+- Localização: `navigator.geolocation` funciona no WebView desde que as permissões nativas estejam no manifesto/Info.plist; recomendado trocar por `@capacitor/geolocation` no nativo para pedido de permissão confiável.
+- Não verificado: comportamento real em aparelho.
 
-## 8. Ordem realista
-Amanhã (viável): teste interno na Play Store via TWA — manifesto+ícones, `assetlinks.json`, páginas Termos/Privacidade/Exclusão, link e aceite no cadastro, exclusão de conta pelo usuário, publicar o site, gerar AAB com Bubblewrap no seu computador. Web Push funciona dentro do TWA no Android.
-Atualização seguinte: tour guiado; teste de push entre duas contas; decisão sobre Supabase próprio.
-Depois (Capacitor): AdMob + UMP, FCM nativo com deduplicação.
-Bloqueios de produção: política de privacidade pública com dados reais do responsável, exclusão de conta pelo usuário, formulário de Segurança de Dados, conta Play Console, assinatura do app, e (para anúncios) Capacitor + conta AdMob aprovada.
+## Ordem
+1. Decidir pacote/Bundle ID (ex.: `app.futquick`) e confirmar Firebase + Apple Developer.
+2. Lovable: Capacitor + config + detecção nativa + tabela de dispositivos + envio FCM + deep links + testes.
+3. Você: gerar projetos Android/iOS, colocar arquivos do Firebase, chave APNs, buildar.
+4. Teste com dois aparelhos: primeiro plano, segundo plano, fechado, toque abrindo tela certa, logout limpando token, sem notificação dupla com Web Push no mesmo aparelho.
 
-## Próximo passo sugerido
-Aprovando este plano, começo pela etapa "Amanhã": manifesto/ícones, páginas legais com campos marcados para preencher, aceite no cadastro e exclusão de conta — sem mudar layout.
+## Não verificado
+Entrega real de push (web ou nativo), mapas em WebView, links profundos, contas Firebase/Apple.
