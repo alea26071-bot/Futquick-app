@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "543613938795",
+    "project_id": "futquick-dc26d",
+    "storage_bucket": "futquick-dc26d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543613938795:android:d4dcc5ebb582b9eb0a952e",
+        "android_client_info": {
+          "package_name": "com.futquick.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBolKxrRh6xKsvReEP9ndjsqru23O2CjIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543613938795:android:3fabf6aad1ab2e610a952e",
+        "android_client_info": {
+          "package_name": "futquick.app.br"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBolKxrRh6xKsvReEP9ndjsqru23O2CjIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
