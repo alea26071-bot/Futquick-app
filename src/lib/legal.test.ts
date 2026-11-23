@@ -1,4 +1,4 @@
-import { test } from "bun:test";
+import { test } from "node:test";
 import assert from "node:assert/strict";
 import { canFinishWithLegal, isLegalDraft, isLegalTestEnvironment, TERMS_VERSION, PRIVACY_VERSION } from "./legal";
 
