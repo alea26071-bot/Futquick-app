@@ -3,7 +3,7 @@
 Identificador permanente: `com.futquick.app` · Nome: Futquick · Capacitor 8.
 
 ## Arquitetura escolhida
-O Futquick renderiza páginas no servidor e usa funções de servidor (login, pagamentos de dados, push, cron).
+O Futquick renderiza páginas no servidor e usa funções de servidor (login, dados, push, rotinas).
 Isso não pode ser empacotado como site estático sem reescrever o app. Por isso o app nativo abre o site
 publicado (`server.url = https://futquick-app.lovable.app`) dentro do WebView, com plugins nativos ativos.
 
