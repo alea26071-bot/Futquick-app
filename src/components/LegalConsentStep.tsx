@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, ChevronRight, FileText, ShieldCheck, Check, AlertTriangle } from "lucide-react";
-import { TERMS_DOC, PRIVACY_DOC, type LegalDoc } from "@/lib/legal";
+import { TERMS_DOC, PRIVACY_DOC, legalPendingItems, type LegalDoc } from "@/lib/legal";
 
 export function LegalConsentStep({
   accepted, onAcceptedChange, termsViewed, privacyViewed, onViewed, draft, testEnv,
@@ -26,7 +26,11 @@ export function LegalConsentStep({
           <AlertTriangle className="size-4 text-destructive shrink-0 mt-0.5" />
           <span>
             <b>RASCUNHO / EM REVISÃO.</b> Os documentos ainda têm dados pendentes dos responsáveis.{" "}
-            {testEnv ? "Conclusão liberada só para testes nesta prévia." : "A conclusão do cadastro está temporariamente indisponível."}
+            {testEnv ? "Conclusão liberada só para testes nesta prévia." : "Por isso, a conclusão de novos cadastros está temporariamente pausada no app oficial. Seus dados preenchidos não serão perdidos."}
+            <span className="block mt-1.5 text-white/60">Falta definir:</span>
+            <ul className="list-disc pl-4 text-white/60">
+              {legalPendingItems().map((i) => <li key={i}>{i}</li>)}
+            </ul>
           </span>
         </div>
       )}
@@ -55,6 +59,7 @@ export function LegalConsentStep({
       {(!termsViewed || !privacyViewed) && (
         <p className="mt-3 text-xs text-white/45 text-center">Abra os dois documentos para liberar a conclusão.</p>
       )}
+      <p className="mt-3 text-[11px] text-white/40 text-center">Ao concluir, registramos as versões aceitas e a data e hora do servidor.</p>
       {open && <LegalReader doc={open === "terms" ? TERMS_DOC : PRIVACY_DOC} draft={draft} onClose={() => setOpen(null)} />}
     </div>
   );

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
 import { LegalConsentStep } from "@/components/LegalConsentStep";
+import { describeSaveError } from "@/lib/save-error";
 import { TERMS_VERSION, PRIVACY_VERSION, isLegalDraft, isLegalTestEnvironment, canFinishWithLegal } from "@/lib/legal";
 import { StateCityPicker } from "@/components/StateCityPicker";
 import { uploadUserPhoto } from "@/lib/storage-helpers";
@@ -241,7 +242,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
           { user_id: userData.user.id, terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION },
           { onConflict: "user_id,terms_version,privacy_version", ignoreDuplicates: true },
         );
-      if (legalError) throw new Error("Não foi possível registrar seu aceite. Tente novamente.");
+      if (legalError) { console.error("[cadastro] aceite falhou", legalError.code); throw new Error(describeSaveError(legalError, "acceptance")); }
       const { data: acceptance } = await supabase
         .from("legal_acceptances").select("id")
         .eq("user_id", userData.user.id).eq("terms_version", TERMS_VERSION).eq("privacy_version", PRIVACY_VERSION)
@@ -268,11 +269,11 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
           ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         })
         .eq("id", userData.user.id);
-      if (error) throw error;
+      if (error) { console.error("[cadastro] perfil falhou", error.code); throw new Error(describeSaveError(error, "profile")); }
       toast.success("Bora jogar!");
       goAfterAuth();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao salvar perfil");
+      toast.error(e instanceof Error ? e.message : describeSaveError(e, "profile"));
     } finally {
       finishingRef.current = false;
       setSaving(false);

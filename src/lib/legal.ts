@@ -9,17 +9,29 @@ export const PRIVACY_VERSION = "1.0";
  * para `true` somente após revisão dos responsáveis.
  */
 export const LEGAL_PENDING = {
-  responsibleNamesFilled: false, // [NOME COMPLETO DO RESPONSÁVEL 1/2]
-  privacyEmailFilled: false, // [E-MAIL DE PRIVACIDADE A DEFINIR]
+  responsibleNamesFilled: true, // confirmado pelos responsáveis
+  privacyEmailFilled: true, // confirmado pelos responsáveis
+  legalTextsReviewed: false, // revisão final dos textos (itens "A CONFIRMAR")
   minorsPolicyConfirmed: false, // política de menores + consentimento verificável do responsável legal
 } as const;
 
-export const RESPONSIBLE_1 = "[NOME COMPLETO DO RESPONSÁVEL 1]";
-export const RESPONSIBLE_2 = "[NOME COMPLETO DO RESPONSÁVEL 2]";
-export const PRIVACY_EMAIL = "[E-MAIL DE PRIVACIDADE A DEFINIR]";
+// Operação atual por pessoas físicas, sem CNPJ informado.
+export const RESPONSIBLE_1 = "Eugenio Gomes Teixeira Filho"; // responsável principal / representante administrativo
+export const RESPONSIBLE_2 = "Pedro Augusto de Souza Duarte"; // coadministrador
+export const PRIVACY_EMAIL = "futquick.oficial@gmail.com";
+
+/** Itens ainda pendentes, exibidos na etapa de aceite. */
+export function legalPendingItems(p: { [K in keyof typeof LEGAL_PENDING]: boolean } = LEGAL_PENDING): string[] {
+  const out: string[] = [];
+  if (!p.responsibleNamesFilled) out.push("Nomes dos responsáveis");
+  if (!p.privacyEmailFilled) out.push("E-mail de privacidade");
+  if (!p.minorsPolicyConfirmed) out.push("Política para menores de 18 anos e consentimento do responsável legal");
+  if (!p.legalTextsReviewed) out.push("Revisão final dos textos (prazos de retenção, fornecedores, bases legais e demais itens marcados como A CONFIRMAR)");
+  return out;
+}
 
 export function isLegalDraft(p: { [K in keyof typeof LEGAL_PENDING]: boolean } = LEGAL_PENDING): boolean {
-  return !(p.responsibleNamesFilled && p.privacyEmailFilled && p.minorsPolicyConfirmed);
+  return Object.values(p).some((v) => !v);
 }
 
 /** Preview/dev permite testar com rascunho; o app publicado (e o app nativo, que carrega o site publicado) não. */
@@ -44,7 +56,7 @@ export const TERMS_DOC: LegalDoc = {
   version: TERMS_VERSION,
   sections: [
     { title: "1. Sobre o Futquick", body: [
-      `O Futquick é um aplicativo para encontrar, criar e organizar jogos esportivos presenciais (peladas e outras modalidades). É mantido por ${RESPONSIBLE_1} e ${RESPONSIBLE_2}, que decidem em conjunto sobre o serviço.`,
+      `O Futquick é um aplicativo para encontrar, criar e organizar jogos esportivos presenciais (peladas e outras modalidades). É mantido, como pessoas físicas, por ${RESPONSIBLE_1} (responsável principal e representante administrativo) e ${RESPONSIBLE_2} (coadministrador).`,
       "Ao concluir o cadastro, você declara que leu e concorda com estes Termos." ] },
     { title: "2. Cadastro e conta", body: [
       "Você deve informar dados verdadeiros (nome, idade, região e foto) e manter seu PIN ou login Google em sigilo. A conta é pessoal e intransferível.",
@@ -83,7 +95,7 @@ export const PRIVACY_DOC: LegalDoc = {
   version: PRIVACY_VERSION,
   sections: [
     { title: "1. Quem é responsável", body: [
-      `${RESPONSIBLE_1} e ${RESPONSIBLE_2}, fundadores do Futquick, decidem em conjunto sobre o tratamento dos seus dados e atuam como controladores conjuntos, nos termos da LGPD (Lei 13.709/2018).`,
+      `O Futquick é operado por pessoas físicas, sem CNPJ: ${RESPONSIBLE_1} (responsável principal e representante administrativo) e ${RESPONSIBLE_2} (coadministrador). A definição formal dos papéis de cada um perante a LGPD (Lei 13.709/2018) e das bases legais de cada tratamento está A CONFIRMAR.`,
       `Canal de privacidade: ${PRIVACY_EMAIL}.` ] },
     { title: "2. Dados que coletamos", body: [
       "Cadastro: nome, telefone (ou conta Google com nome e e-mail), idade, estado, cidade, raio de interesse e foto de perfil. O PIN é usado para login e não é exibido a ninguém.",

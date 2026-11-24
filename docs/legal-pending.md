@@ -18,3 +18,7 @@ Registro: tabela `legal_acceptances` (versões + `accepted_at` do servidor, úni
 - Localização em tempo real nas conversas privadas: funcionamento e retenção.
 - Analytics, anúncios (hoje desativados) e retenção de cada tipo de dado.
 - Ao mudar TERMS_VERSION/PRIVACY_VERSION, criar migration atualizando `require_legal_acceptance` com o novo par.
+
+## Atualização (nov/2026)
+- Preenchidos: responsável principal Eugenio Gomes Teixeira Filho; coadministrador Pedro Augusto de Souza Duarte; e-mail futquick.oficial@gmail.com; operação por pessoas físicas, sem CNPJ.
+- Continuam pendentes (bloqueiam conclusão no app publicado/APK): política para menores de 18 anos (`minorsPolicyConfirmed`) e revisão final dos textos (`legalTextsReviewed`): papéis LGPD/bases legais, retenção, fornecedores, prazo de exclusão, analytics, anúncios.
