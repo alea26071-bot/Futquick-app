@@ -50,7 +50,7 @@ function RevealButton({ shown, onToggle }: { shown: boolean; onToggle: () => voi
 
 
 import type { User } from "@supabase/supabase-js";
-import { ONBOARDING_STEPS as TOTAL_STEPS, NOTIFICATION_RADIUS_OPTIONS as RADIUS_OPTIONS, isOnboardingComplete, type OnboardingProfile } from "@/lib/onboarding";
+import { ONBOARDING_STEPS as TOTAL_STEPS, NOTIFICATION_RADIUS_OPTIONS as RADIUS_OPTIONS, isOnboardingComplete, MIN_AGE, type OnboardingProfile } from "@/lib/onboarding";
 
 type Mode = "signup" | "login";
 
@@ -124,7 +124,7 @@ export function AuthFlow({ user, profile }: { user?: User; profile?: OnboardingP
     step === 1 ? form.name.trim().length >= 2 :
     step === 2 ? phoneCheck.ok :
     step === 3 ? !!user || (validatePin(form.pin) && form.pin === form.pinConfirm) :
-    step === 4 ? !!form.age && Number(form.age) >= 8 && Number(form.age) <= 90 :
+    step === 4 ? !!form.age && Number(form.age) >= MIN_AGE && Number(form.age) <= 90 :
     step === 5 ? !!form.state && form.city.trim().length >= 2 :
     step === 6 ? radiusTouched || form.radius !== null :
     step === 7 ? !!avatarUrl && !uploadingAvatar :

@@ -10,7 +10,7 @@ export function FollowActivityPreference({ userId }: { userId: string }) {
   const qc = useQueryClient();
   const save = useServerFn(setFollowActivityPreference);
   const preference = useQuery({ queryKey: ["follow-activity-preference", userId], queryFn: async () => {
-    const { data, error } = await supabase.from("profiles").select("notify_follow_activity").eq("id", userId).single();
+    const { data, error } = await supabase.rpc("my_profile").single();
     if (error) throw error;
     return data.notify_follow_activity;
   } });

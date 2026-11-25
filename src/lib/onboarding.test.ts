@@ -29,3 +29,12 @@ test("foto do Google não substitui a conclusão das sete etapas", () => {
 test("perfil completo não precisa refazer o cadastro ao entrar novamente", () => {
   assert.equal(isOnboardingComplete(complete), true);
 });
+test("idade mínima de 13 anos", () => {
+  assert.equal(isOnboardingComplete({ ...complete, age: 12 }), false);
+  assert.equal(isOnboardingComplete({ ...complete, age: 13 }), true);
+});
+test("detecta contato na biografia", async () => {
+  const { hasContactInfo } = await import("./onboarding");
+  assert.equal(hasContactInfo("me chama no 11 98888-7777"), true);
+  assert.equal(hasContactInfo("Zagueiro raçudo"), false);
+});

@@ -10,7 +10,7 @@ export default defineTool({
   handler: async (_args, ctx) => {
     const userId = ctx.getUserId();
     if (!ctx.isAuthenticated() || !userId) return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
-    const { data, error } = await supabaseForUser(ctx).from("profiles").select("*").eq("id", userId).maybeSingle();
+    const { data, error } = await supabaseForUser(ctx).rpc("my_profile").maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     if (!data) return { content: [{ type: "text", text: "Profile not found" }], isError: true };
     const { phone: _phone, ...rest } = data as Record<string, unknown>;

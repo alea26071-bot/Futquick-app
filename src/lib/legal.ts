@@ -25,7 +25,7 @@ export function legalPendingItems(p: { [K in keyof typeof LEGAL_PENDING]: boolea
   const out: string[] = [];
   if (!p.responsibleNamesFilled) out.push("Nomes dos responsáveis");
   if (!p.privacyEmailFilled) out.push("E-mail de privacidade");
-  if (!p.minorsPolicyConfirmed) out.push("Política para menores de 18 anos e consentimento do responsável legal");
+  if (!p.minorsPolicyConfirmed) out.push("Política para adolescentes de 13 a 17 anos (idade mínima 13): bases legais e eventual participação do responsável legal");
   if (!p.legalTextsReviewed) out.push("Revisão final dos textos (prazos de retenção, fornecedores, bases legais e demais itens marcados como A CONFIRMAR)");
   return out;
 }
@@ -124,7 +124,7 @@ export const PRIVACY_DOC: LegalDoc = {
     { title: "10. Segurança", body: [
       "Buscamos adotar medidas técnicas e administrativas razoáveis para proteger seus dados. A descrição das medidas de segurança será publicada após auditoria técnica (A CONFIRMAR). Nenhum sistema é totalmente imune a incidentes; se ocorrer um incidente relevante, comunicaremos conforme a LGPD." ] },
     { title: "11. Crianças e adolescentes", body: [
-      "PENDENTE: a política para menores de 18 anos, incluindo consentimento específico e verificável de responsável legal para crianças e salvaguardas de melhor interesse, ainda será definida. Esta versão não resolve esse ponto." ] },
+      "O Futquick é destinado a pessoas com 13 anos ou mais. Para adolescentes, telefone, idade e localização exata não ficam visíveis para outros jogadores, e a biografia não aceita dados de contato. PENDENTE: as bases legais e a eventual participação do responsável legal para adolescentes de 13 a 17 anos ainda serão definidas. Esta versão não resolve esse ponto." ] },
     { title: "12. Seus direitos (LGPD)", body: [
       "Você pode pedir confirmação e acesso aos dados, correção, anonimização, bloqueio ou eliminação de dados desnecessários, portabilidade, informação sobre compartilhamentos, revogação de consentimento e revisão de decisões automatizadas. Também pode reclamar à ANPD.",
       `Para exercer seus direitos ou pedir a exclusão da conta, escreva para ${PRIVACY_EMAIL}. Prazo de resposta: A CONFIRMAR.` ] },

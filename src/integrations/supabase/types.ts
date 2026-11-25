@@ -665,6 +665,7 @@ export type Database = {
         Row: {
           age: number | null
           avatar_url: string | null
+          background_location_enabled: boolean
           bio: string | null
           city: string | null
           cover_photo_paths: string[]
@@ -695,6 +696,7 @@ export type Database = {
         Insert: {
           age?: number | null
           avatar_url?: string | null
+          background_location_enabled?: boolean
           bio?: string | null
           city?: string | null
           cover_photo_paths?: string[]
@@ -725,6 +727,7 @@ export type Database = {
         Update: {
           age?: number | null
           avatar_url?: string | null
+          background_location_enabled?: boolean
           bio?: string | null
           city?: string | null
           cover_photo_paths?: string[]
@@ -1054,6 +1057,46 @@ export type Database = {
       join_pelada: { Args: { _pelada_id: string }; Returns: string }
       leave_pelada: { Args: { _pelada_id: string }; Returns: string }
       max_slots_for: { Args: { _field: string }; Returns: number }
+      my_profile: {
+        Args: never
+        Returns: {
+          age: number | null
+          avatar_url: string | null
+          background_location_enabled: boolean
+          bio: string | null
+          city: string | null
+          cover_photo_paths: string[]
+          created_at: string
+          favorite_position: string | null
+          game_term: string | null
+          id: string
+          latitude: number | null
+          location_updated_at: string | null
+          longitude: number | null
+          name: string
+          notify_follow_activity: boolean
+          notify_radius_km: number | null
+          onboarding_complete: boolean
+          peladas_played: number
+          phone: string | null
+          phone_verified: boolean
+          postura_score: number
+          posture_average: number | null
+          rating_avg: number
+          stars_average: number | null
+          state: string | null
+          suspended_at: string | null
+          theme_preference: string
+          updated_at: string
+          username: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       pelada_group_maintenance: { Args: never; Returns: undefined }
       pending_game_ratings: {
         Args: never

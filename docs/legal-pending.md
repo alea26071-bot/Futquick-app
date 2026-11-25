@@ -5,7 +5,7 @@ Enquanto `LEGAL_PENDING` tiver algum `false`, o app publicado bloqueia "Concorda
 
 1. Preencher `[NOME COMPLETO DO RESPONSÁVEL 1]` e `[NOME COMPLETO DO RESPONSÁVEL 2]` (controladores conjuntos).
 2. Preencher `[E-MAIL DE PRIVACIDADE A DEFINIR]`.
-3. **CRÍTICO — menores:** o cadastro aceita idade a partir de 8 anos. Antes de liberar o cadastro público para menores é preciso definir política de menores, consentimento específico e verificável do responsável legal para crianças (LGPD art. 14), melhor interesse e salvaguardas (chat, localização, encontros presenciais). A tela atual NÃO resolve isso.
+3. **CRÍTICO — adolescentes:** idade mínima agora é 13 anos (app e banco). Telefone, idade e localização exata ficaram privados; biografia de menores de 18 não aceita contatos. Falta definir bases legais e eventual participação do responsável legal para 13–17 anos.
 4. Confirmar itens marcados "A CONFIRMAR": fornecedores e países, retenção pós-exclusão, prazo de resposta, analytics, localização em segundo plano, marketing, fluxo de exclusão de conta.
 5. Revisão jurídica. Ao mudar texto relevante, aumentar `TERMS_VERSION`/`PRIVACY_VERSION`.
 

@@ -2,10 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { distanceKm, effectiveRadiusKm } from "./notification-copy";
 
-test("raio máximo de aviso é 5 km", () => {
-  assert.equal(effectiveRadiusKm(10), 5);
+test("raio de aviso respeita a escolha", () => {
+  assert.equal(effectiveRadiusKm(10), 10);
   assert.equal(effectiveRadiusKm(2), 2);
-  assert.equal(effectiveRadiusKm(null), 5);
+  assert.equal(effectiveRadiusKm(null), 25);
 });
 
 test("pelada a ~4 km entra, a ~7 km fica de fora", () => {
@@ -25,4 +25,10 @@ test("lembrete diário usa o dia de Brasília", () => {
   const r = saoPauloDayStart(new Date("2026-11-22T02:00:00Z"));
   assert.equal(r.day, "2026-11-21");
   assert.equal(r.startIso, "2026-11-21T03:00:00.000Z");
+});
+
+test("raio escolhido 2/5/10 é respeitado e qualquer distância usa teto de 25 km", () => {
+  assert.equal(effectiveRadiusKm(5), 5);
+  assert.equal(effectiveRadiusKm(10), 10);
+  assert.equal(effectiveRadiusKm(null), 25);
 });

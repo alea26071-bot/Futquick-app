@@ -1,3 +1,5 @@
+/** Idade mínima para usar o Futquick. */
+export const MIN_AGE = 13;
 export const ONBOARDING_STEPS = 8;
 
 export const NOTIFICATION_RADIUS_OPTIONS = [
@@ -24,6 +26,14 @@ export function isOnboardingComplete(profile: OnboardingProfile | null | undefin
     !!profile.state &&
     (profile.city?.trim().length ?? 0) >= 2 &&
     (profile.name?.trim().length ?? 0) >= 2 &&
-    typeof profile.age === "number" && profile.age >= 8 && profile.age <= 90 &&
+    typeof profile.age === "number" && profile.age >= MIN_AGE && profile.age <= 90 &&
     (profile.notify_radius_km === null || [2, 5, 10].includes(profile.notify_radius_km ?? -1));
+}
+
+/** Detecta contato pessoal (telefone, e-mail, @rede, endereço) em textos públicos. */
+export function hasContactInfo(text: string): boolean {
+  const t = text.toLowerCase();
+  return /\d[\d\s().-]{7,}\d/.test(t) || /[\w.+-]+@[\w-]+\.[\w.]+/.test(t) ||
+    /(^|\s)@[a-z0-9_.]{3,}/.test(t) || /\b(rua|avenida|av\.|travessa|apto|apartamento)\s/.test(t) ||
+    /(instagram|whats|zap|tiktok|telegram|insta)\b/.test(t);
 }

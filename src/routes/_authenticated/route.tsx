@@ -12,9 +12,7 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) throw redirect({ to: "/auth" });
     // Fotos vindas do Google não substituem a conclusão do cadastro.
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("name, age, city, state, notify_radius_km, onboarding_complete, avatar_url, game_term")
-      .eq("id", data.user.id)
+      .rpc("my_profile")
       .maybeSingle();
     if (profileError) throw profileError;
     if (!isOnboardingComplete(profile)) throw redirect({ to: "/onboarding" });

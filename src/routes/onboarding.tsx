@@ -16,9 +16,7 @@ export const Route = createFileRoute("/onboarding")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
-    const { data: profile, error } = await supabase.from("profiles")
-      .select("name, phone, age, city, state, notify_radius_km, avatar_url, onboarding_complete")
-      .eq("id", data.user.id).maybeSingle();
+    const { data: profile, error } = await supabase.rpc("my_profile").maybeSingle();
     if (error) throw error;
     if (isOnboardingComplete(profile)) throw redirect({ to: "/descobrir" });
     return { user: data.user, profile };

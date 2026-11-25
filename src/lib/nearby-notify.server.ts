@@ -4,7 +4,7 @@ import { COPY, NEARBY_MAX_KM, distanceKm, effectiveRadiusKm } from "@/lib/notifi
 
 type Point = { latitude: number; longitude: number };
 
-/** Usuários com localização dentro do raio (máx. 5 km) do ponto. */
+/** Usuários com localização dentro do raio (raio do usuário; qualquer distância = teto NEARBY_MAX_KM) do ponto. */
 export async function usersNear(p: Point, excludeId?: string) {
   const dLat = NEARBY_MAX_KM / 111;
   const dLng = NEARBY_MAX_KM / (111 * Math.max(Math.cos((p.latitude * Math.PI) / 180), 0.1));

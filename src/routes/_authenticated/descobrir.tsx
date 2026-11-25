@@ -55,7 +55,7 @@ function DescobrirPage() {
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      const { data } = await supabase.rpc("my_profile").maybeSingle();
       return data;
     },
   });

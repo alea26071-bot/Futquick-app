@@ -1,5 +1,7 @@
 // Textos das notificações push — troque aqui pelas frases definitivas.
-export const NEARBY_MAX_KM = 5;
+/** Raio escolhido (2/5/10 km) é respeitado; "qualquer distância" usa este teto só para push, evitando avisos de outras cidades. */
+export const NEARBY_MAX_KM = 25;
+export const NOTIFY_RADIUS_CHOICES = [2, 5, 10] as const;
 
 /** Convite único para ativar o push após o cadastro. */
 export const PUSH_PROMPT = {
@@ -35,7 +37,8 @@ export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: numbe
 
 /** Raio efetivo do usuário: o escolhido, limitado a 5 km. */
 export function effectiveRadiusKm(chosen: number | null | undefined): number {
-  return Math.min(chosen ?? NEARBY_MAX_KM, NEARBY_MAX_KM);
+  if (chosen == null) return NEARBY_MAX_KM;
+  return (NOTIFY_RADIUS_CHOICES as readonly number[]).includes(chosen) ? chosen : Math.min(Math.max(chosen, 0), NEARBY_MAX_KM);
 }
 
 /** Início do dia em São Paulo (UTC-3), usado para "um aviso por dia". */

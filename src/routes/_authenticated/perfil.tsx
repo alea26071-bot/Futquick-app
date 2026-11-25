@@ -1,3 +1,4 @@
+import { MIN_AGE, hasContactInfo } from "@/lib/onboarding";
 import { reputationValue } from "@/lib/reputation";
 import { isNativeApp } from "@/lib/native/platform";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -75,7 +76,7 @@ function PerfilPage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      const { data } = await supabase.rpc("my_profile").maybeSingle();
       return data;
     },
   });
@@ -162,6 +163,9 @@ function PerfilPage() {
   }, [profile]);
 
   const save = async () => {
+    const ageNum = form.age ? parseInt(form.age, 10) : null;
+    if (ageNum != null && ageNum < MIN_AGE) return toast.error(`Idade mínima: ${MIN_AGE} anos.`);
+    if (ageNum != null && ageNum < 18 && hasContactInfo(form.bio)) return toast.error("Por segurança, não coloque telefone, e-mail, endereço ou redes sociais na biografia.");
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -170,7 +174,6 @@ function PerfilPage() {
         city: form.city.trim() || null,
         age: form.age ? parseInt(form.age, 10) : null,
         favorite_position: form.favorite_position || null,
-        onboarding_complete: true,
       })
       .eq("id", user.id);
     if (error) return toast.error(error.message);

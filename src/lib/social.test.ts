@@ -15,8 +15,8 @@ test("paginação social não aceita posições negativas e busca é limitada", 
 });
 test("atividade social respeita raio escolhido sem ultrapassar os 5 km existentes", () => {
   assert.equal(effectiveRadiusKm(2), 2);
-  assert.equal(effectiveRadiusKm(10), 5);
-  assert.equal(effectiveRadiusKm(null), 5);
+  assert.equal(effectiveRadiusKm(10), 10);
+  assert.equal(effectiveRadiusKm(null), 25);
   assert.ok(distanceKm(0, 0, 0, 0.018) > effectiveRadiusKm(1));
   assert.ok(distanceKm(0, 0, 0, 0.018) < effectiveRadiusKm(3));
 });

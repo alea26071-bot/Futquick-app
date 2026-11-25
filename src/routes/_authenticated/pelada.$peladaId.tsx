@@ -53,7 +53,7 @@ function PeladaDetailPage() {
     queryKey: ["profile", pelada?.organizer_id],
     queryFn: async () => {
       if (!pelada) return null;
-      const { data } = await supabase.from("profiles").select("*").eq("id", pelada.organizer_id).maybeSingle();
+      const { data } = await supabase.from("profiles").select("id, name, avatar_url, posture_average, stars_average, city, state").eq("id", pelada.organizer_id).maybeSingle();
       return data;
     },
     enabled: !!pelada,
