@@ -13,8 +13,7 @@ export default defineTool({
     const { data, error } = await supabaseForUser(ctx).rpc("my_profile").maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     if (!data) return { content: [{ type: "text", text: "Profile not found" }], isError: true };
-    const { phone: _phone, ...rest } = data as Record<string, unknown>;
-    const profile = JSON.parse(JSON.stringify(rest)) as Record<string, string | number | boolean | null>;
+    const profile = { id: data.id, name: data.name, city: data.city, state: data.state, stars_average: data.stars_average, posture_average: data.posture_average, peladas_played: data.peladas_played };
     return { content: [{ type: "text", text: JSON.stringify(profile) }], structuredContent: { profile } };
   },
 });

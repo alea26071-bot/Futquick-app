@@ -1,6 +1,5 @@
 // Textos das notificações push — troque aqui pelas frases definitivas.
-/** Raio escolhido (2/5/10 km) é respeitado; "qualquer distância" usa este teto só para push, evitando avisos de outras cidades. */
-export const NEARBY_MAX_KM = 25;
+/** Preferência do perfil: null = sem limite geográfico; ausência/valor inválido falha fechado. */
 export const NOTIFY_RADIUS_CHOICES = [2, 5, 10] as const;
 
 /** Convite único para ativar o push após o cadastro. */
@@ -32,14 +31,24 @@ export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: numbe
   const dLat = r(bLat - aLat);
   const dLng = r(bLng - aLng);
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(aLat)) * Math.cos(r(bLat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * 6371 * Math.asin(Math.sqrt(h));
+  return 2 * 6371 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, h))));
 }
 
-/** Raio efetivo do usuário: o escolhido, limitado a 5 km. */
+/** null não é ausência de preferência: significa Qualquer distância. */
 export function effectiveRadiusKm(chosen: number | null | undefined): number {
-  if (chosen == null) return NEARBY_MAX_KM;
-  return (NOTIFY_RADIUS_CHOICES as readonly number[]).includes(chosen) ? chosen : Math.min(Math.max(chosen, 0), NEARBY_MAX_KM);
+  if (chosen === null) return Infinity;
+  return typeof chosen === "number" && (NOTIFY_RADIUS_CHOICES as readonly number[]).includes(chosen) ? chosen : 0;
 }
+
+export function withinPreferredRadius(radius: number | null | undefined, aLat: number | null, aLng: number | null, bLat: number, bLng: number): boolean {
+  if (radius === null) return true;
+  if (aLat === null || aLng === null || ![aLat, aLng, bLat, bLng].every(Number.isFinite) || Math.abs(aLat) > 90 || Math.abs(bLat) > 90 || Math.abs(aLng) > 180 || Math.abs(bLng) > 180) return false;
+  const limit = effectiveRadiusKm(radius);
+  return limit > 0 && distanceKm(aLat, aLng, bLat, bLng) <= limit;
+}
+
+/** Até três pushes de novas peladas por dia; demais jogos continuam no app e no feed. */
+export function shouldSendNearbyPush(previousToday: number): boolean { return previousToday < 3; }
 
 /** Início do dia em São Paulo (UTC-3), usado para "um aviso por dia". */
 export function saoPauloDayStart(now: Date = new Date()): { day: string; startIso: string } {

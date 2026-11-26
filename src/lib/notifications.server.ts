@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPush } from "@/lib/web-push.server";
 import { sendToNativeDevices } from "@/lib/native-devices.server";
+import { saoPauloDayStart, shouldSendNearbyPush, withinPreferredRadius } from "@/lib/notification-copy";
 
 export type NotifyInput = {
   userId: string;
@@ -25,6 +26,21 @@ export async function notifyUser(input: NotifyInput): Promise<{ delivered: numbe
     if (existing) return { delivered: 0, skipped: true };
   }
 
+  let nearbyPushAllowed = true;
+  if (input.type === "nearby_pelada") {
+    const peladaId = input.data?.peladaId;
+    if (typeof peladaId !== "string") return { delivered: 0, skipped: true };
+    const [{ data: profile, error: profileError }, { data: game, error: gameError }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("notify_radius_km,latitude,longitude,suspended_at,onboarding_complete").eq("id", input.userId).maybeSingle(),
+      supabaseAdmin.from("peladas").select("latitude,longitude,status,organizer_id,starts_at").eq("id", peladaId).maybeSingle(),
+    ]);
+    if (profileError || gameError) throw new Error("Não foi possível verificar o raio do aviso.");
+    if (!profile?.onboarding_complete || profile.suspended_at || !game || game.status !== "open" || new Date(game.starts_at).getTime() <= Date.now() || game.organizer_id === input.userId || !withinPreferredRadius(profile.notify_radius_km, profile.latitude, profile.longitude, game.latitude, game.longitude)) return { delivered: 0, skipped: true };
+    const { count, error: countError } = await supabaseAdmin.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", input.userId).eq("type", "nearby_pelada").gte("created_at", saoPauloDayStart().startIso);
+    if (countError) throw new Error("Não foi possível verificar a frequência dos avisos.");
+    nearbyPushAllowed = shouldSendNearbyPush(count ?? 0);
+  }
+
   const { error } = await supabaseAdmin.from("notifications").insert({
     user_id: input.userId,
     type: input.type,
@@ -34,7 +50,10 @@ export async function notifyUser(input: NotifyInput): Promise<{ delivered: numbe
     data: (input.data ?? {}) as never,
     dedupe_key: input.dedupeKey ?? null,
   });
-  if (error) console.error("[notify] insert failed", error.message);
+  // A unicidade no banco, e não o pré-check, decide corridas simultâneas.
+  if (error?.code === "23505") return { delivered: 0, skipped: true };
+  if (error) throw new Error("Não foi possível registrar a notificação.");
+  if (!nearbyPushAllowed) return { delivered: 0 };
 
   // Respeita "Silenciar notificações" por pelada: registra no app, mas não envia push.
   const peladaId = typeof input.data?.peladaId === "string" ? input.data.peladaId : null;

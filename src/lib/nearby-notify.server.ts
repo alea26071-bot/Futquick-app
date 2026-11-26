@@ -1,30 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { notifyUser } from "@/lib/notifications.server";
-import { COPY, NEARBY_MAX_KM, distanceKm, effectiveRadiusKm } from "@/lib/notification-copy";
-
-type Point = { latitude: number; longitude: number };
-
-/** Usuários com localização dentro do raio (raio do usuário; qualquer distância = teto NEARBY_MAX_KM) do ponto. */
-export async function usersNear(p: Point, excludeId?: string) {
-  const dLat = NEARBY_MAX_KM / 111;
-  const dLng = NEARBY_MAX_KM / (111 * Math.max(Math.cos((p.latitude * Math.PI) / 180), 0.1));
-  const { data } = await supabaseAdmin
-    .from("profiles")
-    .select("id, latitude, longitude, notify_radius_km, suspended_at")
-    .gte("latitude", p.latitude - dLat)
-    .lte("latitude", p.latitude + dLat)
-    .gte("longitude", p.longitude - dLng)
-    .lte("longitude", p.longitude + dLng)
-    .is("suspended_at", null)
-    .limit(2000);
-  return (data ?? []).filter(
-    (u) =>
-      u.id !== excludeId &&
-      u.latitude != null &&
-      u.longitude != null &&
-      distanceKm(p.latitude, p.longitude, u.latitude, u.longitude) <= effectiveRadiusKm(u.notify_radius_km),
-  );
-}
+import { COPY } from "@/lib/notification-copy";
 
 export async function notifyNearbyPeladaCreated(peladaId: string) {
   const { data: p } = await supabaseAdmin
@@ -33,19 +9,21 @@ export async function notifyNearbyPeladaCreated(peladaId: string) {
     .eq("id", peladaId)
     .maybeSingle();
   if (!p || p.status !== "open" || p.latitude == null || p.longitude == null) return 0;
-  const users = await usersNear({ latitude: p.latitude, longitude: p.longitude }, p.organizer_id);
   let sent = 0;
-  for (const u of users) {
-    const { data: blocked } = await supabaseAdmin.rpc("is_blocked", { _a: u.id, _b: p.organizer_id });
-    if (blocked) continue;
-    await notifyUser({
-      userId: u.id,
-      type: "nearby_pelada",
-      ...COPY.nearbyPelada(p.name),
-      url: `/pelada/${p.id}`,
-      dedupeKey: `nearby:${p.id}:${u.id}`,
-    });
-    sent++;
+  let after: string | undefined;
+  while (true) {
+    const { data: users, error } = await supabaseAdmin.rpc("nearby_recipients", { _pelada_id: p.id, _limit: 500, ...(after ? { _after: after } : {}) });
+    if (error) throw new Error("Não foi possível consultar os destinatários dos jogos.");
+    for (const u of users ?? []) {
+      const result = await notifyUser({
+        userId: u.id, type: "nearby_pelada", ...COPY.nearbyPelada(p.name),
+        url: `/pelada/${p.id}`, data: { peladaId: p.id }, dedupeKey: `nearby:${p.id}:${u.id}`,
+      });
+      if (!result.skipped) sent++;
+    }
+    const last = users?.at(-1);
+    if (!last || (users?.length ?? 0) < 500) break;
+    after = last.id;
   }
   return sent;
 }

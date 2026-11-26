@@ -54,7 +54,7 @@ function PlayerProfilePage() {
     queryKey: ["player-profile", userId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("id, name, username, avatar_url, cover_photo_paths, bio, city, state, favorite_position, posture_average, stars_average, peladas_played, phone_verified, created_at")
         .eq("id", userId)
         .maybeSingle();

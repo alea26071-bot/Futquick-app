@@ -237,6 +237,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pelada_attendance_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pelada_attendance_pelada_id_fkey"
             columns: ["pelada_id"]
             isOneToOne: false
@@ -248,6 +255,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_attendance_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -388,6 +402,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pelada_posture_ratings_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pelada_posture_ratings_pelada_id_fkey"
             columns: ["pelada_id"]
             isOneToOne: false
@@ -399,6 +420,13 @@ export type Database = {
             columns: ["rated_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pelada_posture_ratings_rated_id_fkey"
+            columns: ["rated_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -799,6 +827,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "push_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       push_subscriptions: {
@@ -1000,7 +1035,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          cover_photo_paths: string[] | null
+          created_at: string | null
+          favorite_position: string | null
+          id: string | null
+          name: string | null
+          peladas_played: number | null
+          phone_verified: boolean | null
+          posture_average: number | null
+          stars_average: number | null
+          state: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: never
+          city?: string | null
+          cover_photo_paths?: string[] | null
+          created_at?: string | null
+          favorite_position?: string | null
+          id?: string | null
+          name?: string | null
+          peladas_played?: number | null
+          phone_verified?: boolean | null
+          posture_average?: number | null
+          stars_average?: number | null
+          state?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: never
+          city?: string | null
+          cover_photo_paths?: string[] | null
+          created_at?: string | null
+          favorite_position?: string | null
+          id?: string | null
+          name?: string | null
+          peladas_played?: number | null
+          phone_verified?: boolean | null
+          posture_average?: number | null
+          stars_average?: number | null
+          state?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_pelada_participant: {
@@ -1035,7 +1120,68 @@ export type Database = {
         Args: { _pelada_id: string; _user_id: string }
         Returns: undefined
       }
+      discover_peladas: {
+        Args: {
+          _before?: string
+          _five_km?: boolean
+          _free?: boolean
+          _limit?: number
+          _offset?: number
+          _sports?: string[]
+        }
+        Returns: {
+          address: string
+          auto_approve: boolean
+          chat_cleanup_started_at: string | null
+          chat_purged_at: string | null
+          city: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          field_type: string
+          filled_slots: number
+          group_mode: string
+          id: string
+          latitude: number
+          level: string
+          likes_count: number
+          location_name: string
+          longitude: number
+          name: string
+          organizer_id: string
+          photo_url: string | null
+          price_cents: number
+          rating_reminder_sent_at: string | null
+          starts_at: string
+          status: string
+          template_id: string | null
+          total_slots: number
+          updated_at: string
+          waitlist_enabled: boolean
+          was_recurring: boolean
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "peladas"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      game_distance_km: {
+        Args: { a_lat: number; a_lng: number; b_lat: number; b_lng: number }
+        Returns: number
+      }
       game_ready_for_ratings: { Args: { _pelada_id: string }; Returns: boolean }
+      game_within_radius: {
+        Args: {
+          _radius: number
+          a_lat: number
+          a_lng: number
+          b_lat: number
+          b_lng: number
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1097,6 +1243,13 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      nearby_game_count: { Args: { _user_id: string }; Returns: number }
+      nearby_recipients: {
+        Args: { _after?: string; _limit?: number; _pelada_id: string }
+        Returns: {
+          id: string
+        }[]
+      }
       pelada_group_maintenance: { Args: never; Returns: undefined }
       pending_game_ratings: {
         Args: never
@@ -1106,6 +1259,7 @@ export type Database = {
           pending_count: number
         }[]
       }
+      profile_bio_has_contact: { Args: { _text: string }; Returns: boolean }
       prune_inactive_templates: { Args: never; Returns: number }
       purge_expired_conversation: {
         Args: { _pelada_id: string }
@@ -1121,6 +1275,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      registration_is_open: { Args: never; Returns: boolean }
       remove_pelada_participant: {
         Args: { _pelada_id: string; _user_id: string }
         Returns: string
@@ -1145,6 +1300,10 @@ export type Database = {
       transfer_pelada: {
         Args: { _new_organizer: string; _pelada_id: string }
         Returns: undefined
+      }
+      valid_member_thread: {
+        Args: { _organizer_id: string; _pelada_id: string; _player_id: string }
+        Returns: boolean
       }
     }
     Enums: {

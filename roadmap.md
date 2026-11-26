@@ -50,3 +50,9 @@
 - [x] Notificações de pelada com silenciar por grupo; denúncias e bloqueio.
 - [ ] Tela de denúncias no painel adm (banco já pronto).
 - [ ] Destaque de amigos nos cards do feed.
+
+## Revisão prioritária atual
+- [ ] Bloquear criação de novas contas antes da liberação legal, preservando logins existentes.
+- [ ] Auditar privacidade de profiles, validar bio no banco e restringir conversas a membros do mesmo jogo.
+- [ ] Unificar raio de lista/mapa e avisos, sem teto geográfico para Qualquer distância e com paginação.
+- [ ] Executar testes, verificar bloqueio visível sem criar contas e documentar entrega/limitações.

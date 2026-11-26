@@ -33,7 +33,7 @@ export function isOnboardingComplete(profile: OnboardingProfile | null | undefin
 /** Detecta contato pessoal (telefone, e-mail, @rede, endereço) em textos públicos. */
 export function hasContactInfo(text: string): boolean {
   const t = text.toLowerCase();
-  return /\d[\d\s().-]{7,}\d/.test(t) || /[\w.+-]+@[\w-]+\.[\w.]+/.test(t) ||
-    /(^|\s)@[a-z0-9_.]{3,}/.test(t) || /\b(rua|avenida|av\.|travessa|apto|apartamento)\s/.test(t) ||
-    /(instagram|whats|zap|tiktok|telegram|insta)\b/.test(t);
+  return /\d[\d\s().-]{7,}\d/.test(t) || /[a-z0-9_.+-]+@[a-z0-9.-]+\.[a-z]{2,}/.test(t) ||
+    /(^|\s)@[a-z0-9_.]+/.test(t) || /\b(rua|avenida|av\.|travessa|apto|apartamento|cep|cpf|rg)\s/.test(t) ||
+    /https?:\/\/|www\.|\b(instagram|whats|zap|tiktok|telegram|insta|facebook|discord)\b/.test(t);
 }

@@ -224,6 +224,8 @@ export const openChatThread = createServerFn({ method: "POST" })
     if (organizerId !== context.userId && data.otherUserId !== organizerId) {
       throw new Error("Conversa permitida apenas com o organizador");
     }
+    const { data: member, error: membershipError } = await context.supabase.rpc("valid_member_thread", { _pelada_id: pelada.id, _organizer_id: organizerId, _player_id: playerId });
+    if (membershipError || !member) throw new Error("O chat é liberado apenas para participantes confirmados da mesma pelada.");
 
     const { data: existing } = await context.supabase
       .from("chat_threads")
