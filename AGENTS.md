@@ -26,3 +26,4 @@
 - Native Android/iOS apps are a Capacitor shell loading the published SSR site (server.url); native features run only behind `isNativeApp()` so the browser experience and Web Push stay unchanged.
 - Native push tokens live in `push_devices` and are sent through the Firebase Cloud Messaging connector from the same notification helpers as Web Push, so each device receives one channel.
 - AdMob stays disabled unless the public enable flag is set and uses only Google test units until real IDs are configured.
+- Scope registration document presentation under `.legal-documents` with semantic theme tokens and Radix dialog focus management so legal copy and unrelated screens remain unchanged.

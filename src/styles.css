@@ -217,6 +217,25 @@ html.light {
 .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-pulse-ring { animation: pulseRing 2s infinite ease-in-out; }
 
+/* Registration document colors and focus stay local, including portaled readers. */
+.legal-documents { overflow-wrap: anywhere; }
+.legal-documents h1, .legal-documents h2, .legal-documents h3 { letter-spacing: 0; }
+.legal-documents a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.legal-documents a:hover { color: var(--foreground); }
+.legal-documents :is(button, input, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.legal-reader { height: 100dvh; }
+.legal-reader-header { padding-top: max(24px, env(safe-area-inset-top)); }
+.legal-reader-footer { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+.legal-reader-body > section { width: 100%; max-width: 70ch; margin-inline: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .legal-documents.animate-slide-up { animation: none; }
+  .legal-documents button { transition: none; }
+  .legal-documents button:active { transform: none; }
+}
+
 /* ---------------------------------------------------------------
  * Light-mode overrides for legacy hardcoded utility classes.
  * Instead of rewriting every text-white / bg-navy across the app,

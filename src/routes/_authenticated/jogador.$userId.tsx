@@ -177,7 +177,7 @@ function PlayerProfilePage() {
   const isMe = user.id === userId;
   return (
     <main className="profile-page min-h-screen bg-background pb-12 text-foreground">
-      <ProfileCover paths={profile.cover_photo_paths} fallback={profile.avatar_url} name={profile.name}>
+      <ProfileCover paths={profile.cover_photo_paths ?? []} fallback={profile.avatar_url} name={profile.name ?? "Jogador"}>
         <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <Button aria-label="Voltar" variant="ghost" size="icon" onClick={() => window.history.back()} className="profile-cover-action">
             <ArrowLeft className="size-6" strokeWidth={2.5} />
@@ -237,7 +237,7 @@ function PlayerProfilePage() {
         )}
 
         <div className="profile-stats mt-7 grid grid-cols-3 gap-3">
-          <Stat icon={<CircleUserRound />} value={profile.peladas_played} label={plural} tone="primary" />
+          <Stat icon={<CircleUserRound />} value={profile.peladas_played ?? "—"} label={plural} tone="primary" />
           <Stat icon={<Star />} value={reputationValue(profile.stars_average)} label="Nível" tone="warning" />
           <Stat icon={<ShieldCheck />} value={reputationValue(profile.posture_average,true)} label="Postura" tone="success" />
         </div>
